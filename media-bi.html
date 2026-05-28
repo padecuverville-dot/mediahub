@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Media Intelligence Dashboard — Mxplorer</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts@3.49.0/dist/apexcharts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07090f;
+  --bg2:#0c1019;
+  --bg3:#101522;
+  --card:#121b2e;
+  --card2:#182236;
+  --border:#1c2d47;
+  --border2:#243a58;
+  --text:#dce8f5;
+  --text2:#8ba4c0;
+  --text3:#4d6a8a;
+  --accent:#00c9ff;
+  --accent2:#0077ff;
+  --green:#00e5b0;
+  --amber:#ffb547;
+  --red:#ff6b6b;
+  --purple:#b47cff;
+  --c-tv:#00c9ff;
+  --c-press:#b47cff;
+  --c-ooh:#00e5b0;
+  --c-dig:#ffb547;
+  --c-radio:#ff6b6b;
+  --c-cinema:#ff9de2;
+  --radius:10px;
+  --shadow:0 4px 24px rgba(0,0,0,.4);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;font-size:14px;line-height:1.5;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── UPLOAD SCREEN ─────────────────────────────────── */
+#uploadScreen{
+  position:fixed;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:200;padding:24px;
+  background-image:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(0,119,255,.07) 0%,transparent 70%);
+}
+.upload-logo{display:flex;align-items:center;gap:12px;margin-bottom:40px}
+.upload-logo-icon{
+  width:44px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  box-shadow:0 0 24px rgba(0,201,255,.3);
+}
+.upload-logo-text{font-size:22px;font-weight:800;letter-spacing:-0.5px;color:var(--text)}
+.upload-logo-text span{color:var(--accent)}
+
+.upload-card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:40px;max-width:540px;width:100%;text-align:center;
+  box-shadow:var(--shadow);
+}
+.upload-title{font-size:20px;font-weight:700;color:var(--text);margin-bottom:8px}
+.upload-desc{font-size:13px;color:var(--text3);margin-bottom:28px;line-height:1.7}
+
+.drop-zone{
+  border:2px dashed var(--border2);border-radius:12px;padding:40px 24px;
+  cursor:pointer;transition:all .2s;position:relative;background:var(--bg2);
+}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--accent);background:rgba(0,201,255,.04)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{font-size:36px;margin-bottom:12px;display:block}
+.drop-label{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:4px}
+.drop-hint{font-size:12px;color:var(--text3)}
+
+.upload-specs{
+  display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;justify-content:center
+}
+.spec-pill{
+  background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  padding:4px 10px;font-size:11px;color:var(--text3);
+  font-family:'IBM Plex Mono',monospace;
+}
+.spec-pill strong{color:var(--text2)}
+
+.upload-progress{display:none;margin-top:20px;text-align:center}
+.upload-progress.show{display:block}
+.progress-bar-wrap{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin:10px 0}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));width:0%;transition:width .3s;border-radius:2px}
+.progress-label{font-size:12px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
+
+.upload-error{display:none;margin-top:16px;background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.3);border-radius:8px;padding:12px;font-size:12px;color:var(--red)}
+.upload-error.show{display:block}
+
+.col-mapping{display:none;margin-top:20px;text-align:left}
+.col-mapping.show{display:block}
+.col-mapping-title{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px}
+.col-map-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;margin-bottom:8px;font-size:12px}
+.col-map-label{color:var(--text3)}
+.col-map-arrow{color:var(--border2);font-size:10px}
+.col-map-select{background:var(--bg2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:'Syne',sans-serif;font-size:12px;padding:4px 8px;outline:none;width:100%}
+.col-map-select:focus{border-color:var(--accent)}
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  border:none;border-radius:8px;color:#fff;font-family:'Syne',sans-serif;
+  font-size:14px;font-weight:700;padding:12px 28px;cursor:pointer;
+  transition:all .2s;margin-top:16px;width:100%;letter-spacing:.3px;
+}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,119,255,.4)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* ── DASHBOARD ──────────────────────────────────────── */
+#dashboard{display:none}
+#dashboard.show{display:block}
+
+/* HEADER */
+.site-header{
+  background:rgba(12,16,25,.95);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;position:sticky;top:0;z-index:100;height:56px;
+  display:flex;align-items:center;gap:16px;
+}
+.hdr-logo{display:flex;align-items:center;gap:10px}
+.hdr-logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:15px}
+.hdr-logo-text{font-size:15px;font-weight:800;letter-spacing:-.3px}
+.hdr-logo-text span{color:var(--accent)}
+.hdr-sep{width:1px;height:24px;background:var(--border);flex-shrink:0}
+.hdr-badge{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text3);background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:2px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn-reset-file{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text3);font-family:'Syne',sans-serif;font-size:11px;padding:4px 10px;cursor:pointer;transition:all .15s}
+.btn-reset-file:hover{border-color:var(--accent);color:var(--accent)}
+.btn-export-ppt{
+  display:flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#c2185b,#e91e63);
+  border:none;border-radius:6px;color:#fff;
+  font-family:'Syne',sans-serif;font-size:11px;font-weight:700;
+  padding:5px 12px;cursor:pointer;transition:all .2s;letter-spacing:.3px;
+  white-space:nowrap;
+}
+.btn-export-ppt:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 3px 12px rgba(233,30,99,.35)}
+.btn-export-ppt:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-export-ppt .ppt-icon{font-size:13px}
+
+/* EXPORT TOAST */
+#exportToast{
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:var(--card2);border:1px solid var(--border2);border-radius:10px;
+  padding:12px 18px;font-size:12px;color:var(--text2);
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+  transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;
+}
+#exportToast.show{transform:translateY(0);opacity:1}
+#exportToast .toast-icon{font-size:16px}
+
+/* MAIN */
+.main{padding:20px 28px 40px;max-width:1600px;margin:0 auto}
+
+/* FILTERS */
+.filters-row{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px 18px;margin-bottom:20px;
+}
+.filter-group{display:flex;align-items:center;gap:7px}
+.filter-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+.filter-select{
+  background:var(--bg2);border:1px solid var(--border2);border-radius:7px;
+  color:var(--text);font-family:'Syne',sans-serif;font-size:12px;font-weight:500;
+  padding:6px 28px 6px 10px;cursor:pointer;outline:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%234d6a8a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 9px center;
+  transition:border-color .15s;min-width:140px;max-width:200px;
+}
+.filter-select:focus{border-color:var(--accent)}
+.btn-filter-reset{
+  background:transparent;border:1px solid var(--border);border-radius:7px;
+  color:var(--text3);font-family:'Syne',sans-serif;font-size:11px;font-weight:600;
+  padding:6px 12px;cursor:pointer;transition:all .15s;margin-left:auto;white-space:nowrap;
+}
+.btn-filter-reset:hover{border-color:var(--red);color:var(--red)}
+
+/* KPI CARDS */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+@media(max-width:1000px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.kpi-row{grid-template-columns:1fr}}
+.kpi-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px 20px;position:relative;overflow:hidden;
+}
+.kpi-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--kpi-color,var(--accent));border-radius:var(--radius) var(--radius) 0 0;
+}
+.kpi-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.kpi-value{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:500;color:var(--text);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:7px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:2px;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;font-family:'IBM Plex Mono',monospace}
+.badge-up{background:rgba(0,229,176,.12);color:var(--green)}
+.badge-down{background:rgba(255,107,107,.12);color:var(--red)}
+.badge-neutral{background:rgba(139,164,192,.1);color:var(--text2)}
+
+/* SECTION TITLES */
+.sec-title{
+  font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;
+  letter-spacing:1.2px;margin-bottom:14px;display:flex;align-items:center;gap:10px;
+}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.sec-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0}
+
+/* GRIDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.g3-1{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:20px}
+.g1{margin-bottom:20px}
+@media(max-width:1050px){.g2,.g3-1{grid-template-columns:1fr}}
+
+/* CHART CARDS */
+.cc{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.cc-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px}
+.cc-sub{font-size:11px;color:var(--text3);margin-bottom:16px;line-height:1.5}
+
+/* CHART VIEW TABS */
+.c-tabs{display:flex;gap:3px;background:var(--bg2);border-radius:7px;padding:3px;width:fit-content;margin-bottom:14px}
+.c-tab{background:transparent;border:none;border-radius:5px;color:var(--text3);cursor:pointer;font-family:'Syne',sans-serif;font-size:11px;font-weight:600;padding:5px 11px;transition:all .15s}
+.c-tab.active{background:var(--card2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+
+/* INSIGHTS */
+.insights-wrap{
+  background:linear-gradient(135deg,rgba(0,201,255,.05),rgba(180,124,255,.05));
+  border:1px solid rgba(0,201,255,.15);border-radius:var(--radius);
+  padding:20px;margin-bottom:20px;
+}
+.insights-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.insights-hdr-text{font-size:13px;font-weight:700;color:var(--text)}
+.insights-hdr-sub{font-size:11px;color:var(--text3)}
+.insights-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:800px){.insights-grid{grid-template-columns:1fr}}
+.insight-item{
+  background:rgba(7,9,15,.5);border:1px solid var(--border);border-radius:8px;
+  padding:10px 14px;display:flex;gap:10px;align-items:flex-start;
+}
+.insight-emoji{font-size:16px;flex-shrink:0;margin-top:1px}
+.insight-txt{font-size:12px;color:var(--text2);line-height:1.6}
+.insight-txt strong{color:var(--text);font-weight:700}
+
+/* TABLE */
+.tbl-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.tbl-search{
+  background:var(--bg2);border:1px solid var(--border2);border-radius:7px;
+  color:var(--text);font-family:'Syne',sans-serif;font-size:12px;
+  padding:7px 12px;outline:none;width:200px;transition:border-color .15s;
+}
+.tbl-search:focus{border-color:var(--accent)}
+.tbl-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{
+  background:var(--bg3);color:var(--text3);font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.6px;padding:9px 12px;
+  border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;
+  cursor:pointer;user-select:none;position:sticky;top:0;
+}
+thead th:hover{color:var(--accent)}
+.sort-icon{margin-left:3px;font-size:9px;opacity:.4}
+.sort-asc .sort-icon::after{content:'▲';opacity:1}
+.sort-desc .sort-icon::after{content:'▼';opacity:1}
+th:not(.sort-asc):not(.sort-desc) .sort-icon::after{content:'⇅'}
+tbody tr{border-bottom:1px solid rgba(28,45,71,.5);transition:background .1s}
+tbody tr:hover{background:rgba(24,34,54,.6)}
+tbody td{padding:8px 12px;color:var(--text);vertical-align:middle}
+td.mono{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text2)}
+td.num{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);font-weight:500;text-align:right}
+.m-pill{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:.3px}
+.m-TV{background:rgba(0,201,255,.12);color:var(--c-tv)}
+.m-PRESS{background:rgba(180,124,255,.12);color:var(--c-press)}
+.m-OOH{background:rgba(0,229,176,.12);color:var(--c-ooh)}
+.m-DIG{background:rgba(255,181,71,.12);color:var(--c-dig)}
+.m-RADIO{background:rgba(255,107,107,.12);color:var(--c-radio)}
+.m-CINEMA{background:rgba(255,157,226,.12);color:var(--c-cinema)}
+.m-OTHER{background:rgba(139,164,192,.1);color:var(--text2)}
+.tbl-pag{display:flex;align-items:center;justify-content:space-between;padding-top:12px;flex-wrap:wrap;gap:8px}
+.tbl-pag-info{font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace}
+.tbl-pag-btns{display:flex;gap:5px;align-items:center}
+.pag-btn{background:var(--card2);border:1px solid var(--border);border-radius:6px;color:var(--text2);padding:4px 10px;cursor:pointer;font-size:11px;font-family:'Syne',sans-serif;font-weight:600;transition:all .15s}
+.pag-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.pag-btn:disabled{opacity:.3;cursor:not-allowed}
+.pag-cur{font-size:11px;color:var(--text2);padding:0 6px;font-family:'IBM Plex Mono',monospace}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:14px 28px;text-align:center;font-size:11px;color:var(--text3)}
+footer span{color:var(--text2)}
+
+/* ANIMATE IN */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.fade-up{animation:fadeUp .4s ease both}
+.fade-up-1{animation-delay:.05s}
+.fade-up-2{animation-delay:.1s}
+.fade-up-3{animation-delay:.15s}
+.fade-up-4{animation-delay:.2s}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+.empty-state .es-icon{font-size:32px;margin-bottom:10px}
+
+/* BUDGET TOGGLE */
+.budget-toggle-wrap{display:none;align-items:center;gap:8px}
+.budget-toggle-wrap.visible{display:flex}
+.budget-toggle-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+.budget-toggle{display:flex;background:var(--bg2);border:1px solid var(--border2);border-radius:7px;overflow:hidden}
+.budget-btn{background:transparent;border:none;color:var(--text3);cursor:pointer;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;padding:6px 14px;transition:all .15s;letter-spacing:.4px;position:relative}
+.budget-btn.active{background:var(--card2);color:var(--text)}
+.budget-btn.active.brut{color:var(--amber)}
+.budget-btn.active.net{color:var(--green)}
+.budget-sep{width:1px;background:var(--border2);flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- ══ UPLOAD SCREEN ══════════════════════════════════════ -->
+<div id="uploadScreen">
+  <div class="upload-logo">
+    <div class="upload-logo-icon">📊</div>
+    <div class="upload-logo-text">Media<span>BI</span></div>
+  </div>
+
+  <div class="upload-card">
+    <div class="upload-title">Importer un export Mxplorer</div>
+    <div class="upload-desc">
+      Glissez-déposez votre fichier Excel (.xlsx) pour générer instantanément<br>
+      un dashboard interactif d'analyse média.
+    </div>
+
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" onchange="handleFile(this.files[0])"/>
+      <span class="drop-icon">📂</span>
+      <div class="drop-label">Glisser-déposer ou cliquer pour importer</div>
+      <div class="drop-hint">Fichiers acceptés : .xlsx · .xls · .csv</div>
+    </div>
+
+    <div class="upload-specs">
+      <span class="spec-pill">Colonnes attendues → <strong>Annonceur, Média, Budget, Année, Mois</strong></span>
+    </div>
+
+    <div class="upload-progress" id="uploadProgress">
+      <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="progress-label" id="progressLabel">Lecture en cours…</div>
+    </div>
+
+    <div class="upload-error" id="uploadError"></div>
+
+    <div class="col-mapping" id="colMapping">
+      <div class="col-mapping-title">🗂 Correspondance des colonnes</div>
+      <div id="colMapRows"></div>
+      <button class="btn-primary" id="btnConfirm" onclick="confirmMapping()">Générer le Dashboard →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══════════════════════════════════════════ -->
+<div id="dashboard">
+  <header class="site-header">
+    <div class="hdr-logo">
+      <div class="hdr-logo-icon">📊</div>
+      <div class="hdr-logo-text">Media<span>BI</span></div>
+    </div>
+    <div class="hdr-sep"></div>
+    <span class="hdr-badge" id="hdrBadge">—</span>
+    <div class="hdr-right">
+      <button class="btn-export-ppt" id="btnExportPpt" onclick="exportToPPT()">
+        <span class="ppt-icon">📑</span> Exporter PPT
+      </button>
+      <button class="btn-reset-file" onclick="resetToUpload()">↑ Nouveau fichier</button>
+    </div>
+  </header>
+
+  <!-- TOAST -->
+  <div id="exportToast">
+    <span class="toast-icon" id="toastIcon">⏳</span>
+    <span id="toastMsg">Génération du PPT…</span>
+  </div>
+
+  <main class="main">
+
+    <!-- FILTERS -->
+    <div class="filters-row fade-up">
+      <div class="filter-group">
+        <span class="filter-label">Période</span>
+        <select class="filter-select" id="fAnnee" onchange="applyFilters()"></select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Annonceur</span>
+        <select class="filter-select" id="fAnnonceur" onchange="applyFilters()"></select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Média</span>
+        <select class="filter-select" id="fMedia" onchange="applyFilters()"></select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Marque</span>
+        <select class="filter-select" id="fMarque" onchange="applyFilters()"></select>
+      </div>
+      <div class="budget-toggle-wrap" id="budgetToggleWrap">
+        <span class="budget-toggle-label">Valeur</span>
+        <div class="budget-toggle">
+          <button class="budget-btn brut active" id="btnBrut" onclick="setBudgetMode('brut')">BRUT</button>
+          <div class="budget-sep"></div>
+          <button class="budget-btn net" id="btnNet" onclick="setBudgetMode('net')">NET</button>
+        </div>
+      </div>
+      <button class="btn-filter-reset" onclick="resetFilters()">↺ Tout effacer</button>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi-card fade-up fade-up-1" style="--kpi-color:var(--accent)">
+        <div class="kpi-label" id="kpiLabel1">Investissement Total (Brut)</div>
+        <div class="kpi-value" id="kv1">—</div>
+        <div class="kpi-sub" id="ks1"></div>
+      </div>
+      <div class="kpi-card fade-up fade-up-2" style="--kpi-color:var(--green)">
+        <div class="kpi-label">Annonceurs Actifs</div>
+        <div class="kpi-value" id="kv2">—</div>
+        <div class="kpi-sub" id="ks2"></div>
+      </div>
+      <div class="kpi-card fade-up fade-up-3" style="--kpi-color:var(--purple)">
+        <div class="kpi-label">Média Dominant</div>
+        <div class="kpi-value" id="kv3">—</div>
+        <div class="kpi-sub" id="ks3"></div>
+      </div>
+      <div class="kpi-card fade-up fade-up-4" style="--kpi-color:var(--amber)">
+        <div class="kpi-label">Leader SOV</div>
+        <div class="kpi-value" id="kv4">—</div>
+        <div class="kpi-sub" id="ks4"></div>
+      </div>
+    </div>
+
+    <!-- A: MIX MEDIA + SOV -->
+    <div class="sec-title"><span class="sec-dot"></span>A — Vue d'Ensemble & Mix Média</div>
+    <div class="g3-1">
+      <div class="cc">
+        <div class="cc-title">Part de Voix — Top Annonceurs</div>
+        <div class="cc-sub" id="subSOV">Classement par investissement brut · % SOV calculé dynamiquement</div>
+        <div id="chartSOV"></div>
+      </div>
+      <div class="cc">
+        <div class="cc-title">Mix Média Global</div>
+        <div class="cc-sub">Répartition budgétaire par média</div>
+        <div id="chartDonut"></div>
+      </div>
+    </div>
+
+    <!-- B: STACKED -->
+    <div class="sec-title"><span class="sec-dot"></span>B — Stratégies Concurrentielles</div>
+    <div class="g1">
+      <div class="cc">
+        <div class="cc-title">Dépendance Média par Annonceur</div>
+        <div class="cc-sub">Part de chaque média dans les investissements totaux — 100% stacked</div>
+        <div id="chartStacked"></div>
+      </div>
+    </div>
+
+    <!-- C: LINE -->
+    <div class="sec-title"><span class="sec-dot"></span>C — Dynamique Temporelle & Saisonnalité</div>
+    <div class="g1">
+      <div class="cc">
+        <div class="cc-title">Évolution des Investissements</div>
+        <div class="cc-sub">Top 5 annonceurs · Détection des pics de campagne</div>
+        <div class="c-tabs">
+          <button class="c-tab active" onclick="setView('monthly',this)">Mensuel</button>
+          <button class="c-tab" onclick="setView('quarterly',this)">Trimestriel</button>
+          <button class="c-tab" onclick="setView('yearly',this)">Annuel</button>
+        </div>
+        <div id="chartLine"></div>
+      </div>
+    </div>
+
+    <!-- D: INSIGHTS + TABLE -->
+    <div class="sec-title"><span class="sec-dot"></span>D — Insights & Données Détaillées</div>
+
+    <div class="insights-wrap">
+      <div class="insights-hdr">
+        <span style="font-size:20px">🧠</span>
+        <div>
+          <div class="insights-hdr-text">Analyses & Anomalies Détectées</div>
+          <div class="insights-hdr-sub">Moteur de règles automatique sur les données filtrées</div>
+        </div>
+      </div>
+      <div class="insights-grid" id="insightList"></div>
+    </div>
+
+    <div class="cc g1">
+      <div class="tbl-toolbar">
+        <div>
+          <div class="cc-title">Tableau Détaillé</div>
+          <div class="cc-sub" style="margin-bottom:0">Cliquer les en-têtes pour trier · Recherche instantanée</div>
+        </div>
+        <input class="tbl-search" id="tblSearch" type="text" placeholder="🔍 Rechercher…" oninput="tblPage=0;renderTable()"/>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th id="th-annonceur" onclick="tblSort('annonceur')">Annonceur <span class="sort-icon"></span></th>
+              <th id="th-marque" onclick="tblSort('marque')">Marque <span class="sort-icon"></span></th>
+              <th id="th-media" onclick="tblSort('media')">Média <span class="sort-icon"></span></th>
+              <th id="th-annee" onclick="tblSort('annee')">Année <span class="sort-icon"></span></th>
+              <th id="th-mois" onclick="tblSort('moisNum')">Mois <span class="sort-icon"></span></th>
+              <th id="th-budget" class="sort-desc" onclick="tblSort('budget')" style="text-align:right">Budget (k€) <span class="sort-icon"></span></th>
+            </tr>
+          </thead>
+          <tbody id="tblBody"></tbody>
+        </table>
+      </div>
+      <div class="tbl-pag">
+        <span class="tbl-pag-info" id="tblMeta"></span>
+        <div class="tbl-pag-btns">
+          <button class="pag-btn" id="btnPrev" onclick="changePage(-1)">← Préc.</button>
+          <span class="pag-cur" id="tblPagCur"></span>
+          <button class="pag-btn" id="btnNext" onclick="changePage(1)">Suiv. →</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+  <footer>MediaBI Dashboard · <span id="footerInfo">—</span></footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════
+let RAW = [];
+let FILTERED = [];
+let colMap = {};
+let detectedCols = [];
+let lineView = 'monthly';
+let tblSortKey = 'budget';
+let tblSortDir = 'desc';
+let tblPage = 0;
+const PAGE = 20;
+let budgetMode = 'brut';   // 'brut' | 'net'
+let hasNetCol = false;
+
+let charts = { sov: null, donut: null, stacked: null, line: null };
+
+// ══════════════════════════════════════════════════
+//  COLORS
+// ══════════════════════════════════════════════════
+const PALETTE = [
+  '#00c9ff','#b47cff','#00e5b0','#ffb547','#ff6b6b',
+  '#ff9de2','#4ade80','#60a5fa','#fbbf24','#34d399',
+  '#e879f9','#f97316','#a3e635','#22d3ee','#fb7185'
+];
+
+function mediaColor(m){
+  const k=(m||'').toUpperCase();
+  if(k.includes('TELEV')||k==='TV') return '#00c9ff';
+  if(k.includes('PRESS')) return '#b47cff';
+  if(k.includes('EXTERIEURE')||k.includes('OOH')||k.includes('AFFICHAGE')) return '#00e5b0';
+  if(k.includes('INTERNET')||k.includes('DIGITAL')||k.includes('DISPLAY')) return '#ffb547';
+  if(k.includes('RADIO')) return '#ff6b6b';
+  if(k.includes('CINEMA')||k.includes('CINÉMA')) return '#ff9de2';
+  return '#8ba4c0';
+}
+
+function mediaPillClass(m){
+  const k=(m||'').toUpperCase();
+  if(k.includes('TELEV')||k==='TV') return 'm-TV';
+  if(k.includes('PRESS')) return 'm-PRESS';
+  if(k.includes('EXTERIEURE')||k.includes('OOH')||k.includes('AFFICHAGE')) return 'm-OOH';
+  if(k.includes('INTERNET')||k.includes('DIGITAL')||k.includes('DISPLAY')) return 'm-DIG';
+  if(k.includes('RADIO')) return 'm-RADIO';
+  if(k.includes('CINEMA')||k.includes('CINÉMA')) return 'm-CINEMA';
+  return 'm-OTHER';
+}
+
+const MONTH_ORDER = {
+  'janvier':1,'février':2,'fevrier':2,'mars':3,'avril':4,'mai':5,'juin':6,
+  'juillet':7,'août':8,'aout':8,'septembre':9,'octobre':10,'novembre':11,'décembre':12,'decembre':12
+};
+const MONTH_SHORT = ['','Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+const MONTH_FULL = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+// ══════════════════════════════════════════════════
+//  UPLOAD / FILE PARSING
+// ══════════════════════════════════════════════════
+const dz = document.getElementById('dropZone');
+dz.addEventListener('dragover', e=>{e.preventDefault();dz.classList.add('dragover')});
+dz.addEventListener('dragleave', ()=>dz.classList.remove('dragover'));
+dz.addEventListener('drop', e=>{
+  e.preventDefault();dz.classList.remove('dragover');
+  if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+
+function handleFile(file){
+  if(!file) return;
+  showProgress('Lecture du fichier…', 10);
+  clearError();
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      showProgress('Analyse du fichier…', 40);
+      const wb = XLSX.read(e.target.result, {type:'array', cellDates:true});
+      const sheetName = wb.SheetNames[0];
+      const ws = wb.Sheets[sheetName];
+      showProgress('Conversion en données…', 70);
+      const json = XLSX.utils.sheet_to_json(ws, {defval:''});
+      if(!json.length) throw new Error('Le fichier semble vide ou illisible.');
+      detectedCols = Object.keys(json[0]);
+      showProgress('Détection des colonnes…', 90);
+      autoDetectMapping(json);
+    } catch(err){
+      showError('Erreur : ' + err.message);
+      hideProgress();
+    }
+  };
+  reader.onerror = ()=>showError('Impossible de lire le fichier.');
+  reader.readAsArrayBuffer(file);
+
+  // store for confirmMapping
+  window._pendingFile = file;
+  window._pendingReader = reader;
+}
+
+function autoDetectMapping(json){
+  const cols = Object.keys(json[0]);
+  const lower = cols.map(c=>c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''));
+
+  const fields = [
+    {key:'annee',   labels:['annee','année','year','an'],          required:true},
+    {key:'mois',    labels:['mois','month','periode'],             required:true},
+    {key:'annonceur',labels:['annonceur','advertiser','marque annonceur'], required:true},
+    {key:'marque',  labels:['marque','brand','produit'],           required:false},
+    {key:'media',   labels:['media','média','canal','channel'],    required:true},
+    {key:'budget',  labels:['budget brut','brut','investissement brut','invest brut','budget','investissement','invest','montant','valeur','euros','spend'], required:true},
+    {key:'budgetNet',labels:['budget net','net estimé','net estime','net','investissement net','invest net'], required:false},
+    {key:'groupe',  labels:['groupe','group'],                     required:false},
+    {key:'categorie',labels:['categorie','catégorie','category','support'], required:false},
+  ];
+
+  colMap = {};
+  fields.forEach(f=>{
+    // exact then partial match
+    let found = null;
+    for(let i=0;i<lower.length;i++){
+      if(f.labels.some(l=>lower[i]===l)){found=cols[i];break;}
+    }
+    if(!found){
+      for(let i=0;i<lower.length;i++){
+        if(f.labels.some(l=>lower[i].includes(l)||l.includes(lower[i]))){found=cols[i];break;}
+      }
+    }
+    colMap[f.key] = found||'';
+  });
+
+  // Check required
+  const missing = fields.filter(f=>f.required&&!colMap[f.key]).map(f=>f.key);
+  if(missing.length===0){
+    // Auto-proceed
+    window._pendingJSON = json;
+    buildRAW(json);
+    return;
+  }
+
+  // Show manual mapping UI
+  window._pendingJSON = json;
+  showMappingUI(cols, fields);
+  showProgress('Veuillez compléter la correspondance des colonnes.', 100);
+}
+
+function showMappingUI(cols, fields){
+  const container = document.getElementById('colMapRows');
+  container.innerHTML = '';
+  fields.forEach(f=>{
+    const row = document.createElement('div');
+    row.className='col-map-row';
+    const opts = ['<option value="">— Non mappé —</option>'];
+    cols.forEach(c=>{
+      const sel = colMap[f.key]===c?'selected':'';
+      opts.push(`<option value="${c}" ${sel}>${c}</option>`);
+    });
+    row.innerHTML=`
+      <span class="col-map-label">${f.key}${f.required?' *':''}</span>
+      <span class="col-map-arrow">→</span>
+      <select class="col-map-select" data-field="${f.key}">${opts.join('')}</select>`;
+    container.appendChild(row);
+  });
+  document.getElementById('colMapping').classList.add('show');
+}
+
+function confirmMapping(){
+  document.querySelectorAll('.col-map-select').forEach(sel=>{
+    colMap[sel.dataset.field]=sel.value;
+  });
+  const required = ['annee','mois','annonceur','media','budget'];
+  const missing = required.filter(k=>!colMap[k]);
+  if(missing.length){showError('Champs obligatoires manquants : '+missing.join(', '));return;}
+  buildRAW(window._pendingJSON);
+}
+
+function buildRAW(json){
+  showProgress('Construction des données…', 95);
+  const processed = [];
+  let budgetErrors = 0;
+
+  json.forEach(row=>{
+    const annee = row[colMap.annee];
+    const moisRaw = row[colMap.mois];
+    const annonceur = String(row[colMap.annonceur]||'').trim();
+    const media = String(row[colMap.media]||'').trim();
+    const budgetRaw = row[colMap.budget];
+    if(!annonceur||!media) return;
+
+    const parseBudget = v => {
+      const n = parseFloat(String(v||'').replace(',','.').replace(/[^\d.-]/g,''));
+      return isNaN(n) ? 0 : n;
+    };
+
+    const budgetBrut = parseBudget(budgetRaw);
+    if(budgetBrut <= 0){ budgetErrors++; return; }
+
+    // Net column (optional)
+    const budgetNetRaw = colMap.budgetNet ? row[colMap.budgetNet] : null;
+    const budgetNet = budgetNetRaw != null ? parseBudget(budgetNetRaw) : null;
+
+    const anneeNum = parseInt(annee)||0;
+    let moisNum = 0, moisStr = '';
+    if(typeof moisRaw==='number'){
+      moisNum=moisRaw; moisStr=MONTH_FULL[moisNum]||String(moisRaw);
+    } else {
+      const ml=(String(moisRaw)||'').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+      moisNum=MONTH_ORDER[ml]||0;
+      moisStr=MONTH_FULL[moisNum]||String(moisRaw)||'';
+      if(!moisNum && moisRaw instanceof Date){moisNum=moisRaw.getMonth()+1;moisStr=MONTH_FULL[moisNum];}
+    }
+
+    processed.push({
+      annee: anneeNum,
+      mois: moisStr,
+      moisNum,
+      annonceur,
+      marque: String(row[colMap.marque]||annonceur).trim(),
+      media,
+      groupe: String(row[colMap.groupe]||'').trim(),
+      categorie: String(row[colMap.categorie]||'').trim(),
+      budgetBrut,
+      budgetNet,
+      budget: budgetBrut  // alias, updated by setBudgetMode()
+    });
+  });
+
+  if(!processed.length) throw new Error('Aucune donnée valide trouvée. Vérifiez les colonnes Budget/Annonceur/Média.');
+
+  // Detect if net column was actually populated
+  hasNetCol = !!colMap.budgetNet && processed.some(r => r.budgetNet !== null && r.budgetNet > 0);
+
+  RAW = processed;
+  budgetMode = 'brut';
+  syncBudgetAlias();
+  FILTERED = [...RAW];
+  hideProgress();
+  initDashboard();
+}
+
+// ══════════════════════════════════════════════════
+//  BUDGET MODE TOGGLE
+// ══════════════════════════════════════════════════
+function syncBudgetAlias(){
+  RAW.forEach(r => {
+    r.budget = (budgetMode === 'net' && r.budgetNet !== null && r.budgetNet > 0)
+      ? r.budgetNet
+      : r.budgetBrut;
+  });
+}
+
+function setBudgetMode(mode){
+  if(mode === budgetMode) return;
+  budgetMode = mode;
+  syncBudgetAlias();
+  // Re-apply filters on updated budget values
+  applyFilters();
+  // Update toggle appearance
+  document.getElementById('btnBrut').classList.toggle('active', mode==='brut');
+  document.getElementById('btnNet').classList.toggle('active', mode==='net');
+  // Update table header label
+  const thBudget = document.getElementById('th-budget');
+  if(thBudget) thBudget.innerHTML = `${mode==='net'?'Budget Net':'Budget Brut'} (k€) <span class="sort-icon"></span>`;
+}
+
+// ══════════════════════════════════════════════════
+//  DASHBOARD INIT
+// ══════════════════════════════════════════════════
+function initDashboard(){
+  // populate filters
+  const annees = [...new Set(RAW.map(r=>r.annee))].filter(Boolean).sort();
+  const annonceurs = [...new Set(RAW.map(r=>r.annonceur))].sort();
+  const medias = [...new Set(RAW.map(r=>r.media))].sort();
+  const marques = [...new Set(RAW.map(r=>r.marque))].sort();
+
+  fillSelect('fAnnee', annees, 'Toutes les années');
+  fillSelect('fAnnonceur', annonceurs, 'Tous les annonceurs');
+  fillSelect('fMedia', medias, 'Tous les médias');
+  fillSelect('fMarque', marques, 'Toutes les marques');
+
+  const totalBudget = RAW.reduce((s,r)=>s+r.budget,0);
+  const years = annees.join(' – ');
+  document.getElementById('hdrBadge').textContent =
+    `${annonceurs.length} annonceurs · ${RAW.length.toLocaleString('fr-FR')} lignes · ${years} · ${fmtBig(totalBudget)}`;
+  document.getElementById('footerInfo').textContent =
+    `${RAW.length.toLocaleString('fr-FR')} enregistrements · ${annees.join(' – ')}`;
+
+  // Show budget toggle only if Net column was detected
+  const toggleWrap = document.getElementById('budgetToggleWrap');
+  if(hasNetCol){
+    toggleWrap.classList.add('visible');
+  } else {
+    toggleWrap.classList.remove('visible');
+  }
+
+  document.getElementById('uploadScreen').style.display='none';
+  const dash = document.getElementById('dashboard');
+  dash.classList.add('show');
+
+  renderAll();
+}
+
+function fillSelect(id, vals, placeholder){
+  const s = document.getElementById(id);
+  s.innerHTML = `<option value="">${placeholder}</option>`;
+  vals.forEach(v=>{
+    const o=document.createElement('option');
+    o.value=v; o.textContent=v;
+    s.appendChild(o);
+  });
+}
+
+function resetToUpload(){
+  RAW=[];FILTERED=[];budgetMode='brut';hasNetCol=false;
+  Object.keys(charts).forEach(k=>{if(charts[k]){try{charts[k].destroy();}catch(e){}charts[k]=null;}});
+  document.getElementById('budgetToggleWrap').classList.remove('visible');
+  document.getElementById('btnBrut').classList.add('active');
+  document.getElementById('btnNet').classList.remove('active');
+  document.getElementById('dashboard').classList.remove('show');
+  document.getElementById('dashboard').style.display='';
+  document.getElementById('uploadScreen').style.display='';
+  document.getElementById('fileInput').value='';
+  document.getElementById('colMapping').classList.remove('show');
+  document.getElementById('uploadError').classList.remove('show');
+  hideProgress();
+}
+
+// ══════════════════════════════════════════════════
+//  FILTERS
+// ══════════════════════════════════════════════════
+function applyFilters(){
+  const annee = document.getElementById('fAnnee').value;
+  const ann = document.getElementById('fAnnonceur').value;
+  const med = document.getElementById('fMedia').value;
+  const mar = document.getElementById('fMarque').value;
+  FILTERED = RAW.filter(r=>{
+    if(annee && String(r.annee)!==String(annee)) return false;
+    if(ann && r.annonceur!==ann) return false;
+    if(med && r.media!==med) return false;
+    if(mar && r.marque!==mar) return false;
+    return true;
+  });
+  tblPage=0;
+  renderAll();
+}
+
+function resetFilters(){
+  ['fAnnee','fAnnonceur','fMedia','fMarque'].forEach(id=>document.getElementById(id).value='');
+  FILTERED=[...RAW];
+  tblPage=0;
+  renderAll();
+}
+
+// ══════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════
+function sum(arr){return arr.reduce((s,r)=>s+r.budget,0);}
+function fmtBig(v){
+  if(v>=1e6) return (v/1e6).toFixed(2)+'M€';
+  if(v>=1e3) return (v/1e3).toFixed(1)+'k€';
+  return v.toFixed(1)+'€';
+}
+function fmtAxis(v){
+  if(v>=1e6) return (v/1e6).toFixed(1)+'M';
+  if(v>=1e3) return (v/1e3).toFixed(0)+'k';
+  return v.toFixed(0);
+}
+function topN(obj, n){
+  return Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,n);
+}
+function groupSum(arr, key){
+  const m={};
+  arr.forEach(r=>{const k=r[key];m[k]=(m[k]||0)+r.budget;});
+  return m;
+}
+
+// ══════════════════════════════════════════════════
+//  KPI CARDS
+// ══════════════════════════════════════════════════
+function renderKPIs(){
+  const modeLabel = budgetMode === 'net' ? 'Net' : 'Brut';
+  document.getElementById('kpiLabel1').textContent = `Investissement Total (${modeLabel})`;
+  const subSOV = document.getElementById('subSOV');
+  if(subSOV) subSOV.textContent = `Classement par investissement ${modeLabel.toLowerCase()} · % SOV calculé dynamiquement`;
+
+  const total = sum(FILTERED);
+  const annonceurSet = new Set(FILTERED.map(r=>r.annonceur));
+  const marqueSet = new Set(FILTERED.map(r=>r.marque));
+
+  // YoY
+  const years = [...new Set(RAW.map(r=>r.annee))].sort();
+  const annFilter = document.getElementById('fAnnee').value;
+  let yoyHtml='';
+  if(!annFilter && years.length>=2){
+    const yr1=years[years.length-2], yr2=years[years.length-1];
+    const b1=sum(FILTERED.filter(r=>r.annee===yr1));
+    const b2=sum(FILTERED.filter(r=>r.annee===yr2));
+    if(b1>0){
+      const pct=((b2-b1)/b1*100);
+      const cl=pct>0?'badge-up':'badge-down';
+      const sign=pct>0?'+':'';
+      yoyHtml=`<span class="badge ${cl}">${sign}${pct.toFixed(1)}% vs ${yr1}</span>`;
+    }
+  }
+
+  document.getElementById('kv1').textContent=fmtBig(total);
+  document.getElementById('ks1').innerHTML=yoyHtml||`<span>${FILTERED.length.toLocaleString('fr-FR')} lignes</span>`;
+
+  document.getElementById('kv2').textContent=annonceurSet.size;
+  document.getElementById('ks2').innerHTML=`<span>${marqueSet.size} marques</span>`;
+
+  const byMedia=groupSum(FILTERED,'media');
+  const domEntry=topN(byMedia,1)[0];
+  if(domEntry){
+    const pct=(domEntry[1]/total*100).toFixed(1);
+    const lbl=domEntry[0].length>12?domEntry[0].substring(0,12)+'…':domEntry[0];
+    document.getElementById('kv3').textContent=lbl;
+    document.getElementById('ks3').innerHTML=`<span class="badge badge-neutral">${pct}% du mix</span>`;
+  }
+
+  const byAnn=groupSum(FILTERED,'annonceur');
+  const leaderEntry=topN(byAnn,1)[0];
+  if(leaderEntry){
+    const sov=(leaderEntry[1]/total*100).toFixed(1);
+    const lbl=leaderEntry[0].length>12?leaderEntry[0].substring(0,12)+'…':leaderEntry[0];
+    document.getElementById('kv4').textContent=lbl;
+    document.getElementById('ks4').innerHTML=`<span class="badge badge-neutral">SOV ${sov}%</span>`;
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  CHART: DONUT
+// ══════════════════════════════════════════════════
+function renderDonut(){
+  const byMedia=groupSum(FILTERED,'media');
+  const entries=Object.entries(byMedia).sort((a,b)=>b[1]-a[1]);
+  const labels=entries.map(e=>e[0]);
+  const vals=entries.map(e=>parseFloat(e[1].toFixed(1)));
+  const colors=entries.map(e=>mediaColor(e[0]));
+  const totalV=vals.reduce((s,v)=>s+v,0);
+
+  const opts={
+    series:vals,labels,
+    chart:{type:'donut',height:300,background:'transparent',fontFamily:"'Syne',sans-serif",sparkline:{enabled:false}},
+    colors,
+    stroke:{show:false},
+    dataLabels:{enabled:true,style:{fontSize:'11px',fontFamily:"'Syne',sans-serif",fontWeight:'600'},
+      formatter:(v)=>v>=4?v.toFixed(1)+'%':'',
+      dropShadow:{enabled:false}},
+    plotOptions:{pie:{donut:{size:'62%',
+      labels:{show:true,
+        total:{show:true,showAlways:true,label:'Total',color:'#4d6a8a',fontSize:'11px',
+          formatter:()=>fmtBig(totalV)},
+        value:{show:true,fontSize:'16px',fontFamily:"'IBM Plex Mono',monospace",color:'#dce8f5',
+          formatter:(v)=>fmtBig(v)}
+      }
+    }}},
+    legend:{position:'bottom',labels:{colors:'#8ba4c0'},fontSize:'11px',fontFamily:"'Syne',sans-serif",
+      markers:{width:10,height:10,radius:2}},
+    tooltip:{theme:'dark',y:{formatter:(v)=>fmtBig(v)+' ('+((v/totalV)*100).toFixed(1)+'%)'}},
+    theme:{mode:'dark'}
+  };
+
+  if(charts.donut){charts.donut.updateOptions(opts,true,false,false);}
+  else{charts.donut=new ApexCharts(document.getElementById('chartDonut'),opts);charts.donut.render();}
+}
+
+// ══════════════════════════════════════════════════
+//  CHART: SOV BAR
+// ══════════════════════════════════════════════════
+function renderSOV(){
+  const byAnn=groupSum(FILTERED,'annonceur');
+  const top=topN(byAnn,15);
+  const totalBudget=sum(FILTERED);
+  const cats=top.map(e=>e[0]);
+  const vals=top.map(e=>parseFloat(e[1].toFixed(1)));
+  const sovs=top.map(e=>(e[1]/totalBudget*100).toFixed(1));
+
+  const opts={
+    series:[{name:'Budget (k€)',data:vals}],
+    chart:{type:'bar',height:Math.max(280,cats.length*30+60),background:'transparent',
+      toolbar:{show:false},fontFamily:"'Syne',sans-serif",
+      animations:{enabled:true,speed:400}},
+    colors:[function({dataPointIndex}){return PALETTE[dataPointIndex%PALETTE.length];}],
+    plotOptions:{bar:{horizontal:true,borderRadius:3,distributed:true,
+      dataLabels:{position:'right'},barHeight:'65%'}},
+    dataLabels:{enabled:true,
+      formatter:(v,{dataPointIndex})=>`${fmtBig(v)}  ${sovs[dataPointIndex]}%`,
+      style:{fontSize:'10px',fontFamily:"'IBM Plex Mono',monospace",colors:['#8ba4c0']},
+      offsetX:6,background:{enabled:false}},
+    xaxis:{categories:cats,
+      labels:{style:{colors:'#4d6a8a',fontSize:'10px'},formatter:fmtAxis},
+      axisBorder:{show:false},axisTicks:{show:false}},
+    yaxis:{labels:{style:{colors:'#8ba4c0',fontSize:'11px',fontFamily:"'Syne',sans-serif"},maxWidth:140}},
+    grid:{borderColor:'#1c2d47',strokeDashArray:4,xaxis:{lines:{show:true}},yaxis:{lines:{show:false}}},
+    tooltip:{theme:'dark',shared:false,
+      y:{formatter:(v,{dataPointIndex})=>`${fmtBig(v)} · SOV ${sovs[dataPointIndex]}%`}},
+    legend:{show:false},
+    theme:{mode:'dark'}
+  };
+
+  if(charts.sov){
+    charts.sov.updateOptions(opts,true,false,false);
+  } else {
+    charts.sov=new ApexCharts(document.getElementById('chartSOV'),opts);
+    charts.sov.render();
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  CHART: STACKED 100%
+// ══════════════════════════════════════════════════
+function renderStacked(){
+  const byAnn=groupSum(FILTERED,'annonceur');
+  const top15=topN(byAnn,15).map(e=>e[0]);
+  const allMedias=[...new Set(FILTERED.map(r=>r.media))].sort();
+
+  const series=allMedias.map(m=>({
+    name:m,
+    data:top15.map(ann=>{
+      const tot=sum(FILTERED.filter(r=>r.annonceur===ann));
+      const sub=sum(FILTERED.filter(r=>r.annonceur===ann&&r.media===m));
+      return tot>0?parseFloat((sub/tot*100).toFixed(1)):0;
+    })
+  }));
+
+  const opts={
+    series,
+    chart:{type:'bar',height:Math.max(300,top15.length*28+80),stacked:true,stackType:'100%',
+      background:'transparent',toolbar:{show:false},fontFamily:"'Syne',sans-serif",
+      animations:{enabled:true,speed:400}},
+    colors:allMedias.map(m=>mediaColor(m)),
+    plotOptions:{bar:{horizontal:true,borderRadius:2,barHeight:'60%'}},
+    xaxis:{categories:top15,labels:{formatter:(v)=>v+'%',style:{colors:'#4d6a8a',fontSize:'10px'}},
+      axisBorder:{show:false},axisTicks:{show:false}},
+    yaxis:{labels:{style:{colors:'#8ba4c0',fontSize:'11px',fontFamily:"'Syne',sans-serif"},maxWidth:140}},
+    grid:{borderColor:'#1c2d47',strokeDashArray:4},
+    dataLabels:{enabled:true,formatter:(v)=>v>7?v.toFixed(0)+'%':'',
+      style:{fontSize:'10px',fontFamily:"'IBM Plex Mono',monospace",
+        colors:['rgba(0,0,0,0.75)'],fontWeight:'500'}},
+    tooltip:{theme:'dark',y:{formatter:(v)=>v.toFixed(1)+'%'}},
+    legend:{position:'top',labels:{colors:'#8ba4c0'},fontSize:'11px',
+      fontFamily:"'Syne',sans-serif",markers:{width:10,height:10,radius:2}},
+    theme:{mode:'dark'}
+  };
+
+  if(charts.stacked){charts.stacked.updateOptions(opts,true,false,false);}
+  else{charts.stacked=new ApexCharts(document.getElementById('chartStacked'),opts);charts.stacked.render();}
+}
+
+// ══════════════════════════════════════════════════
+//  CHART: LINE
+// ══════════════════════════════════════════════════
+function setView(v,btn){
+  lineView=v;
+  document.querySelectorAll('.c-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLine();
+}
+
+function renderLine(){
+  const byAnn=groupSum(FILTERED,'annonceur');
+  const top5=topN(byAnn,5).map(e=>e[0]);
+  const years=[...new Set(FILTERED.map(r=>r.annee))].filter(Boolean).sort();
+  let cats=[], series=[];
+
+  if(lineView==='monthly'){
+    years.forEach(y=>{for(let m=1;m<=12;m++) cats.push(MONTH_SHORT[m]+' '+String(y).slice(2));});
+    series=top5.map(ann=>({
+      name:ann,
+      data:years.flatMap(y=>
+        Array.from({length:12},(_,i)=>{
+          const m=i+1;
+          return parseFloat(sum(FILTERED.filter(r=>r.annonceur===ann&&r.annee===y&&r.moisNum===m)).toFixed(1));
+        })
+      )
+    }));
+  } else if(lineView==='quarterly'){
+    years.forEach(y=>['Q1','Q2','Q3','Q4'].forEach(q=>cats.push(q+' '+y)));
+    const qMap={1:0,2:0,3:0,4:1,5:1,6:1,7:2,8:2,9:2,10:3,11:3,12:3};
+    series=top5.map(ann=>({
+      name:ann,
+      data:years.flatMap(y=>
+        [0,1,2,3].map(q=>parseFloat(sum(FILTERED.filter(r=>r.annonceur===ann&&r.annee===y&&qMap[r.moisNum]===q)).toFixed(1)))
+      )
+    }));
+  } else {
+    cats=years.map(String);
+    series=top5.map(ann=>({
+      name:ann,
+      data:years.map(y=>parseFloat(sum(FILTERED.filter(r=>r.annonceur===ann&&r.annee===y)).toFixed(1)))
+    }));
+  }
+
+  const tickAmt = Math.min(cats.length, lineView==='monthly'?24:cats.length);
+
+  const opts={
+    series,
+    chart:{type:'line',height:380,background:'transparent',toolbar:{show:false},
+      fontFamily:"'Syne',sans-serif",animations:{enabled:true,easing:'easeinout',speed:500},
+      zoom:{enabled:false}},
+    colors:PALETTE,
+    stroke:{width:2.5,curve:'smooth'},
+    markers:{size:0,hover:{size:5,sizeOffset:2}},
+    xaxis:{categories:cats,
+      labels:{style:{colors:'#4d6a8a',fontSize:'10px'},rotate:-30,
+        hideOverlappingLabels:true,showDuplicates:false},
+      axisBorder:{show:false},axisTicks:{show:false},tickAmount:tickAmt},
+    yaxis:{labels:{formatter:fmtAxis,style:{colors:'#4d6a8a',fontSize:'10px'}}},
+    grid:{borderColor:'#1c2d47',strokeDashArray:4},
+    tooltip:{theme:'dark',shared:true,intersect:false,
+      y:{formatter:(v)=>fmtBig(v)},
+      x:{show:true}},
+    legend:{position:'top',labels:{colors:'#8ba4c0'},fontSize:'11px',
+      fontFamily:"'Syne',sans-serif",markers:{width:10,height:10,radius:2}},
+    theme:{mode:'dark'}
+  };
+
+  if(charts.line){charts.line.updateOptions(opts,true,false,false);}
+  else{charts.line=new ApexCharts(document.getElementById('chartLine'),opts);charts.line.render();}
+}
+
+// ══════════════════════════════════════════════════
+//  INSIGHTS ENGINE
+// ══════════════════════════════════════════════════
+function renderInsights(){
+  const items=[];
+  const total=sum(FILTERED);
+  if(total===0){document.getElementById('insightList').innerHTML='<div class="empty-state"><div class="es-icon">🔍</div>Aucune donnée à analyser.</div>';return;}
+
+  const byMedia=groupSum(FILTERED,'media');
+  const byAnn=groupSum(FILTERED,'annonceur');
+  const sortedAnn=topN(byAnn,20);
+  const sortedMedia=topN(byMedia,10);
+
+  // 1. Dominant media
+  if(sortedMedia.length){
+    const [m,v]=sortedMedia[0];
+    const pct=(v/total*100).toFixed(0);
+    if(pct>70) items.push({e:'📺',t:`<strong>Dominance ${m} :</strong> ${pct}% des investissements du secteur — stratégie mass-media très concentrée sur un seul canal.`});
+  }
+
+  // 2. Digital underinvested
+  const digV=sum(FILTERED.filter(r=>r.media.toUpperCase().includes('INTERNET')||r.media.toUpperCase().includes('DIGITAL')||r.media.toUpperCase().includes('DISPLAY')));
+  const digPct=(digV/total*100);
+  if(digPct<10&&total>1000) items.push({e:'📱',t:`<strong>Digital sous-investi :</strong> seulement <strong>${digPct.toFixed(1)}%</strong> du mix — largement en-deçà des benchmarks cross-secteurs (25-40%).`});
+
+  // 3. Leader SOV
+  if(sortedAnn.length){
+    const [leader,lv]=sortedAnn[0];
+    const sov=(lv/total*100).toFixed(1);
+    items.push({e:'🏆',t:`<strong>${leader}</strong> domine le marché avec une SOV de <strong>${sov}%</strong> (${fmtBig(lv)}) — position de leader très marquée.`});
+  }
+
+  // 4. Top3 concentration
+  if(sortedAnn.length>=3){
+    const top3v=sortedAnn.slice(0,3).reduce((s,e)=>s+e[1],0);
+    const top3p=(top3v/total*100).toFixed(0);
+    items.push({e:'🎯',t:`<strong>Concentration top 3 :</strong> ${sortedAnn.slice(0,3).map(e=>e[0].split(' ')[0]).join(', ')} captent <strong>${top3p}%</strong> des investissements totaux.`});
+  }
+
+  // 5. Seasonal peak
+  const byMonth={};
+  FILTERED.forEach(r=>{if(r.moisNum>0){byMonth[r.moisNum]=(byMonth[r.moisNum]||0)+r.budget;}});
+  const sortedM=Object.entries(byMonth).sort((a,b)=>b[1]-a[1]);
+  if(sortedM.length){
+    const peakM=MONTH_FULL[parseInt(sortedM[0][0])];
+    const peakP=(sortedM[0][1]/total*100).toFixed(1);
+    items.push({e:'📅',t:`<strong>Pic saisonnier en ${peakM} :</strong> ${peakP}% des investissements — potentiel maronnier fort (rentrée, fêtes, campagne printanière…).`});
+  }
+
+  // 6. YoY
+  const years=[...new Set(FILTERED.map(r=>r.annee))].filter(Boolean).sort();
+  if(years.length>=2){
+    const y1=years[years.length-2],y2=years[years.length-1];
+    const b1=sum(FILTERED.filter(r=>r.annee===y1));
+    const b2=sum(FILTERED.filter(r=>r.annee===y2));
+    if(b1>0){
+      const pct=((b2-b1)/b1*100).toFixed(1);
+      items.push({e:pct>0?'📈':'📉',t:`<strong>Évolution ${y1}→${y2} :</strong> investissements en ${pct>0?'hausse':'baisse'} de <strong>${Math.abs(pct)}%</strong> (${fmtBig(b2)} vs ${fmtBig(b1)}).`});
+    }
+  }
+
+  // 7. Digital-first annonceur
+  sortedAnn.slice(0,10).forEach(([ann,annTot])=>{
+    const dv=sum(FILTERED.filter(r=>r.annonceur===ann&&(r.media.toUpperCase().includes('INTERNET')||r.media.toUpperCase().includes('DIGITAL'))));
+    if(dv/annTot>0.35&&annTot>50) items.push({e:'💻',t:`<strong>${ann}</strong> adopte une stratégie <strong>Digital-first</strong> (${(dv/annTot*100).toFixed(0)}% Internet Display) — profil atypique vs le secteur.`});
+  });
+
+  // 8. Mono-media
+  sortedAnn.slice(0,8).forEach(([ann,annTot])=>{
+    const medCount=new Set(FILTERED.filter(r=>r.annonceur===ann).map(r=>r.media)).size;
+    if(medCount===1&&annTot>500) items.push({e:'📡',t:`<strong>${ann}</strong> investit sur <strong>1 seul média</strong> (${sum(FILTERED.filter(r=>r.annonceur===ann))>0?[...new Set(FILTERED.filter(r=>r.annonceur===ann).map(r=>r.media))][0]:''}) — stratégie mono-canal concentrée.`});
+  });
+
+  document.getElementById('insightList').innerHTML=
+    items.slice(0,8).map(i=>`<div class="insight-item"><span class="insight-emoji">${i.e}</span><div class="insight-txt">${i.t}</div></div>`).join('');
+}
+
+// ══════════════════════════════════════════════════
+//  TABLE
+// ══════════════════════════════════════════════════
+function getTableRows(){
+  const q=(document.getElementById('tblSearch').value||'').toLowerCase();
+  // Aggregate to annonceur+marque+media+annee+mois
+  const agg={};
+  FILTERED.forEach(r=>{
+    const key=`${r.annonceur}||${r.marque}||${r.media}||${r.annee}||${r.moisNum}||${r.mois}`;
+    if(!agg[key]) agg[key]={annonceur:r.annonceur,marque:r.marque,media:r.media,annee:r.annee,moisNum:r.moisNum,mois:r.mois,budget:0,budgetBrut:0,budgetNet:0};
+    agg[key].budget+=r.budget;
+    agg[key].budgetBrut+=r.budgetBrut;
+    agg[key].budgetNet+=(r.budgetNet||0);
+  });
+  let rows=Object.values(agg).map(r=>({...r,budget:parseFloat(r.budget.toFixed(1))}));
+  if(q) rows=rows.filter(r=>
+    r.annonceur.toLowerCase().includes(q)||r.marque.toLowerCase().includes(q)||
+    r.media.toLowerCase().includes(q)||String(r.annee).includes(q)||r.mois.toLowerCase().includes(q)
+  );
+  rows.sort((a,b)=>{
+    const k=tblSortKey;
+    let va=a[k], vb=b[k];
+    if(typeof va==='string') return tblSortDir==='asc'?va.localeCompare(vb,'fr'):vb.localeCompare(va,'fr');
+    return tblSortDir==='asc'?va-vb:vb-va;
+  });
+  return rows;
+}
+
+function tblSort(key){
+  if(tblSortKey===key) tblSortDir=tblSortDir==='asc'?'desc':'asc';
+  else{tblSortKey=key;tblSortDir=key==='budget'?'desc':'asc';}
+  tblPage=0;
+  document.querySelectorAll('thead th').forEach(th=>th.classList.remove('sort-asc','sort-desc'));
+  const th=document.getElementById('th-'+(key==='moisNum'?'mois':key));
+  if(th) th.classList.add('sort-'+tblSortDir);
+  renderTable();
+}
+
+function renderTable(){
+  const modeLabel = budgetMode === 'net' ? 'Net' : 'Brut';
+  const thBudget = document.getElementById('th-budget');
+  if(thBudget) thBudget.innerHTML = `Budget ${modeLabel} (k€) <span class="sort-icon ${tblSortKey==='budget'?'sort-'+tblSortDir:''}"></span>`;
+  const rows=getTableRows();
+  const total=rows.length;
+  const pageRows=rows.slice(tblPage*PAGE,(tblPage+1)*PAGE);
+  const body=document.getElementById('tblBody');
+  if(!total){body.innerHTML='<tr><td colspan="6" class="empty-state"><div class="es-icon">🔍</div>Aucun résultat</td></tr>';return;}
+  body.innerHTML=pageRows.map(r=>{
+    const pillCls=mediaPillClass(r.media);
+    const mLabel=r.media.length>20?r.media.substring(0,18)+'…':r.media;
+    const bFmt=r.budget.toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1});
+    const netFmt = (hasNetCol && budgetMode==='net' && r.budgetNet>0)
+      ? `<span style="font-size:10px;color:var(--text3);margin-left:4px">(brut: ${r.budgetBrut.toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1})})</span>`
+      : (hasNetCol && budgetMode==='brut' && r.budgetNet>0
+        ? `<span style="font-size:10px;color:var(--text3);margin-left:4px">(net: ${r.budgetNet.toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1})})</span>`
+        : '');
+    return `<tr>
+      <td><strong style="font-size:12px">${r.annonceur}</strong></td>
+      <td style="color:var(--text2)">${r.marque}</td>
+      <td><span class="m-pill ${pillCls}">${mLabel}</span></td>
+      <td class="mono">${r.annee||'—'}</td>
+      <td class="mono">${r.mois||'—'}</td>
+      <td class="num">${bFmt}${netFmt}</td>
+    </tr>`;
+  }).join('');
+  const maxPage=Math.ceil(total/PAGE)||1;
+  document.getElementById('tblMeta').textContent=`${total.toLocaleString('fr-FR')} entrées`;
+  document.getElementById('tblPagCur').textContent=`${tblPage+1} / ${maxPage}`;
+  document.getElementById('btnPrev').disabled=tblPage===0;
+  document.getElementById('btnNext').disabled=(tblPage+1)*PAGE>=total;
+}
+
+function changePage(d){
+  const rows=getTableRows();
+  const max=Math.ceil(rows.length/PAGE)-1;
+  tblPage=Math.max(0,Math.min(max,tblPage+d));
+  renderTable();
+}
+
+// ══════════════════════════════════════════════════
+//  RENDER ALL
+// ══════════════════════════════════════════════════
+function renderAll(){
+  renderKPIs();
+  renderDonut();
+  renderSOV();
+  renderStacked();
+  renderLine();
+  renderInsights();
+  renderTable();
+}
+
+// ══════════════════════════════════════════════════
+//  PPT EXPORT
+// ══════════════════════════════════════════════════
+function showToast(msg, icon='⏳'){
+  const t=document.getElementById('exportToast');
+  document.getElementById('toastMsg').textContent=msg;
+  document.getElementById('toastIcon').textContent=icon;
+  t.classList.add('show');
+}
+function hideToast(){setTimeout(()=>document.getElementById('exportToast').classList.remove('show'),2800);}
+
+async function exportToPPT(){
+  if(!FILTERED.length){showToast('Aucune donnée à exporter.','⚠️');hideToast();return;}
+  const btn=document.getElementById('btnExportPpt');
+  btn.disabled=true; btn.textContent='⏳ Génération…';
+  showToast('Construction des slides…','⏳');
+
+  try{
+    const pres = new PptxGenJS();
+    pres.layout = 'LAYOUT_16x9';
+    pres.title = 'MediaBI — Export Dashboard';
+    pres.author = 'MediaBI Dashboard';
+
+    // ── palette (no # prefix ever) ──
+    const C = {
+      bg:     '07090F', card:   '121B2E', card2:  '182236',
+      border: '1C2D47', accent: '00C9FF', accent2:'0077FF',
+      text:   'DCE8F5', text2:  '8BA4C0', text3:  '4D6A8A',
+      green:  '00E5B0', amber:  'FFB547', red:    'FF6B6B', purple: 'B47CFF',
+      tv:     '00C9FF', press:  'B47CFF', ooh:    '00E5B0', dig:    'FFB547',
+      radio:  'FF6B6B', cinema: 'FF9DE2'
+    };
+    const CHART_PALETTE = ['00C9FF','B47CFF','00E5B0','FFB547','FF6B6B','FF9DE2','4ADE80','60A5FA','FBBF24','34D399','E879F9','F97316','A3E635','22D3EE','FB7185'];
+    const MEDIA_CHART_COLORS = (medias) => medias.map(m=>{
+      const k=m.toUpperCase();
+      if(k.includes('TELEV')||k==='TV') return C.tv;
+      if(k.includes('PRESS')) return C.press;
+      if(k.includes('EXTERIEU')||k.includes('OOH')||k.includes('AFFICH')) return C.ooh;
+      if(k.includes('INTERNET')||k.includes('DIGITAL')||k.includes('DISPLAY')) return C.dig;
+      if(k.includes('RADIO')) return C.radio;
+      if(k.includes('CINEMA')||k.includes('CIN')) return C.cinema;
+      return '8BA4C0';
+    });
+
+    const modeLabel = budgetMode==='net'?'Net':'Brut';
+    const totalBudget = sum(FILTERED);
+    const byAnn = groupSum(FILTERED,'annonceur');
+    const sortedAnn = topN(byAnn,15);
+    const top5 = sortedAnn.slice(0,5).map(e=>e[0]);
+    const byMedia = groupSum(FILTERED,'media');
+    const sortedMedia = Object.entries(byMedia).sort((a,b)=>b[1]-a[1]);
+    const years = [...new Set(FILTERED.map(r=>r.annee))].filter(Boolean).sort();
+    const annonceurs = new Set(FILTERED.map(r=>r.annonceur));
+    const domMedia = sortedMedia[0]||['—',0];
+    const leader = sortedAnn[0]||['—',0];
+
+    // ── HELPERS ──────────────────────────────────
+    const bgSlide = (slide) => { slide.background = { color: C.bg }; };
+    const accentBar = (slide, color=C.accent) => {
+      slide.addShape(pres.shapes.RECTANGLE, {x:0,y:0,w:10,h:0.04,fill:{color},line:{color,width:0}});
+    };
+    const slideTitle = (slide, title, sub='') => {
+      slide.addText(title, {x:0.45,y:0.12,w:9.1,h:0.45,fontSize:20,bold:true,color:C.text,fontFace:'Calibri',margin:0});
+      if(sub) slide.addText(sub, {x:0.45,y:0.56,w:9.1,h:0.25,fontSize:10,color:C.text3,fontFace:'Calibri',margin:0});
+    };
+    const footerSlide = (slide, n, total) => {
+      slide.addShape(pres.shapes.RECTANGLE,{x:0,y:5.55,w:10,h:0.075,fill:{color:C.border},line:{color:C.border,width:0}});
+      slide.addText(`MediaBI Dashboard  ·  Budget ${modeLabel}  ·  ${fmtBig(totalBudget)}`,{x:0.45,y:5.59,w:7,h:0.18,fontSize:7,color:C.text3,fontFace:'Calibri',margin:0});
+      slide.addText(`${n} / ${total}`,{x:9,y:5.59,w:0.7,h:0.18,fontSize:7,color:C.text3,fontFace:'Calibri',align:'right',margin:0});
+    };
+    const kpiCard = (slide, x, y, w, label, value, sub, accentColor) => {
+      slide.addShape(pres.shapes.RECTANGLE,{x,y,w,h:1.05,fill:{color:C.card},line:{color:C.border,width:0.5}});
+      slide.addShape(pres.shapes.RECTANGLE,{x,y,w,h:0.04,fill:{color:accentColor},line:{color:accentColor,width:0}});
+      slide.addText(label,{x:x+0.15,y:y+0.12,w:w-0.3,h:0.18,fontSize:7,color:C.text3,bold:true,fontFace:'Calibri',margin:0,charSpacing:1});
+      slide.addText(value,{x:x+0.15,y:y+0.32,w:w-0.3,h:0.42,fontSize:22,color:C.text,bold:true,fontFace:'Calibri',margin:0});
+      if(sub) slide.addText(sub,{x:x+0.15,y:y+0.76,w:w-0.3,h:0.2,fontSize:8,color:accentColor,fontFace:'Calibri',margin:0});
+    };
+
+    const TOTAL_SLIDES = 7;
+
+    // ════════════════════════════════════════
+    // SLIDE 1 — COVER
+    // ════════════════════════════════════════
+    const s1 = pres.addSlide();
+    bgSlide(s1);
+    // Full left panel
+    s1.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:3.8,h:5.625,fill:{color:C.card},line:{color:C.card,width:0}});
+    s1.addShape(pres.shapes.RECTANGLE,{x:0,y:0,w:0.07,h:5.625,fill:{color:C.accent},line:{color:C.accent,width:0}});
+    // Logo area
+    s1.addText('Media',{x:0.25,y:0.55,w:3.3,h:0.7,fontSize:36,bold:true,color:C.text,fontFace:'Calibri',margin:0});
+    s1.addText('BI',{x:1.6,y:0.55,w:3.3,h:0.7,fontSize:36,bold:true,color:C.accent,fontFace:'Calibri',margin:0});
+    s1.addText('Dashboard',{x:0.25,y:1.15,w:3.3,h:0.4,fontSize:16,color:C.text2,fontFace:'Calibri',margin:0});
+    // Divider
+    s1.addShape(pres.shapes.RECTANGLE,{x:0.25,y:1.65,w:3.2,h:0.015,fill:{color:C.border},line:{color:C.border,width:0}});
+    // Meta info
+    const metaLines = [
+      {label:'PÉRIODE',val:years.join(' – ')},
+      {label:'ANNONCEURS',val:String(annonceurs.size)},
+      {label:'ENREGISTREMENTS',val:FILTERED.length.toLocaleString('fr-FR')},
+      {label:'BUDGET TOTAL ('+modeLabel.toUpperCase()+')',val:fmtBig(totalBudget)},
+    ];
+    metaLines.forEach((m,i)=>{
+      const ym=1.85+i*0.65;
+      s1.addText(m.label,{x:0.25,y:ym,w:3.3,h:0.2,fontSize:7,color:C.text3,bold:true,fontFace:'Calibri',margin:0,charSpacing:0.8});
+      s1.addText(m.val,{x:0.25,y:ym+0.2,w:3.3,h:0.3,fontSize:15,color:C.text,bold:true,fontFace:'Calibri',margin:0});
+    });
+    // Right side — KPIs
+    s1.addText('VUE D\'ENSEMBLE',{x:4.1,y:0.3,w:5.5,h:0.28,fontSize:9,color:C.text3,bold:true,fontFace:'Calibri',margin:0,charSpacing:1.2});
+    const sovLeader = leader[1]>0?(leader[1]/totalBudget*100).toFixed(1)+'%':'—';
+    const domPct = domMedia[1]>0?(domMedia[1]/totalBudget*100).toFixed(1)+'%':'—';
+    const top3v = sortedAnn.slice(0,3).reduce((s,e)=>s+e[1],0);
+    const top3p = totalBudget>0?(top3v/totalBudget*100).toFixed(0)+'%':'—';
+    const yoyHtml = (()=>{if(years.length>=2){const b1=sum(FILTERED.filter(r=>r.annee===years[years.length-2])),b2=sum(FILTERED.filter(r=>r.annee===years[years.length-1]));if(b1>0)return ((b2-b1)/b1*100).toFixed(1)+'%';}return '—';})();
+    const kpis=[
+      {l:'INVESTISSEMENT TOTAL',v:fmtBig(totalBudget),s:'budget '+modeLabel.toLowerCase(),c:C.accent},
+      {l:'LEADER SOV',v:leader[0].length>10?leader[0].slice(0,10)+'…':leader[0],s:'SOV '+sovLeader,c:C.green},
+      {l:'MÉDIA DOMINANT',v:(domMedia[0]||'—').length>12?(domMedia[0]||'—').slice(0,12)+'…':(domMedia[0]||'—'),s:domPct+' du mix',c:C.purple},
+      {l:'TOP 3 CONCENTRATION',v:top3p,s:'des investissements',c:C.amber},
+    ];
+    kpis.forEach((k,i)=>kpiCard(s1, 4.1+(i%2)*2.8, 0.65+Math.floor(i/2)*1.2, 2.6, k.l, k.v, k.s, k.c));
+    // Insights preview on right
+    s1.addShape(pres.shapes.RECTANGLE,{x:4.1,y:2.95,w:5.7,h:0.015,fill:{color:C.border},line:{color:C.border,width:0}});
+    s1.addText('INSIGHTS CLÉS',{x:4.1,y:3.08,w:5.5,h:0.2,fontSize:8,color:C.text3,bold:true,fontFace:'Calibri',margin:0,charSpacing:1});
+    // Generate top 3 insight bullets
+    const insightBullets = [];
+    if(sortedAnn.length) insightBullets.push(`${leader[0]} domine le marché avec ${sovLeader} de SOV (${fmtBig(leader[1])})`);
+    if(domMedia[0]) insightBullets.push(`${domMedia[0]} capte ${domPct} des investissements — stratégie très concentrée`);
+    insightBullets.push(`Top 3 annonceurs représentent ${top3p} du budget total secteur`);
+    if(years.length>=2&&yoyHtml!=='—') insightBullets.push(`Évolution ${years[years.length-2]}→${years[years.length-1]} : ${yoyHtml}`);
+    const bulletItems = insightBullets.slice(0,4).map((t,i,a)=>({text:t,options:{bullet:true,color:C.text2,fontSize:10,fontFace:'Calibri',breakLine:i<a.length-1}}));
+    s1.addText(bulletItems,{x:4.1,y:3.3,w:5.7,h:1.8,valign:'top',margin:0});
+    // Slide number
+    s1.addText('Généré par MediaBI Dashboard',{x:4.1,y:5.35,w:5.7,h:0.2,fontSize:7.5,color:C.text3,fontFace:'Calibri',margin:0,align:'right'});
+
+    // ════════════════════════════════════════
+    // SLIDE 2 — SOV TOP ANNONCEURS
+    // ════════════════════════════════════════
+    const s2 = pres.addSlide();
+    bgSlide(s2); accentBar(s2);
+    slideTitle(s2,'Part de Voix — Top Annonceurs',`Budget ${modeLabel} · ${fmtBig(totalBudget)} total secteur · % SOV par annonceur`);
+    footerSlide(s2,2,TOTAL_SLIDES);
+    const sovLabels = sortedAnn.map(e=>e[0].length>18?e[0].slice(0,17)+'…':e[0]);
+    const sovVals   = sortedAnn.map(e=>parseFloat(e[1].toFixed(1)));
+    s2.addChart(pres.charts.BAR,[{name:'Budget '+modeLabel,labels:sovLabels,values:sovVals}],{
+      x:0.35,y:0.85,w:6.3,h:4.55,
+      barDir:'bar',barGrouping:'clustered',
+      chartColors:sortedAnn.map((_,i)=>CHART_PALETTE[i%CHART_PALETTE.length]),
+      chartArea:{fill:{color:C.card},roundedCorners:false},
+      plotArea:{fill:{color:C.card}},
+      catAxisLabelColor:C.text2,catAxisFontSize:9,catAxisFontFace:'Calibri',
+      valAxisLabelColor:C.text3,valAxisFontSize:8,valAxisFontFace:'Calibri',
+      valGridLine:{color:C.border,style:'solid',size:0.5},catGridLine:{style:'none'},
+      showValue:true,dataLabelPosition:'outEnd',dataLabelColor:C.text2,dataLabelFontSize:8,dataLabelFontFace:'Calibri',
+      showLegend:false,
+    });
+    // SOV % column
+    s2.addShape(pres.shapes.RECTANGLE,{x:6.75,y:0.85,w:3.0,h:4.55,fill:{color:C.card},line:{color:C.border,width:0.5}});
+    s2.addText('ANNONCEUR',{x:6.8,y:0.9,w:1.5,h:0.25,fontSize:7,bold:true,color:C.text3,fontFace:'Calibri',margin:0,charSpacing:0.5});
+    s2.addText('SOV',{x:8.55,y:0.9,w:1.1,h:0.25,fontSize:7,bold:true,color:C.text3,fontFace:'Calibri',margin:0,align:'right',charSpacing:0.5});
+    sortedAnn.slice(0,12).forEach((e,i)=>{
+      const yy=1.22+i*0.285;
+      const sov=(e[1]/totalBudget*100).toFixed(1)+'%';
+      const nm=e[0].length>18?e[0].slice(0,17)+'…':e[0];
+      const dotC=CHART_PALETTE[i%CHART_PALETTE.length];
+      s2.addShape(pres.shapes.OVAL,{x:6.82,y:yy+0.05,w:0.12,h:0.12,fill:{color:dotC},line:{color:dotC,width:0}});
+      s2.addText(nm,{x:7.0,y:yy,w:1.55,h:0.24,fontSize:8.5,color:C.text2,fontFace:'Calibri',margin:0,valign:'middle'});
+      s2.addText(sov,{x:8.55,y:yy,w:1.1,h:0.24,fontSize:9,color:dotC,bold:true,fontFace:'Calibri',margin:0,align:'right',valign:'middle'});
+    });
+
+    // ════════════════════════════════════════
+    // SLIDE 3 — MIX MÉDIA
+    // ════════════════════════════════════════
+    const s3 = pres.addSlide();
+    bgSlide(s3); accentBar(s3);
+    slideTitle(s3,'Mix Média Global',`Répartition des investissements par canal · Budget ${modeLabel}`);
+    footerSlide(s3,3,TOTAL_SLIDES);
+    const mediaPieLabels = sortedMedia.map(e=>e[0]);
+    const mediaPieVals   = sortedMedia.map(e=>parseFloat(e[1].toFixed(1)));
+    const pieColors = MEDIA_CHART_COLORS(mediaPieLabels);
+    s3.addChart(pres.charts.DOUGHNUT,[{name:'Budget',labels:mediaPieLabels,values:mediaPieVals}],{
+      x:0.3,y:0.85,w:5.5,h:4.5,
+      chartColors:pieColors,
+      chartArea:{fill:{color:C.card},roundedCorners:false},
+      plotArea:{fill:{color:C.card}},
+      showPercent:true,dataLabelFontSize:11,dataLabelColor:C.text,dataLabelFontFace:'Calibri',
+      showLegend:true,legendPos:'b',legendColor:C.text2,legendFontSize:10,legendFontFace:'Calibri',
+      holeSize:55,
+    });
+    // Right: breakdown table
+    s3.addShape(pres.shapes.RECTANGLE,{x:6.0,y:0.85,w:3.7,h:4.55,fill:{color:C.card},line:{color:C.border,width:0.5}});
+    s3.addText('DÉTAIL PAR MÉDIA',{x:6.15,y:0.98,w:3.4,h:0.22,fontSize:8,bold:true,color:C.text3,fontFace:'Calibri',margin:0,charSpacing:0.8});
+    sortedMedia.forEach((e,i)=>{
+      const yy=1.3+i*0.72;
+      const pct=(e[1]/totalBudget*100).toFixed(1);
+      const col=pieColors[i];
+      s3.addShape(pres.shapes.RECTANGLE,{x:6.15,y:yy,w:3.4,h:0.58,fill:{color:C.card2},line:{color:C.border,width:0.3}});
+      s3.addShape(pres.shapes.RECTANGLE,{x:6.15,y:yy,w:0.05,h:0.58,fill:{color:col},line:{color:col,width:0}});
+      s3.addText(e[0].length>16?e[0].slice(0,15)+'…':e[0],{x:6.25,y:yy+0.04,w:2.2,h:0.22,fontSize:9,bold:true,color:C.text,fontFace:'Calibri',margin:0});
+      s3.addText(fmtBig(e[1]),{x:6.25,y:yy+0.27,w:1.5,h:0.22,fontSize:8,color:C.text2,fontFace:'Calibri',margin:0});
+      s3.addText(pct+'%',{x:8.05,y:yy+0.12,w:1.0,h:0.3,fontSize:18,bold:true,color:col,fontFace:'Calibri',margin:0,align:'right',valign:'middle'});
+    });
+
+    // ════════════════════════════════════════
+    // SLIDE 4 — DÉPENDANCE MÉDIA (STACKED 100%)
+    // ════════════════════════════════════════
+    const s4 = pres.addSlide();
+    bgSlide(s4); accentBar(s4);
+    slideTitle(s4,'Dépendance Média par Annonceur','Part de chaque média dans le budget total — 100% stacked · Top 12 annonceurs');
+    footerSlide(s4,4,TOTAL_SLIDES);
+    const top12 = sortedAnn.slice(0,12).map(e=>e[0]);
+    const allMedias = [...new Set(FILTERED.map(r=>r.media))].sort();
+    const stackedData = allMedias.map(m=>({
+      name:m.length>14?m.slice(0,13)+'…':m,
+      labels:top12.map(a=>a.length>14?a.slice(0,13)+'…':a),
+      values:top12.map(ann=>{
+        const tot=sum(FILTERED.filter(r=>r.annonceur===ann));
+        const sub=sum(FILTERED.filter(r=>r.annonceur===ann&&r.media===m));
+        return tot>0?parseFloat((sub/tot*100).toFixed(1)):0;
+      })
+    }));
+    s4.addChart(pres.charts.BAR,stackedData,{
+      x:0.35,y:0.85,w:9.3,h:4.55,
+      barDir:'bar',barGrouping:'percentStacked',
+      chartColors:MEDIA_CHART_COLORS(allMedias),
+      chartArea:{fill:{color:C.card},roundedCorners:false},
+      plotArea:{fill:{color:C.card}},
+      catAxisLabelColor:C.text2,catAxisFontSize:9,catAxisFontFace:'Calibri',
+      valAxisLabelColor:C.text3,valAxisFontSize:8,valAxisFontFace:'Calibri',
+      valGridLine:{color:C.border,style:'solid',size:0.5},catGridLine:{style:'none'},
+      showValue:true,dataLabelColor:'000000',dataLabelFontSize:8,dataLabelFontFace:'Calibri',
+      showLegend:true,legendPos:'t',legendColor:C.text2,legendFontSize:9,legendFontFace:'Calibri',
+    });
+
+    // ════════════════════════════════════════
+    // SLIDE 5 — ÉVOLUTION TEMPORELLE
+    // ════════════════════════════════════════
+    const s5 = pres.addSlide();
+    bgSlide(s5); accentBar(s5);
+    slideTitle(s5,'Évolution des Investissements','Top 5 annonceurs · Dynamique temporelle & détection des pics de campagne');
+    footerSlide(s5,5,TOTAL_SLIDES);
+    // Build monthly time series
+    const lineCats=[], lineData=[];
+    years.forEach(y=>{for(let m=1;m<=12;m++) lineCats.push(MONTH_SHORT[m]+"'"+String(y).slice(2));});
+    const lineChartData = top5.map((ann,i)=>({
+      name:ann.length>16?ann.slice(0,15)+'…':ann,
+      labels:lineCats,
+      values:years.flatMap(y=>Array.from({length:12},(_,idx)=>parseFloat(sum(FILTERED.filter(r=>r.annonceur===ann&&r.annee===y&&r.moisNum===idx+1)).toFixed(1))))
+    }));
+    s5.addChart(pres.charts.LINE,lineChartData,{
+      x:0.35,y:0.85,w:9.3,h:4.55,
+      chartColors:CHART_PALETTE.slice(0,5),
+      lineSize:2,lineSmooth:true,
+      chartArea:{fill:{color:C.card},roundedCorners:false},
+      plotArea:{fill:{color:C.card}},
+      catAxisLabelColor:C.text3,catAxisFontSize:8,catAxisFontFace:'Calibri',catLabelFormatCode:'General',
+      valAxisLabelColor:C.text3,valAxisFontSize:8,valAxisFontFace:'Calibri',
+      valGridLine:{color:C.border,style:'solid',size:0.5},catGridLine:{style:'none'},
+      showLegend:true,legendPos:'t',legendColor:C.text2,legendFontSize:9,legendFontFace:'Calibri',
+      showValue:false,
+    });
+
+    // ════════════════════════════════════════
+    // SLIDE 6 — INSIGHTS & ANOMALIES
+    // ════════════════════════════════════════
+    const s6 = pres.addSlide();
+    bgSlide(s6); accentBar(s6,C.purple);
+    slideTitle(s6,'Insights & Anomalies Détectées','Analyse automatique des données · Règles appliquées sur le périmètre filtré');
+    footerSlide(s6,6,TOTAL_SLIDES);
+    // Gather insights text
+    const iItems=[];
+    const domPctNum=domMedia[1]>0?(domMedia[1]/totalBudget*100):0;
+    if(domPctNum>70) iItems.push({e:'📺',t:`Dominance ${domMedia[0]} : ${domPctNum.toFixed(0)}% des investissements — stratégie mass-media très concentrée sur un seul canal.`});
+    const digV2=sum(FILTERED.filter(r=>r.media.toUpperCase().includes('INTERNET')||r.media.toUpperCase().includes('DIGITAL')));
+    const digPct2=(digV2/totalBudget*100);
+    if(digPct2<10&&totalBudget>1000) iItems.push({e:'📱',t:`Digital sous-investi : seulement ${digPct2.toFixed(1)}% du mix — largement en-deçà des benchmarks cross-secteurs (25-40%).`});
+    if(leader[1]>0) iItems.push({e:'🏆',t:`${leader[0]} domine le marché avec une SOV de ${(leader[1]/totalBudget*100).toFixed(1)}% (${fmtBig(leader[1])}).`});
+    if(sortedAnn.length>=3){const t3p=(sortedAnn.slice(0,3).reduce((s,e)=>s+e[1],0)/totalBudget*100).toFixed(0);iItems.push({e:'🎯',t:`Concentration top 3 (${sortedAnn.slice(0,3).map(e=>e[0].split(' ')[0]).join(', ')}) : ${t3p}% des investissements.`});}
+    const mByMonth={};FILTERED.forEach(r=>{if(r.moisNum>0)mByMonth[r.moisNum]=(mByMonth[r.moisNum]||0)+r.budget;});
+    const peakM2=Object.entries(mByMonth).sort((a,b)=>b[1]-a[1]);
+    if(peakM2.length) iItems.push({e:'📅',t:`Pic saisonnier en ${MONTH_FULL[parseInt(peakM2[0][0])]} : ${(peakM2[0][1]/totalBudget*100).toFixed(1)}% des investissements annuels.`});
+    if(years.length>=2){const b1=sum(FILTERED.filter(r=>r.annee===years[years.length-2])),b2=sum(FILTERED.filter(r=>r.annee===years[years.length-1]));if(b1>0){const pct2=((b2-b1)/b1*100).toFixed(1);iItems.push({e:pct2>0?'📈':'📉',t:`Évolution ${years[years.length-2]}→${years[years.length-1]} : ${pct2>0?'hausse':'baisse'} de ${Math.abs(pct2)}% (${fmtBig(b2)} vs ${fmtBig(b1)}).`});}}
+    sortedAnn.slice(0,10).forEach(([ann,annTot])=>{
+      const dv=sum(FILTERED.filter(r=>r.annonceur===ann&&(r.media.toUpperCase().includes('INTERNET')||r.media.toUpperCase().includes('DIGITAL'))));
+      if(dv/annTot>0.35&&annTot>50) iItems.push({e:'💻',t:`${ann} : stratégie Digital-first (${(dv/annTot*100).toFixed(0)}% Internet Display) — profil atypique vs le secteur.`});
+    });
+    sortedAnn.slice(0,8).forEach(([ann,annTot])=>{
+      const mc=new Set(FILTERED.filter(r=>r.annonceur===ann).map(r=>r.media)).size;
+      if(mc===1&&annTot>500){const mUniq=[...new Set(FILTERED.filter(r=>r.annonceur===ann).map(r=>r.media))][0];iItems.push({e:'📡',t:`${ann} : investit exclusivement sur ${mUniq} — stratégie mono-canal concentrée.`});}
+    });
+    // Layout: 2 columns, max 8 insights
+    const cols=2, maxI=Math.min(iItems.length,8);
+    const perCol=Math.ceil(maxI/cols);
+    const cw=4.5, ch=0.72, cx=[0.35,5.05], cy0=0.88;
+    iItems.slice(0,maxI).forEach((item,i)=>{
+      const col=Math.floor(i/perCol), row=i%perCol;
+      const ix=cx[col], iy=cy0+row*(ch+0.1);
+      s6.addShape(pres.shapes.RECTANGLE,{x:ix,y:iy,w:cw,h:ch,fill:{color:C.card},line:{color:C.border,width:0.5}});
+      s6.addShape(pres.shapes.RECTANGLE,{x:ix,y:iy,w:0.05,h:ch,fill:{color:C.accent},line:{color:C.accent,width:0}});
+      s6.addText(item.e,{x:ix+0.12,y:iy+0.18,w:0.3,h:0.35,fontSize:16,margin:0,valign:'middle'});
+      s6.addText(item.t,{x:ix+0.48,y:iy+0.06,w:cw-0.58,h:ch-0.12,fontSize:9,color:C.text2,fontFace:'Calibri',margin:0,valign:'middle',wrap:true});
+    });
+
+    // ════════════════════════════════════════
+    // SLIDE 7 — TABLEAU DE DONNÉES
+    // ════════════════════════════════════════
+    const s7 = pres.addSlide();
+    bgSlide(s7); accentBar(s7,C.green);
+    slideTitle(s7,'Données Détaillées — Top 50 lignes',`Agrégation par Annonceur · Marque · Média · Année · Budget ${modeLabel} (k€)`);
+    footerSlide(s7,7,TOTAL_SLIDES);
+    // Aggregate top 50 rows
+    const agg={};
+    FILTERED.forEach(r=>{
+      const k=`${r.annonceur}||${r.marque}||${r.media}||${r.annee}`;
+      if(!agg[k]) agg[k]={annonceur:r.annonceur,marque:r.marque,media:r.media,annee:r.annee,budget:0};
+      agg[k].budget+=r.budget;
+    });
+    const tblRows=Object.values(agg).sort((a,b)=>b.budget-a.budget).slice(0,50);
+    const hStyle={fill:{color:C.card2},color:C.text3,bold:true,fontSize:8,fontFace:'Calibri',align:'left',valign:'middle'};
+    const tableData=[
+      [
+        {text:'ANNONCEUR',options:{...hStyle}},
+        {text:'MARQUE',options:{...hStyle}},
+        {text:'MÉDIA',options:{...hStyle}},
+        {text:'ANNÉE',options:{...hStyle,align:'center'}},
+        {text:'BUDGET (k€)',options:{...hStyle,align:'right'}},
+      ],
+      ...tblRows.map((r,i)=>{
+        const even=i%2===0;
+        const rStyle={fill:{color:even?C.card:C.card2},color:C.text2,fontSize:8,fontFace:'Calibri',valign:'middle'};
+        const cap=(s,n)=>s.length>n?s.slice(0,n-1)+'…':s;
+        return [
+          {text:cap(r.annonceur,22),options:{...rStyle,color:C.text,bold:true}},
+          {text:cap(r.marque,22),options:{...rStyle}},
+          {text:cap(r.media,18),options:{...rStyle}},
+          {text:String(r.annee||'—'),options:{...rStyle,align:'center'}},
+          {text:r.budget.toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1}),options:{...rStyle,align:'right',color:C.accent,bold:true}},
+        ];
+      })
+    ];
+    s7.addTable(tableData,{
+      x:0.35,y:0.85,w:9.3,
+      rowH:0.19,
+      colW:[2.6,2.1,2.0,0.8,1.8],
+      border:{pt:0.3,color:C.border},
+      autoPage:false,
+    });
+
+    // ── WRITE FILE ──
+    const ts = new Date().toISOString().slice(0,10);
+    await pres.writeFile({fileName:`MediaBI_Dashboard_${ts}.pptx`});
+    btn.disabled=false; btn.innerHTML='<span class="ppt-icon">📑</span> Exporter PPT';
+    showToast('PPT généré avec succès — 7 slides !','✅');
+    hideToast();
+
+  } catch(err){
+    btn.disabled=false; btn.innerHTML='<span class="ppt-icon">📑</span> Exporter PPT';
+    showToast('Erreur : '+err.message,'❌');
+    hideToast();
+    console.error(err);
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  PROGRESS / ERROR UI
+// ══════════════════════════════════════════════════
+function showProgress(msg, pct){
+  const el=document.getElementById('uploadProgress');
+  el.classList.add('show');
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent=msg;
+}
+function hideProgress(){
+  document.getElementById('uploadProgress').classList.remove('show');
+}
+function showError(msg){
+  const el=document.getElementById('uploadError');
+  el.textContent=msg;el.classList.add('show');
+  hideProgress();
+}
+function clearError(){
+  document.getElementById('uploadError').classList.remove('show');
+}
+</script>
+</body>
+</html>

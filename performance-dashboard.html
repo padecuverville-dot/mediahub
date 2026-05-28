@@ -1,0 +1,3218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Performance — Doctolib</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+/* ============================================
+   DOCTOLIB DESIGN SYSTEM
+   ============================================ */
+:root {
+  --db-blue: #107ACA;
+  --db-blue-dark: #0E5DA0;
+  --db-blue-darker: #0A4576;
+  --db-blue-light: #E3F0FB;
+  --db-blue-lighter: #F2F8FD;
+  --db-navy: #0E1F37;
+  --db-gray-900: #1E293B;
+  --db-gray-700: #475569;
+  --db-gray-500: #64748B;
+  --db-gray-400: #94A3B8;
+  --db-gray-300: #CBD5E1;
+  --db-gray-200: #E2E8F0;
+  --db-gray-100: #F1F5F9;
+  --db-gray-50: #F8FAFC;
+  --db-white: #FFFFFF;
+  --db-success: #00B894;
+  --db-success-light: #D1F5EB;
+  --db-warning: #FF9F43;
+  --db-warning-light: #FFE9D1;
+  --db-danger: #EF5350;
+  --db-danger-light: #FDE2E1;
+  --db-teal: #00C8B8;
+  --shadow-sm: 0 1px 2px 0 rgba(15, 30, 55, 0.04);
+  --shadow-md: 0 4px 12px -2px rgba(15, 30, 55, 0.06), 0 2px 4px -2px rgba(15, 30, 55, 0.04);
+  --shadow-lg: 0 12px 32px -8px rgba(15, 30, 55, 0.10), 0 4px 8px -2px rgba(15, 30, 55, 0.05);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--db-gray-50);
+  color: var(--db-navy);
+  line-height: 1.55;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+.header {
+  background: var(--db-white);
+  border-bottom: 1px solid var(--db-gray-200);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.header-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand img {
+  height: 36px;
+  width: auto;
+}
+
+.brand-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--db-gray-200);
+}
+
+.brand-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--db-gray-700);
+  letter-spacing: 0.2px;
+}
+
+.brand-subtitle {
+  font-size: 12px;
+  color: var(--db-gray-500);
+  font-weight: 500;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--db-blue);
+  color: white;
+  box-shadow: 0 1px 3px rgba(16, 122, 202, 0.2);
+}
+.btn-primary:hover { background: var(--db-blue-dark); box-shadow: 0 4px 12px rgba(16, 122, 202, 0.3); transform: translateY(-1px); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--db-gray-700);
+  border: 1px solid var(--db-gray-200);
+}
+.btn-ghost:hover { background: var(--db-gray-50); border-color: var(--db-gray-300); }
+
+.btn svg { width: 16px; height: 16px; }
+
+/* ============================================
+   MAIN LAYOUT
+   ============================================ */
+.main {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+/* ============================================
+   CAMPAIGN BANNER
+   ============================================ */
+.campaign-banner {
+  background: linear-gradient(135deg, var(--db-blue) 0%, var(--db-blue-dark) 100%);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  color: white;
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 32px -8px rgba(16, 122, 202, 0.25);
+}
+
+.campaign-banner::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -10%;
+  width: 60%;
+  height: 200%;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.12) 0%, transparent 60%);
+  transform: rotate(-15deg);
+  pointer-events: none;
+}
+
+.campaign-banner-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: center;
+}
+
+.campaign-title-block h1 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 4px;
+  letter-spacing: -0.5px;
+}
+
+.campaign-title-block .subtitle {
+  font-size: 15px;
+  opacity: 0.85;
+  font-weight: 500;
+}
+
+.campaign-meta {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.campaign-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.campaign-meta-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.campaign-meta-value {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.campaign-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.18);
+  backdrop-filter: blur(10px);
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.campaign-status-dot {
+  width: 8px;
+  height: 8px;
+  background: #4ADE80;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.3);
+  animation: pulse 2s infinite;
+}
+/* Banner status variants — colored dot to mirror partner status */
+.campaign-status.status-active .campaign-status-dot { background: #4ADE80; box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.3); }
+.campaign-status.status-paused .campaign-status-dot { background: #FFB454; box-shadow: 0 0 0 3px rgba(255, 180, 84, 0.35); animation: none; }
+.campaign-status.status-ended  .campaign-status-dot { background: #94A3B8; box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.30); animation: none; }
+.campaign-status.status-pending .campaign-status-dot { background: #FFB454; box-shadow: 0 0 0 3px rgba(255, 180, 84, 0.35); animation: none; }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ============================================
+   SECTION
+   ============================================ */
+.section {
+  margin-bottom: 40px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 16px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-title h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--db-navy);
+  letter-spacing: -0.3px;
+}
+
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--db-blue-light);
+  color: var(--db-blue-dark);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.section-subtitle {
+  font-size: 13px;
+  color: var(--db-gray-500);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+/* ============================================
+   KPI CARDS
+   ============================================ */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.kpi-card {
+  background: var(--db-white);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--db-gray-200);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.kpi-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+
+.kpi-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.kpi-card-icon svg { width: 20px; height: 20px; }
+
+.kpi-icon-blue { background: var(--db-blue-light); color: var(--db-blue); }
+.kpi-icon-success { background: var(--db-success-light); color: var(--db-success); }
+.kpi-icon-warning { background: var(--db-warning-light); color: var(--db-warning); }
+.kpi-icon-teal { background: #CCF5F0; color: var(--db-teal); }
+
+.kpi-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--db-gray-500);
+  margin-bottom: 4px;
+}
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--db-navy);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.kpi-compare {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--db-gray-500);
+  font-weight: 500;
+}
+
+.kpi-compare-value {
+  font-weight: 700;
+  color: var(--db-gray-700);
+}
+
+.kpi-progress {
+  margin-top: 12px;
+  height: 6px;
+  background: var(--db-gray-100);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.kpi-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--db-blue), var(--db-teal));
+  border-radius: 100px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.kpi-progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--db-gray-500);
+}
+
+.kpi-progress-label strong { color: var(--db-blue); }
+
+.delta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 7px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.delta-positive { background: var(--db-success-light); color: var(--db-success); }
+.delta-negative { background: var(--db-danger-light); color: var(--db-danger); }
+.delta-neutral { background: var(--db-gray-100); color: var(--db-gray-500); }
+
+/* ============================================
+   PERFORMANCE STATUS CODES (good / mid / bad)
+   ============================================ */
+.perf-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.perf-good { color: var(--db-success); }
+.perf-mid  { color: var(--db-warning); }
+.perf-bad  { color: var(--db-danger); }
+.perf-good .perf-dot, .perf-dot.perf-good { background: var(--db-success); }
+.perf-mid .perf-dot,  .perf-dot.perf-mid  { background: var(--db-warning); }
+.perf-bad .perf-dot,  .perf-dot.perf-bad  { background: var(--db-danger); }
+
+/* Apply colored bar on the left of partner-metric cards */
+.partner-metric.perf-good { border-left: 3px solid var(--db-success); }
+.partner-metric.perf-mid  { border-left: 3px solid var(--db-warning); }
+.partner-metric.perf-bad  { border-left: 3px solid var(--db-danger); }
+
+/* Colored value text */
+.partner-metric.perf-good .partner-metric-value { color: var(--db-success); }
+.partner-metric.perf-mid  .partner-metric-value { color: #B45309; } /* darker orange for legibility */
+.partner-metric.perf-bad  .partner-metric-value { color: var(--db-danger); }
+
+/* KPI cards — colored top-border to mirror the perf-status idea */
+.kpi-card.perf-good { box-shadow: 0 0 0 2px var(--db-success-light) inset, var(--shadow-sm); }
+.kpi-card.perf-mid  { box-shadow: 0 0 0 2px var(--db-warning-light) inset, var(--shadow-sm); }
+.kpi-card.perf-bad  { box-shadow: 0 0 0 2px var(--db-danger-light) inset, var(--shadow-sm); }
+
+/* Legend block above KPI grid */
+.perf-legend {
+  display: flex; gap: 14px; align-items: center; flex-wrap: wrap;
+  font-size: 12px; color: var(--db-gray-500); font-weight: 600;
+  margin-top: -8px; margin-bottom: 12px;
+}
+.perf-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+
+/* ============================================
+   PARTNER CARDS
+   ============================================ */
+.partner-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 20px;
+}
+
+.partner-card {
+  background: var(--db-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--db-gray-200);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.partner-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+
+.partner-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--db-gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: linear-gradient(180deg, var(--db-gray-50) 0%, transparent 100%);
+}
+
+.partner-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.partner-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+  letter-spacing: -0.3px;
+}
+
+.partner-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--db-navy);
+  line-height: 1.2;
+}
+
+.partner-format {
+  font-size: 12px;
+  color: var(--db-gray-500);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+.partner-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 5px;
+}
+
+.tag-audio { background: #F3E8FF; color: #7E22CE; }
+.tag-vol { background: #DBEAFE; color: #1E40AF; }
+.tag-pbu { background: #FEE2E2; color: #B91C1C; }
+.tag-some { background: #FEF3C7; color: #B45309; }
+
+.partner-body {
+  padding: 18px 22px;
+  flex: 1;
+}
+
+.partner-budget-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.partner-budget-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.partner-budget-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--db-gray-500);
+}
+
+.partner-budget-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--db-navy);
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.partner-budget-target {
+  font-size: 12px;
+  color: var(--db-gray-500);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  align-self: flex-end;
+  padding-bottom: 4px;
+}
+
+.partner-progress {
+  height: 8px;
+  background: var(--db-gray-100);
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.partner-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--db-blue), var(--db-blue-dark));
+  border-radius: 100px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.partner-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.partner-metric {
+  padding: 12px 14px;
+  background: var(--db-gray-50);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--db-gray-100);
+}
+
+.partner-metric-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--db-gray-500);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.partner-metric-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--db-navy);
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.partner-metric-prev {
+  font-size: 11px;
+  color: var(--db-gray-400);
+  font-weight: 600;
+}
+
+.partner-footer {
+  padding: 12px 22px;
+  border-top: 1px solid var(--db-gray-100);
+  background: var(--db-gray-50);
+  font-size: 12px;
+  color: var(--db-gray-500);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.partner-comment-btn {
+  background: none;
+  border: none;
+  color: var(--db-blue);
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.partner-comment-btn:hover { text-decoration: underline; }
+
+.partner-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.status-active { color: var(--db-success); }
+.status-pending { color: var(--db-warning); }
+.status-late { color: var(--db-danger); }
+.status-paused { color: #B45309; }   /* darker amber */
+.status-ended  { color: var(--db-gray-500); }
+
+.partner-comment {
+  display: none;
+  padding: 12px 22px;
+  background: var(--db-blue-lighter);
+  border-top: 1px solid var(--db-blue-light);
+  font-size: 12px;
+  color: var(--db-gray-700);
+  line-height: 1.5;
+  white-space: pre-line;
+}
+.partner-comment.show { display: block; }
+
+/* ============================================
+   CHARTS
+   ============================================ */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.chart-card {
+  background: var(--db-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--db-gray-200);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.chart-card-full { grid-column: 1 / -1; }
+
+.chart-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--db-navy);
+  margin-bottom: 4px;
+}
+
+.chart-card-subtitle {
+  font-size: 12px;
+  color: var(--db-gray-500);
+  margin-bottom: 18px;
+  font-weight: 500;
+}
+
+.chart-container {
+  position: relative;
+  height: 280px;
+}
+
+.chart-container-tall { height: 340px; }
+
+/* ============================================
+   CREATIVES SECTION
+   ============================================ */
+.creatives-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 20px;
+}
+@media (max-width: 1100px) { .creatives-layout { grid-template-columns: 1fr; } }
+
+.creatives-table-wrap {
+  background: var(--db-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--db-gray-200);
+  padding: 8px 0;
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+}
+
+.creatives-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  color: var(--db-navy);
+}
+
+.creatives-table th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--db-gray-500);
+  padding: 14px 16px 10px;
+  border-bottom: 2px solid var(--db-gray-200);
+  background: var(--db-gray-100, #F8FAFC);
+}
+.creatives-table th.num { text-align: right; }
+
+.creatives-table tbody tr {
+  border-bottom: 1px solid var(--db-gray-200);
+  transition: background 0.15s;
+}
+.creatives-table tbody tr:last-child { border-bottom: none; }
+.creatives-table tbody tr:hover { background: var(--db-blue-light); }
+
+.creatives-table td {
+  padding: 12px 16px;
+  vertical-align: middle;
+}
+.creatives-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.creatives-table .creative-name { font-weight: 700; color: var(--db-navy); }
+.creatives-table .creative-format { color: var(--db-gray-500); font-size: 12px; font-weight: 500; }
+.creatives-table .creative-best { color: var(--db-success, #00B894); font-weight: 800; }
+.creatives-table .creative-worst { color: #DC2626; font-weight: 700; }
+.creatives-table .creative-best::after { content: ' 🏆'; }
+
+.creatives-table .empty-row td {
+  text-align: center;
+  padding: 32px;
+  color: var(--db-gray-500);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.creatives-charts {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.creatives-charts .chart-container-tall { height: 200px; }
+
+/* ============================================
+   BLS / SLS SECTION
+   ============================================ */
+.brand-lift-banner {
+  background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+  border-radius: var(--radius-md);
+  padding: 4px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.brand-lift-banner svg { width: 18px; height: 14px; }
+
+.bls-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.bls-card {
+  background: var(--db-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--db-gray-200);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.bls-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--db-blue), var(--db-teal));
+}
+
+.bls-card.bls-card-highlight::before {
+  background: linear-gradient(90deg, #FF0000, #FF6B6B);
+}
+
+.bls-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--db-gray-500);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.bls-value {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--db-navy);
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bls-value.bls-value-success { color: var(--db-success); }
+.bls-value.bls-value-blue { color: var(--db-blue); }
+
+.bls-sublabel {
+  font-size: 12px;
+  color: var(--db-gray-500);
+  font-weight: 500;
+}
+
+.bls-tag {
+  display: inline-block;
+  background: var(--db-blue-light);
+  color: var(--db-blue-dark);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 4px;
+  margin-top: 6px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.bls-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.bls-chart-card {
+  background: var(--db-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--db-gray-200);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.bls-chart-card h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--db-navy);
+  margin-bottom: 6px;
+}
+
+.bls-chart-card p {
+  font-size: 12px;
+  color: var(--db-gray-500);
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.bls-img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  background: var(--db-gray-50);
+  border: 1px solid var(--db-gray-100);
+}
+
+/* ============================================
+   SLS TABLE
+   ============================================ */
+.sls-section {
+  background: var(--db-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--db-gray-200);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+
+.sls-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.sls-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--db-gray-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--db-gray-200);
+}
+
+.sls-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--db-gray-100);
+  font-size: 14px;
+}
+
+.sls-table tr:last-child td { border-bottom: none; }
+
+.sls-table tr.highlight {
+  background: var(--db-blue-lighter);
+}
+
+.sls-table tr.highlight td {
+  font-weight: 700;
+  color: var(--db-blue-dark);
+}
+
+.sls-keyword {
+  font-family: 'Manrope', monospace;
+  font-weight: 600;
+}
+
+.insufficient {
+  color: var(--db-gray-400);
+  font-style: italic;
+  font-size: 13px;
+}
+
+/* ============================================
+   UPLOAD MODAL
+   ============================================ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(14, 31, 55, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal {
+  background: white;
+  border-radius: var(--radius-xl);
+  max-width: 560px;
+  width: 100%;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: modalIn 0.25s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--db-gray-100);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--db-navy);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--db-gray-500);
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+.modal-body { padding: 28px; }
+
+.upload-zone {
+  border: 2px dashed var(--db-gray-300);
+  border-radius: var(--radius-md);
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--db-gray-50);
+}
+
+.upload-zone:hover, .upload-zone.dragover {
+  border-color: var(--db-blue);
+  background: var(--db-blue-lighter);
+}
+
+.upload-zone svg {
+  width: 40px;
+  height: 40px;
+  color: var(--db-blue);
+  margin-bottom: 12px;
+}
+
+.upload-zone-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--db-navy);
+  margin-bottom: 4px;
+}
+
+.upload-zone-subtitle {
+  font-size: 13px;
+  color: var(--db-gray-500);
+}
+
+.upload-info {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: var(--db-blue-lighter);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--db-blue-darker);
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.upload-info svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--db-navy);
+  color: white;
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: var(--shadow-lg);
+  z-index: 2000;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.toast.show { transform: translateY(0); opacity: 1; }
+
+.toast.success { background: var(--db-success); }
+.toast.error { background: var(--db-danger); }
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer {
+  text-align: center;
+  padding: 32px 20px;
+  color: var(--db-gray-500);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.footer a { color: var(--db-blue); text-decoration: none; font-weight: 600; }
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fadeInUp 0.5s ease backwards;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 1024px) {
+  .charts-grid, .bls-charts { grid-template-columns: 1fr; }
+  .bls-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 768px) {
+  .main { padding: 20px 16px; }
+  .header-inner { padding: 14px 16px; }
+  .campaign-banner-inner { grid-template-columns: 1fr; gap: 20px; }
+  .campaign-meta { gap: 20px; }
+  .bls-grid { grid-template-columns: 1fr; }
+  .campaign-title-block h1 { font-size: 22px; }
+  .partner-grid { grid-template-columns: 1fr; }
+  .brand-divider, .brand-title-block { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <img id="brandLogo" alt="Doctolib">
+      <div class="brand-divider"></div>
+      <div class="brand-title-block">
+        <div class="brand-title">Performance Dashboard</div>
+        <div class="brand-subtitle">re-mind | PHD × Doctolib</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost" onclick="exportData()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
+        Exporter
+      </button>
+      <button class="btn btn-primary" onclick="openUploadModal()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.9 5 5 0 019.65-2.36 4 4 0 011.23 7.84M12 12v8m0-8l-3 3m3-3l3 3"/></svg>
+        Mettre à jour
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- CAMPAIGN BANNER -->
+  <div class="campaign-banner animate-in">
+    <div class="campaign-banner-inner">
+      <div>
+        <h1 id="campaignTitle">Campagne BtoB — Vague 1</h1>
+        <div class="subtitle" id="campaignSubtitle">Plan média digital • Notoriété professions médicales</div>
+        <div class="campaign-status">
+          <span class="campaign-status-dot"></span>
+          <span id="campaignStatus">Campagne en cours</span>
+        </div>
+      </div>
+      <div class="campaign-meta">
+        <div class="campaign-meta-item">
+          <div class="campaign-meta-label">Client</div>
+          <div class="campaign-meta-value" id="clientName">Doctolib</div>
+        </div>
+        <div class="campaign-meta-item">
+          <div class="campaign-meta-label">Période</div>
+          <div class="campaign-meta-value" id="campaignDates">20 avr. → 10 mai 2026</div>
+        </div>
+        <div class="campaign-meta-item">
+          <div class="campaign-meta-label">Progression temps</div>
+          <div class="campaign-meta-value" id="timeProgress">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI OVERVIEW -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">
+        <h2>Vue d'ensemble</h2>
+        <span class="section-badge">Synthèse</span>
+      </div>
+      <div class="section-subtitle">Prévisionnel vs Réalisé</div>
+    </div>
+    <div class="perf-legend">
+      <span>Performance vs cible :</span>
+      <span class="perf-legend-item"><span class="perf-dot perf-good"></span>En ligne</span>
+      <span class="perf-legend-item"><span class="perf-dot perf-mid"></span>À surveiller</span>
+      <span class="perf-legend-item"><span class="perf-dot perf-bad"></span>Sous-performance</span>
+    </div>
+    <div class="kpi-grid" id="kpiGrid"></div>
+  </section>
+
+  <!-- PARTNERS -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">
+        <h2>Performance par partenaire</h2>
+        <span class="section-badge" id="partnerCount">— partenaires</span>
+      </div>
+      <div class="section-subtitle">Comparatif détaillé par régie</div>
+    </div>
+    <div class="partner-grid" id="partnerGrid"></div>
+  </section>
+
+  <!-- CHARTS -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">
+        <h2>Analyses comparatives</h2>
+        <span class="section-badge">Charts</span>
+      </div>
+      <div class="section-subtitle">Visualisation des performances</div>
+    </div>
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-card-title">Budget : Prévisionnel vs Réalisé</div>
+        <div class="chart-card-subtitle">Investissement par partenaire (en €)</div>
+        <div class="chart-container"><canvas id="budgetChart"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Impressions : Prévisionnel vs Réalisé</div>
+        <div class="chart-card-subtitle">Volume délivré par partenaire</div>
+        <div class="chart-container"><canvas id="impressionsChart"></canvas></div>
+      </div>
+      <div class="chart-card chart-card-full">
+        <div class="chart-card-title">Taux de complétion vidéo</div>
+        <div class="chart-card-subtitle">Réalisé vs Objectif de complétion par partenaire</div>
+        <div class="chart-container chart-container-tall"><canvas id="completionChart"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREATIVES -->
+  <section class="section" id="creativesSection">
+    <div class="section-header">
+      <div class="section-title">
+        <h2>Performance des créas</h2>
+        <span class="section-badge" id="creativeCount">— créas</span>
+      </div>
+      <div class="section-subtitle">Comparatif global · Complétion + Coût par vidéo vue 100% (CPV100)</div>
+    </div>
+    <div class="creatives-layout">
+      <div class="creatives-table-wrap">
+        <table class="creatives-table">
+          <thead>
+            <tr>
+              <th>Créa</th>
+              <th>Format</th>
+              <th class="num">Impressions</th>
+              <th class="num">V100</th>
+              <th class="num">Complétion</th>
+              <th class="num">CPV100</th>
+            </tr>
+          </thead>
+          <tbody id="creativesTbody"></tbody>
+        </table>
+      </div>
+      <div class="creatives-charts">
+        <div class="chart-card">
+          <div class="chart-card-title">Taux de complétion</div>
+          <div class="chart-card-subtitle">Classement par créa</div>
+          <div class="chart-container chart-container-tall"><canvas id="creativeCompletionChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-card-title">Coût par V100</div>
+          <div class="chart-card-subtitle">Plus c'est bas, mieux c'est</div>
+          <div class="chart-container chart-container-tall"><canvas id="creativeCpvChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLS YouTube -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">
+        <h2>Brand Lift Study — Notoriété</h2>
+        <span class="brand-lift-banner">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          YouTube
+        </span>
+      </div>
+      <div class="section-subtitle">Mesure de l'impact incrémental sur la notoriété</div>
+    </div>
+
+    <div class="bls-grid">
+      <div class="bls-card bls-card-highlight">
+        <div class="bls-label">Impact absolu</div>
+        <div class="bls-value bls-value-success" id="blsImpact">+12,90 %</div>
+        <div class="bls-sublabel">Amélioration de la notoriété</div>
+        <span class="bls-tag" id="blsCertainty">Certitude ≥ 90%</span>
+      </div>
+      <div class="bls-card">
+        <div class="bls-label">Utilisateurs impactés</div>
+        <div class="bls-value bls-value-blue" id="blsUsers">142 k</div>
+        <div class="bls-sublabel">Personnes ayant développé une awareness</div>
+      </div>
+      <div class="bls-card">
+        <div class="bls-label">Coût par utilisateur intéressé</div>
+        <div class="bls-value" id="blsCost">0,13 €</div>
+        <div class="bls-sublabel">CPL très compétitif vs benchmark</div>
+      </div>
+      <div class="bls-card">
+        <div class="bls-label">Awareness organique</div>
+        <div class="bls-value" id="blsBaseline">34,1 %</div>
+        <div class="bls-sublabel">Sans exposition à la campagne</div>
+      </div>
+    </div>
+
+    <div class="bls-charts">
+      <div class="bls-chart-card">
+        <h3>Awareness lift par âge</h3>
+        <p>Augmentation absolue de la notoriété par tranche d'âge</p>
+        <div style="position: relative; height: 280px;"><canvas id="blsAgeChart"></canvas></div>
+      </div>
+      <div class="bls-chart-card">
+        <h3>Awareness lift par genre</h3>
+        <p>Différence d'awareness entre population exposée et témoin</p>
+        <div style="position: relative; height: 280px;"><canvas id="blsGenderChart"></canvas></div>
+      </div>
+    </div>
+    <div id="blsMethodology" style="margin-top: 16px; font-size: 12px; color: var(--db-gray-500); font-weight: 500; padding: 14px 18px; background: var(--db-gray-50); border-radius: 10px; border-left: 3px solid var(--db-blue); display: none;"></div>
+  </section>
+
+  <!-- SLS YouTube -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-title">
+        <h2>Search Lift Study — Recherches</h2>
+        <span class="brand-lift-banner">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          YouTube
+        </span>
+      </div>
+      <div class="section-subtitle">Impact de la campagne sur les recherches Doctolib</div>
+    </div>
+
+    <div class="bls-grid" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="bls-card bls-card-highlight">
+        <div class="bls-label">Impact relatif</div>
+        <div class="bls-value bls-value-success" id="slsImpact">+13,55 %</div>
+        <div class="bls-sublabel">Augmentation des recherches</div>
+        <span class="bls-tag" id="slsCertainty">Certitude ≥ 90%</span>
+      </div>
+      <div class="bls-card">
+        <div class="bls-label">Mot-clé principal</div>
+        <div class="bls-value bls-value-blue" id="slsKeyword" style="font-size: 22px; margin-top: 8px;">"doctolib"</div>
+        <div class="bls-sublabel" id="slsIndexedLabel">Augmentation incrémentale indexée : 1,00</div>
+      </div>
+      <div class="bls-card">
+        <div class="bls-label">Termes mesurés</div>
+        <div class="bls-value bls-value-blue" id="slsKeywordCount">5</div>
+        <div class="bls-sublabel">Groupe de mots-clés tracés</div>
+      </div>
+    </div>
+
+    <div class="sls-section" style="margin-top: 20px;">
+      <h3 style="font-size: 14px; font-weight: 700; color: var(--db-navy); margin-bottom: 4px;">Détail par mot-clé</h3>
+      <p style="font-size: 12px; color: var(--db-gray-500); font-weight: 500;">Impact mesuré sur le groupe de recherche Doctolib</p>
+      <table class="sls-table">
+        <thead>
+          <tr>
+            <th>Recherche</th>
+            <th>Augmentation indexée</th>
+            <th>Impact relatif</th>
+            <th>Certitude</th>
+          </tr>
+        </thead>
+        <tbody id="slsTableBody">
+        </tbody>
+      </table>
+      <div id="slsMethodology" style="margin-top: 16px; font-size: 12px; color: var(--db-gray-500); font-weight: 500; padding: 14px 18px; background: var(--db-gray-50); border-radius: 10px; border-left: 3px solid var(--db-blue); display: none;"></div>
+    </div>
+  </section>
+
+  <div class="footer">
+    Dashboard mis à jour le <span id="lastUpdate">—</span> · <a href="#" onclick="openUploadModal(); return false;">Charger un nouveau fichier Excel</a>
+  </div>
+</main>
+
+<!-- UPLOAD MODAL -->
+<div class="modal-overlay" id="uploadModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Mettre à jour les données</div>
+      <button class="modal-close" onclick="closeUploadModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="upload-zone" id="uploadZone">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.9 5 5 0 019.65-2.36 4 4 0 011.23 7.84M12 12v8m0-8l-3 3m3-3l3 3"/></svg>
+        <div class="upload-zone-title">Déposez votre fichier Excel ici</div>
+        <div class="upload-zone-subtitle">ou cliquez pour parcourir · Format .xlsx attendu</div>
+        <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none">
+      </div>
+      <div class="upload-info">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <div><strong>Structure attendue</strong> : même format que le fichier de la Vague 1 — en-têtes en ligne 9, partenaires en lignes 11+, colonnes Prévisionnel (24–30) et Réalisé (31–39).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- EMBEDDED IMAGES -->
+<script>
+const EMBEDDED_IMAGES = {
+  doctolib_logo: 'data:image/png;base64,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',
+};
+
+</script>
+
+<!-- DASHBOARD LOGIC -->
+<script>
+/* ============================================
+   INITIAL DATA — vide par défaut, à remplir via import Excel
+   ============================================ */
+const INITIAL_DATA = {
+  client: 'Doctolib',
+  campaign: '— Aucune campagne chargée',
+  startDate: null,
+  endDate: null,
+  partners: [],
+  creatives: [],
+  bls: {
+    impact: null, users: null, cost: null, baseline: null, discovery: null,
+    certainty: '', methodology: '', age: [], gender: []
+  },
+  sls: {
+    impact: null, keyword: '', indexedLift: null, keywordCount: null,
+    certainty: '', methodology: '', rows: []
+  }
+};
+
+let currentData = JSON.parse(JSON.stringify(INITIAL_DATA));
+let charts = {};
+
+/* ============================================
+   FORMATTERS
+   ============================================ */
+const fmt = {
+  num(n, dec = 0) {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    return Number(n).toLocaleString('fr-FR', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+  },
+  euros(n, dec = 0) {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    return Number(n).toLocaleString('fr-FR', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + ' €';
+  },
+  pct(n, dec = 1) {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    return (Number(n) * 100).toLocaleString('fr-FR', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + ' %';
+  },
+  pctRaw(n, dec = 1) {
+    if (n === null || n === undefined || isNaN(n)) return '—';
+    return Number(n).toLocaleString('fr-FR', { minimumFractionDigits: dec, maximumFractionDigits: dec }) + ' %';
+  },
+  compact(n) {
+    if (n === null || n === undefined || isNaN(n) || n === 0) return '0';
+    const abs = Math.abs(n);
+    if (abs >= 1e6) return (n / 1e6).toLocaleString('fr-FR', { maximumFractionDigits: 2 }) + ' M';
+    if (abs >= 1e3) return (n / 1e3).toLocaleString('fr-FR', { maximumFractionDigits: 1 }) + ' k';
+    return Math.round(n).toLocaleString('fr-FR');
+  },
+  date(d) {
+    if (!d) return '—';
+    const date = (d instanceof Date) ? d : new Date(d);
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+};
+
+/* ============================================
+   AGGREGATIONS
+   ============================================ */
+function computeTotals(partners) {
+  return partners.reduce((acc, p) => {
+    acc.budget_prev += p.budget_prev || 0;
+    acc.budget_real += p.budget_real || 0;
+    acc.impressions_prev += p.impressions_prev || 0;
+    acc.impressions_real += p.impressions_real || 0;
+    acc.v100_prev += p.v100_prev || 0;
+    acc.v100_real += p.v100_real || 0;
+    acc.clicks_prev += p.clicks_prev || 0;
+    acc.clicks_real += p.clicks_real || 0;
+    return acc;
+  }, { budget_prev: 0, budget_real: 0, impressions_prev: 0, impressions_real: 0, v100_prev: 0, v100_real: 0, clicks_prev: 0, clicks_real: 0 });
+}
+
+function computeTimeProgress(start, end) {
+  const s = new Date(start).getTime();
+  const e = new Date(end).getTime();
+  const now = Date.now();
+  if (now < s) return 0;
+  if (now > e) return 100;
+  return Math.round(((now - s) / (e - s)) * 100);
+}
+
+/* ============================================
+   PERF STATUS HELPER — returns 'good' | 'mid' | 'bad' | ''
+   ============================================
+   Modes:
+   - 'forward'  : higher is better (completion, CTR, V100, clicks vs target)
+   - 'inverse'  : lower is better  (CPV100, CPM cost)
+   - 'temporal' : volume KPIs (budget, impressions, clicks) compared to time elapsed
+                  → expected delivery rate at this point = timeProgress%
+*/
+function perfStatus(value, target, mode, timeProgress) {
+  // No target or no real value yet → no status
+  if (!target || target <= 0) return '';
+  if (value == null || isNaN(value)) return '';
+
+  if (mode === 'inverse') {
+    // Cost: ratio = actual / target ; ≤ 1 is good
+    const r = value / target;
+    if (r <= 1.00) return 'good';
+    if (r <= 1.10) return 'mid';
+    return 'bad';
+  }
+
+  if (mode === 'temporal') {
+    // For volume KPIs: compare delivery rate vs time-elapsed rate
+    // If campaign hasn't started, no status
+    if (!timeProgress || timeProgress <= 0) return '';
+    const deliveryRate = (value / target) * 100;     // % of target delivered
+    const expected = timeProgress;                    // % we should have delivered
+    if (value === 0) return 'bad';
+    const ratio = deliveryRate / expected;            // 1.0 = pile dans les clous
+    if (ratio >= 0.95) return 'good';
+    if (ratio >= 0.70) return 'mid';
+    return 'bad';
+  }
+
+  // forward (default): higher = better, vs the target
+  if (value === 0) return '';
+  const r = value / target;
+  if (r >= 0.95) return 'good';
+  if (r >= 0.80) return 'mid';
+  return 'bad';
+}
+
+/* ============================================
+   RENDER: CAMPAIGN BANNER
+   ============================================ */
+function renderBanner() {
+  document.getElementById('clientName').textContent = currentData.client;
+  document.getElementById('campaignTitle').textContent = `Campagne ${currentData.campaign}`;
+  document.getElementById('campaignDates').textContent = `${fmt.date(currentData.startDate)} → ${fmt.date(currentData.endDate)}`;
+
+  const timeProgress = computeTimeProgress(currentData.startDate, currentData.endDate);
+  document.getElementById('timeProgress').textContent = timeProgress + ' %';
+
+  // Derive a global campaign status from per-partner statuses + dates
+  const partners = currentData.partners || [];
+  const counts = { active: 0, paused: 0, ended: 0, pending: 0, late: 0 };
+  partners.forEach(p => {
+    const budgetPct = p.budget_prev > 0 ? (p.budget_real / p.budget_prev * 100) : 0;
+    const isStarted = p.budget_real > 0 || p.impressions_real > 0;
+    const r = resolvePartnerStatus(p, budgetPct, isStarted);
+    counts[r.code] = (counts[r.code] || 0) + 1;
+  });
+
+  let statusText, statusCode;
+  if (partners.length === 0) {
+    statusText = 'Aucune donnée chargée'; statusCode = 'pending';
+  } else if (counts.active > 0 || counts.late > 0) {
+    statusText = 'Campagne en diffusion'; statusCode = 'active';
+  } else if (counts.paused > 0 && counts.paused >= counts.ended) {
+    statusText = 'Campagne en pause'; statusCode = 'paused';
+  } else if (counts.ended > 0 && counts.ended === partners.length) {
+    statusText = 'Campagne terminée'; statusCode = 'ended';
+  } else if (timeProgress === 100) {
+    statusText = 'Campagne terminée'; statusCode = 'ended';
+  } else if (timeProgress === 0) {
+    statusText = 'Campagne à venir'; statusCode = 'pending';
+  } else {
+    statusText = 'Campagne en cours'; statusCode = 'active';
+  }
+
+  const statusEl = document.getElementById('campaignStatus');
+  statusEl.textContent = statusText;
+  // Recolor the parent badge based on statusCode
+  const badge = statusEl.closest('.campaign-status');
+  if (badge) {
+    badge.classList.remove('status-active', 'status-paused', 'status-ended', 'status-pending', 'status-late');
+    badge.classList.add('status-' + statusCode);
+  }
+}
+
+/* ============================================
+   RENDER: KPI OVERVIEW
+   ============================================ */
+function renderKPIs() {
+  const t = computeTotals(currentData.partners);
+  const grid = document.getElementById('kpiGrid');
+  const budgetPct = t.budget_prev > 0 ? (t.budget_real / t.budget_prev * 100) : 0;
+  const impressionsPct = t.impressions_prev > 0 ? (t.impressions_real / t.impressions_prev * 100) : 0;
+
+  // Completion + CPV100 are VIDEO-only metrics — restrict to VOL + PBU partners
+  // (Audio/SoMe have no V100 by nature so they shouldn't dilute the average)
+  const videoPartners = (currentData.partners || []).filter(p => p.lever === 'VOL' || p.lever === 'PBU');
+  const tVideo = computeTotals(videoPartners);
+  const completionAvg = tVideo.impressions_real > 0 ? (tVideo.v100_real / tVideo.impressions_real) : 0;
+  const cpv100Real = tVideo.v100_real > 0 ? (tVideo.budget_real / tVideo.v100_real) : 0;
+  const cpv100Prev = tVideo.v100_prev > 0 ? (tVideo.budget_prev / tVideo.v100_prev) : 0;
+
+  const clicksDelta = t.clicks_prev > 0 ? ((t.clicks_real - t.clicks_prev) / t.clicks_prev * 100) : 0;
+  const timeProgress = computeTimeProgress(currentData.startDate, currentData.endDate);
+
+  // Compute per-KPI status
+  const statusBudget = perfStatus(t.budget_real, t.budget_prev, 'temporal', timeProgress);
+  const statusImpressions = perfStatus(t.impressions_real, t.impressions_prev, 'temporal', timeProgress);
+  // Completion vs 85% benchmark (forward mode, target = 0.85)
+  const statusCompletion = perfStatus(completionAvg, 0.85, 'forward');
+  const statusClicks = perfStatus(t.clicks_real, t.clicks_prev, 'temporal', timeProgress);
+  const statusCpv100 = perfStatus(cpv100Real, cpv100Prev, 'inverse');
+
+  grid.innerHTML = `
+    <div class="kpi-card animate-in ${statusBudget}" style="animation-delay: 0.05s">
+      <div class="kpi-card-icon kpi-icon-blue">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <div class="kpi-label">${statusBudget ? `<span class="perf-dot ${statusBudget}"></span>` : ''}Budget investi</div>
+      <div class="kpi-value">${fmt.euros(t.budget_real, 0)}</div>
+      <div class="kpi-compare">
+        <span>sur</span><span class="kpi-compare-value">${fmt.euros(t.budget_prev, 0)} prévus</span>
+      </div>
+      <div class="kpi-progress"><div class="kpi-progress-bar" style="width: ${Math.min(budgetPct, 100)}%"></div></div>
+      <div class="kpi-progress-label">
+        <span><strong>${budgetPct.toFixed(1)}%</strong> investi</span>
+        <span>${timeProgress}% du temps</span>
+      </div>
+    </div>
+
+    <div class="kpi-card animate-in ${statusImpressions}" style="animation-delay: 0.1s">
+      <div class="kpi-card-icon kpi-icon-success">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+      </div>
+      <div class="kpi-label">Impressions délivrées</div>
+      <div class="kpi-value">${fmt.compact(t.impressions_real)}</div>
+      <div class="kpi-compare">
+        <span>sur</span><span class="kpi-compare-value">${fmt.compact(t.impressions_prev)} prévues</span>
+        <span class="delta-badge ${impressionsPct >= 100 ? 'delta-positive' : 'delta-neutral'}">${impressionsPct.toFixed(1)}%</span>
+      </div>
+      <div class="kpi-progress"><div class="kpi-progress-bar" style="width: ${Math.min(impressionsPct, 100)}%"></div></div>
+      <div class="kpi-progress-label">
+        <span><strong>${fmt.compact(t.impressions_real)}</strong> impressions</span>
+        <span>${fmt.compact(t.impressions_prev - t.impressions_real)} restantes</span>
+      </div>
+    </div>
+
+    <div class="kpi-card animate-in ${statusCompletion}" style="animation-delay: 0.15s">
+      <div class="kpi-card-icon kpi-icon-teal">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+      </div>
+      <div class="kpi-label">${statusCompletion ? `<span class="perf-dot ${statusCompletion}"></span>` : ''}Taux de complétion moyen <span style="font-weight:500; font-size:10px; color: var(--db-gray-500); text-transform:none; letter-spacing:0;">· vidéo</span></div>
+      <div class="kpi-value">${fmt.pct(completionAvg, 1)}</div>
+      <div class="kpi-compare">
+        <span>${fmt.compact(tVideo.v100_real)} vues 100%</span>
+        ${completionAvg > 0 ? `<span class="delta-badge ${completionAvg >= 0.85 ? 'delta-positive' : 'delta-neutral'}">${completionAvg >= 0.85 ? '+' : ''}${((completionAvg - 0.85) * 100).toFixed(1)} pts vs bench</span>` : ''}
+      </div>
+      <div class="kpi-progress"><div class="kpi-progress-bar" style="width: ${Math.min(completionAvg * 100, 100)}%"></div></div>
+      <div class="kpi-progress-label">
+        <span>Performance : <strong>${completionAvg >= 0.9 ? 'excellente' : completionAvg >= 0.75 ? 'correcte' : completionAvg > 0 ? 'à surveiller' : '—'}</strong></span>
+        <span>Benchmark 85%</span>
+      </div>
+    </div>
+
+    <div class="kpi-card animate-in ${statusClicks}" style="animation-delay: 0.2s">
+      <div class="kpi-card-icon kpi-icon-warning">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+      </div>
+      <div class="kpi-label">${statusClicks ? `<span class="perf-dot ${statusClicks}"></span>` : ''}Clics enregistrés</div>
+      <div class="kpi-value">${fmt.num(t.clicks_real)}</div>
+      <div class="kpi-compare">
+        <span>sur</span><span class="kpi-compare-value">${fmt.num(t.clicks_prev)} prévus</span>
+      </div>
+      <div class="kpi-progress"><div class="kpi-progress-bar" style="width: ${t.clicks_prev > 0 ? Math.min(t.clicks_real / t.clicks_prev * 100, 100) : 0}%"></div></div>
+      <div class="kpi-progress-label">
+        <span><strong>${t.clicks_prev > 0 ? (t.clicks_real / t.clicks_prev * 100).toFixed(1) : 0}%</strong> atteint</span>
+        <span>CTR global ${t.impressions_real > 0 ? (t.clicks_real / t.impressions_real * 100).toFixed(3) : 0}%</span>
+      </div>
+    </div>
+
+    <div class="kpi-card animate-in ${statusCpv100}" style="animation-delay: 0.25s">
+      <div class="kpi-card-icon kpi-icon-blue">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <div class="kpi-label">${statusCpv100 ? `<span class="perf-dot ${statusCpv100}"></span>` : ''}CPV100 global <span style="font-weight:500; font-size:10px; color: var(--db-gray-500); text-transform:none; letter-spacing:0;">· vidéo</span></div>
+      <div class="kpi-value">${cpv100Real > 0 ? fmt.euros(cpv100Real, 3) : '—'}</div>
+      <div class="kpi-compare">
+        <span>cible</span><span class="kpi-compare-value">${cpv100Prev > 0 ? fmt.euros(cpv100Prev, 3) : '—'}</span>
+        ${cpv100Prev > 0 && cpv100Real > 0 ? `<span class="delta-badge ${cpv100Real <= cpv100Prev ? 'delta-positive' : 'delta-neutral'}">${cpv100Real <= cpv100Prev ? '−' : '+'}${Math.abs(((cpv100Real - cpv100Prev) / cpv100Prev) * 100).toFixed(1)}%</span>` : ''}
+      </div>
+      <div class="kpi-progress"><div class="kpi-progress-bar" style="width: ${cpv100Prev > 0 ? Math.min((cpv100Prev / Math.max(cpv100Real, 0.0001)) * 100, 100) : 0}%"></div></div>
+      <div class="kpi-progress-label">
+        <span>Coût pour 1 vidéo vue à 100%</span>
+        <span>${fmt.compact(tVideo.v100_real)} V100 cumulées · ${videoPartners.length} partenaire${videoPartners.length > 1 ? 's' : ''} vidéo</span>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================
+   RENDER: PARTNERS
+   ============================================ */
+function getPartnerInitials(name) {
+  const clean = name.replace(/[+\s]/g, '');
+  if (clean.length <= 2) return clean.toUpperCase();
+  if (clean.length <= 3) return clean.toUpperCase();
+  return clean.substring(0, 2).toUpperCase();
+}
+
+function getPartnerColor(regie) {
+  const colors = {
+    'TF1+': '#0E1F37', 'FTV': '#E60028', 'Managéo': '#FF6B35',
+    'YouTube': '#FF0000', 'Hawk': '#7E22CE', 'Social Media': '#1877F2'
+  };
+  return colors[regie] || '#107ACA';
+}
+
+/* Resolve partner status: manual user-set value takes priority, fallback to auto. */
+function resolvePartnerStatus(p, budgetPct, isStarted) {
+  // Try the manual statut field first
+  const manual = (p.statut || '').toString().trim().toLowerCase();
+  if (manual) {
+    if (manual.startsWith('en diff') || manual === 'active' || manual === 'diffusion') return { code: 'active', label: 'En diffusion' };
+    if (manual.startsWith('en pause') || manual === 'pause' || manual === 'paused') return { code: 'paused', label: 'En pause' };
+    if (manual.startsWith('terminé') || manual.startsWith('termine') || manual === 'ended' || manual === 'fini') return { code: 'ended', label: 'Terminée' };
+    if (manual.startsWith('à venir') || manual.startsWith('a venir') || manual === 'pending') return { code: 'pending', label: 'À venir' };
+  }
+  // Fallback to automatic detection from budget delivery
+  if (!isStarted) return { code: 'pending', label: 'À venir' };
+  if (budgetPct < 30) return { code: 'late', label: 'Sous-diffusion' };
+  return { code: 'active', label: 'En diffusion' };
+}
+
+function renderPartners() {
+  const grid = document.getElementById('partnerGrid');
+  document.getElementById('partnerCount').textContent = currentData.partners.length + ' partenaires';
+
+  // Empty state — invite the user to import the Excel template
+  if (currentData.partners.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; padding: 60px 30px; text-align: center; background: var(--db-blue-light); border-radius: 16px; border: 2px dashed var(--db-blue);">
+        <div style="font-size: 48px; margin-bottom: 16px;">📁</div>
+        <div style="font-size: 18px; font-weight: 700; color: var(--db-navy); margin-bottom: 8px;">Aucune campagne chargée</div>
+        <div style="font-size: 14px; color: var(--db-gray-500); margin-bottom: 24px; max-width: 480px; margin-left: auto; margin-right: auto;">
+          Importez votre fichier Excel pour afficher les performances. Le template prêt à remplir contient un onglet « Performances » et un onglet « Brand &amp; Search Lift ».
+        </div>
+        <button onclick="openUploadModal()" style="background: var(--db-blue); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit;">
+          Charger un fichier Excel
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  const timeProgress = computeTimeProgress(currentData.startDate, currentData.endDate);
+
+  grid.innerHTML = currentData.partners.map((p, idx) => {
+    const budgetPct = p.budget_prev > 0 ? (p.budget_real / p.budget_prev * 100) : 0;
+    const isStarted = p.budget_real > 0 || p.impressions_real > 0;
+    const completionVsTarget = p.completion_prev > 0 ? (p.completion_real / p.completion_prev) : 1;
+    const { code: status, label: statusLabel } = resolvePartnerStatus(p, budgetPct, isStarted);
+
+    // Perf status per metric
+    const sImp   = perfStatus(p.impressions_real, p.impressions_prev, 'temporal', timeProgress);
+    const sCompl = perfStatus(p.completion_real, p.completion_prev, 'forward');
+    const sV100  = perfStatus(p.v100_real, p.v100_prev, 'temporal', timeProgress);
+    const sCpv   = perfStatus(p.cpv100_real, p.cpv100_prev, 'inverse');
+    const sCtr   = perfStatus(p.ctr_real, p.ctr_prev, 'forward');
+    const sClk   = perfStatus(p.clicks_real, p.clicks_prev, 'temporal', timeProgress);
+
+    return `
+      <div class="partner-card animate-in" style="animation-delay: ${0.1 + idx * 0.06}s">
+        <div class="partner-header">
+          <div class="partner-logo">
+            <div class="partner-icon" style="background: ${getPartnerColor(p.regie)}">
+              ${getPartnerInitials(p.regie)}
+            </div>
+            <div>
+              <div class="partner-name">${p.regie}</div>
+              <div class="partner-format">${p.format}</div>
+            </div>
+          </div>
+          <div class="partner-tag ${p.tagClass}">${p.lever}</div>
+        </div>
+
+        <div class="partner-body">
+          <div class="partner-budget-row">
+            <div class="partner-budget-info">
+              <div class="partner-budget-label">Budget investi</div>
+              <div class="partner-budget-value">${fmt.euros(p.budget_real, 0)}</div>
+            </div>
+            <div class="partner-budget-target">/ ${fmt.euros(p.budget_prev, 0)}</div>
+          </div>
+          <div class="partner-progress">
+            <div class="partner-progress-bar" style="width: ${Math.min(budgetPct, 100)}%"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:11px; color: var(--db-gray-500); font-weight:600; margin-bottom: 14px;">
+            <span><strong style="color: var(--db-blue);">${budgetPct.toFixed(1)}%</strong> investi</span>
+            <span>CPM ${p.cpm_real > 0 ? fmt.euros(p.cpm_real, 2) : '—'} / cible ${fmt.euros(p.cpm_prev, 2)}</span>
+          </div>
+
+          <div class="partner-metrics">
+            <div class="partner-metric ${sImp}">
+              <div class="partner-metric-label">${sImp ? `<span class="perf-dot ${sImp}"></span>` : ''}Impressions</div>
+              <div class="partner-metric-value">${fmt.compact(p.impressions_real)}</div>
+              <div class="partner-metric-prev">cible : ${fmt.compact(p.impressions_prev)}</div>
+            </div>
+            <div class="partner-metric ${sCompl}">
+              <div class="partner-metric-label">${sCompl ? `<span class="perf-dot ${sCompl}"></span>` : ''}Complétion</div>
+              <div class="partner-metric-value">${p.completion_real > 0 ? fmt.pct(p.completion_real, 1) : '—'}</div>
+              <div class="partner-metric-prev">cible : ${fmt.pct(p.completion_prev, 0)}</div>
+            </div>
+            <div class="partner-metric ${sV100}">
+              <div class="partner-metric-label">${sV100 ? `<span class="perf-dot ${sV100}"></span>` : ''}Vues 100%</div>
+              <div class="partner-metric-value">${fmt.compact(p.v100_real)}</div>
+              <div class="partner-metric-prev">cible : ${fmt.compact(p.v100_prev)}</div>
+            </div>
+            <div class="partner-metric ${sCpv}">
+              <div class="partner-metric-label">${sCpv ? `<span class="perf-dot ${sCpv}"></span>` : ''}CPV100</div>
+              <div class="partner-metric-value">${p.cpv100_real > 0 ? fmt.euros(p.cpv100_real, 3) : '—'}</div>
+              <div class="partner-metric-prev">cible : ${p.cpv100_prev > 0 ? fmt.euros(p.cpv100_prev, 3) : '—'}</div>
+            </div>
+            <div class="partner-metric ${sCtr}">
+              <div class="partner-metric-label">${sCtr ? `<span class="perf-dot ${sCtr}"></span>` : ''}CTR</div>
+              <div class="partner-metric-value">${p.ctr_real > 0 ? fmt.pct(p.ctr_real, 3) : '—'}</div>
+              <div class="partner-metric-prev">cible : ${p.ctr_prev > 0 ? fmt.pct(p.ctr_prev, 3) : '—'}</div>
+            </div>
+            <div class="partner-metric ${sClk}">
+              <div class="partner-metric-label">${sClk ? `<span class="perf-dot ${sClk}"></span>` : ''}Clics</div>
+              <div class="partner-metric-value">${p.clicks_real > 0 ? fmt.num(p.clicks_real) : '—'}</div>
+              <div class="partner-metric-prev">cible : ${p.clicks_prev > 0 ? fmt.num(p.clicks_prev) : '—'}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="partner-footer">
+          <div class="partner-status status-${status}">
+            <span style="width:6px;height:6px;background:currentColor;border-radius:50%"></span>
+            ${statusLabel}
+          </div>
+          <button class="partner-comment-btn" onclick="toggleComment(${idx})">
+            <span id="cmt-label-${idx}">Voir le commentaire</span>
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+        </div>
+        <div class="partner-comment" id="cmt-${idx}">${p.comment || 'Aucun commentaire.'}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleComment(idx) {
+  const el = document.getElementById(`cmt-${idx}`);
+  const label = document.getElementById(`cmt-label-${idx}`);
+  el.classList.toggle('show');
+  label.textContent = el.classList.contains('show') ? 'Masquer' : 'Voir le commentaire';
+}
+
+/* ============================================
+   RENDER: CHARTS
+   ============================================ */
+function destroyCharts() {
+  Object.values(charts).forEach(c => c.destroy());
+  charts = {};
+}
+
+function getChartFont() {
+  return { family: "'Manrope', sans-serif", size: 11, weight: '600' };
+}
+
+const chartColorPrev = '#94A3B8';
+const chartColorReal = '#107ACA';
+const chartColorTarget = '#94A3B8';
+const chartColorReachedHigh = '#00B894';
+const chartColorReachedMid = '#107ACA';
+const chartColorReachedLow = '#FF9F43';
+
+function renderCharts() {
+  destroyCharts();
+  const partners = currentData.partners;
+  const labels = partners.map(p => p.regie);
+
+  Chart.defaults.font.family = "'Manrope', sans-serif";
+  Chart.defaults.color = '#64748B';
+  Chart.defaults.borderColor = '#E2E8F0';
+
+  const commonOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        align: 'end',
+        labels: {
+          font: { ...getChartFont(), size: 12 },
+          color: '#475569',
+          usePointStyle: true,
+          pointStyle: 'rectRounded',
+          padding: 16,
+          boxWidth: 10,
+          boxHeight: 10
+        }
+      },
+      tooltip: {
+        backgroundColor: '#0E1F37',
+        titleFont: { ...getChartFont(), weight: '700', size: 12 },
+        bodyFont: getChartFont(),
+        padding: 12,
+        cornerRadius: 8,
+        boxPadding: 6,
+        displayColors: true,
+        usePointStyle: true
+      }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: getChartFont() } },
+      y: { grid: { color: '#F1F5F9' }, ticks: { font: getChartFont() }, beginAtZero: true }
+    }
+  };
+
+  // Budget chart
+  charts.budget = new Chart(document.getElementById('budgetChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Budget prévisionnel', data: partners.map(p => p.budget_prev), backgroundColor: chartColorPrev, borderRadius: 6, barPercentage: 0.7, categoryPercentage: 0.65 },
+        { label: 'Budget réalisé', data: partners.map(p => p.budget_real), backgroundColor: chartColorReal, borderRadius: 6, barPercentage: 0.7, categoryPercentage: 0.65 }
+      ]
+    },
+    options: {
+      ...commonOpts,
+      scales: {
+        ...commonOpts.scales,
+        y: {
+          ...commonOpts.scales.y,
+          ticks: { ...commonOpts.scales.y.ticks, callback: v => fmt.compact(v) + ' €' }
+        }
+      },
+      plugins: {
+        ...commonOpts.plugins,
+        tooltip: {
+          ...commonOpts.plugins.tooltip,
+          callbacks: { label: c => `${c.dataset.label} : ${fmt.euros(c.raw, 0)}` }
+        }
+      }
+    }
+  });
+
+  // Impressions chart
+  charts.impressions = new Chart(document.getElementById('impressionsChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Impressions prévisionnelles', data: partners.map(p => p.impressions_prev), backgroundColor: chartColorPrev, borderRadius: 6, barPercentage: 0.7, categoryPercentage: 0.65 },
+        { label: 'Impressions réalisées', data: partners.map(p => p.impressions_real), backgroundColor: chartColorReal, borderRadius: 6, barPercentage: 0.7, categoryPercentage: 0.65 }
+      ]
+    },
+    options: {
+      ...commonOpts,
+      scales: {
+        ...commonOpts.scales,
+        y: {
+          ...commonOpts.scales.y,
+          ticks: { ...commonOpts.scales.y.ticks, callback: v => fmt.compact(v) }
+        }
+      },
+      plugins: {
+        ...commonOpts.plugins,
+        tooltip: {
+          ...commonOpts.plugins.tooltip,
+          callbacks: { label: c => `${c.dataset.label} : ${fmt.num(c.raw)}` }
+        }
+      }
+    }
+  });
+
+  // Completion chart
+  const completionLabels = partners.filter(p => p.completion_prev > 0).map(p => p.regie);
+  const completionPartners = partners.filter(p => p.completion_prev > 0);
+  charts.completion = new Chart(document.getElementById('completionChart'), {
+    type: 'bar',
+    data: {
+      labels: completionLabels,
+      datasets: [
+        { label: 'Objectif de complétion', data: completionPartners.map(p => p.completion_prev * 100), backgroundColor: chartColorTarget, borderRadius: 6, barPercentage: 0.6, categoryPercentage: 0.7 },
+        {
+          label: 'Complétion réalisée',
+          data: completionPartners.map(p => p.completion_real * 100),
+          backgroundColor: completionPartners.map(p => {
+            if (p.completion_real >= p.completion_prev) return chartColorReachedHigh;
+            if (p.completion_real >= p.completion_prev * 0.9) return chartColorReachedMid;
+            return chartColorReachedLow;
+          }),
+          borderRadius: 6, barPercentage: 0.6, categoryPercentage: 0.7
+        }
+      ]
+    },
+    options: {
+      ...commonOpts,
+      indexAxis: 'x',
+      scales: {
+        ...commonOpts.scales,
+        y: {
+          ...commonOpts.scales.y,
+          min: 0, max: 100,
+          ticks: { ...commonOpts.scales.y.ticks, callback: v => v + '%' }
+        }
+      },
+      plugins: {
+        ...commonOpts.plugins,
+        tooltip: {
+          ...commonOpts.plugins.tooltip,
+          callbacks: { label: c => `${c.dataset.label} : ${c.raw.toFixed(1)}%` }
+        }
+      }
+    }
+  });
+}
+
+/* ============================================
+   RENDER: CREATIVES (table + charts)
+   ============================================ */
+function renderCreatives() {
+  const tbody = document.getElementById('creativesTbody');
+  const countEl = document.getElementById('creativeCount');
+  const creatives = (currentData.creatives || []).slice();
+
+  if (countEl) countEl.textContent = creatives.length + ' créa' + (creatives.length > 1 ? 's' : '');
+
+  // Compute CPV100 for each (priorise field; fallback budget_real / v100_real)
+  creatives.forEach(c => {
+    if ((c.cpv100_real == null || c.cpv100_real === 0) && c.budget_real > 0 && c.v100_real > 0) {
+      c.cpv100_real = c.budget_real / c.v100_real;
+    }
+  });
+
+  // Sort by completion desc for the table; ties broken by lower CPV100
+  creatives.sort((a, b) => (b.completion_real - a.completion_real) || ((a.cpv100_real || Infinity) - (b.cpv100_real || Infinity)));
+
+  if (!tbody) return;
+
+  if (creatives.length === 0) {
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">Aucune créa renseignée. Remplissez l'onglet « Créas » du template pour activer ce comparatif.</td></tr>`;
+    // Destroy charts if any
+    ['creativeCompletionChart', 'creativeCpvChart'].forEach(id => {
+      if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+    });
+    return;
+  }
+
+  // Identify best/worst for highlighting
+  const valid = creatives.filter(c => c.completion_real > 0);
+  const bestCompletion = valid.length ? Math.max(...valid.map(c => c.completion_real)) : null;
+  const validCpv = creatives.filter(c => c.cpv100_real > 0);
+  const bestCpv = validCpv.length ? Math.min(...validCpv.map(c => c.cpv100_real)) : null;
+
+  tbody.innerHTML = creatives.map(c => {
+    const isBestCompl = c.completion_real > 0 && c.completion_real === bestCompletion;
+    const isBestCpv = c.cpv100_real > 0 && c.cpv100_real === bestCpv;
+    return `
+      <tr>
+        <td>
+          <div class="creative-name">${c.name || '—'}</div>
+        </td>
+        <td><span class="creative-format">${c.format || '—'}</span></td>
+        <td class="num">${c.impressions_real > 0 ? fmt.num(c.impressions_real) : '—'}</td>
+        <td class="num">${c.v100_real > 0 ? fmt.num(c.v100_real) : '—'}</td>
+        <td class="num ${isBestCompl ? 'creative-best' : ''}">${c.completion_real > 0 ? fmt.pct(c.completion_real, 1) : '—'}</td>
+        <td class="num ${isBestCpv ? 'creative-best' : ''}">${c.cpv100_real > 0 ? fmt.euros(c.cpv100_real, 3) : '—'}</td>
+      </tr>
+    `;
+  }).join('');
+
+  // Charts
+  renderCreativeCharts(creatives, bestCompletion, bestCpv);
+}
+
+function renderCreativeCharts(creatives, bestCompletion, bestCpv) {
+  const navy = getComputedStyle(document.documentElement).getPropertyValue('--db-navy').trim() || '#0E1F37';
+  const blue = getComputedStyle(document.documentElement).getPropertyValue('--db-blue').trim() || '#107ACA';
+  const success = getComputedStyle(document.documentElement).getPropertyValue('--db-success').trim() || '#00B894';
+  const gray400 = '#94A3B8';
+
+  Chart.defaults.font.family = "'Manrope', sans-serif";
+  Chart.defaults.color = '#64748B';
+  Chart.defaults.borderColor = '#E2E8F0';
+
+  const labels = creatives.map(c => c.name || '—');
+
+  // --- Completion chart ---
+  const completionCanvas = document.getElementById('creativeCompletionChart');
+  if (completionCanvas) {
+    if (charts.creativeCompletionChart) charts.creativeCompletionChart.destroy();
+    const completionData = creatives.map(c => c.completion_real * 100);
+    const colors = creatives.map(c => c.completion_real > 0 && c.completion_real === bestCompletion ? success : blue);
+    charts.creativeCompletionChart = new Chart(completionCanvas, {
+      type: 'bar',
+      data: { labels, datasets: [{ data: completionData, backgroundColor: colors, borderRadius: 6, barPercentage: 0.7 }] },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ctx.parsed.x.toFixed(1) + ' %' } }
+        },
+        scales: {
+          x: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' }, grid: { color: '#F1F5F9' } },
+          y: { grid: { display: false }, ticks: { font: { size: 11, weight: 600 }, color: navy } }
+        }
+      }
+    });
+  }
+
+  // --- CPV100 chart ---
+  const cpvCanvas = document.getElementById('creativeCpvChart');
+  if (cpvCanvas) {
+    if (charts.creativeCpvChart) charts.creativeCpvChart.destroy();
+    const cpvData = creatives.map(c => c.cpv100_real || 0);
+    const colors = creatives.map(c => c.cpv100_real > 0 && c.cpv100_real === bestCpv ? success : blue);
+    charts.creativeCpvChart = new Chart(cpvCanvas, {
+      type: 'bar',
+      data: { labels, datasets: [{ data: cpvData, backgroundColor: colors, borderRadius: 6, barPercentage: 0.7 }] },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { callbacks: { label: ctx => ctx.parsed.x.toLocaleString('fr-FR', { minimumFractionDigits: 3, maximumFractionDigits: 3 }) + ' €' } }
+        },
+        scales: {
+          x: { beginAtZero: true, ticks: { callback: v => v.toLocaleString('fr-FR') + ' €' }, grid: { color: '#F1F5F9' } },
+          y: { grid: { display: false }, ticks: { font: { size: 11, weight: 600 }, color: navy } }
+        }
+      }
+    });
+  }
+}
+
+/* ============================================
+   RENDER: BLS / SLS
+   ============================================ */
+function renderBLSCharts() {
+  const navy = getComputedStyle(document.documentElement).getPropertyValue('--db-navy').trim() || '#0E1F37';
+  const blue = getComputedStyle(document.documentElement).getPropertyValue('--db-blue').trim() || '#107ACA';
+  const gray500 = getComputedStyle(document.documentElement).getPropertyValue('--db-gray-500').trim() || '#6B7280';
+  const success = getComputedStyle(document.documentElement).getPropertyValue('--db-success').trim() || '#00B894';
+
+  const gridColor = 'rgba(14, 31, 55, 0.08)';
+  const fontFamily = "'Manrope', system-ui, sans-serif";
+
+  // --- BLS by age ---
+  const ageCanvas = document.getElementById('blsAgeChart');
+  if (ageCanvas) {
+    if (charts.blsAge) charts.blsAge.destroy();
+    const ageData = (currentData.bls.age || []).filter(d => d && d.range);
+    if (ageData.length > 0) {
+      charts.blsAge = new Chart(ageCanvas, {
+        type: 'bar',
+        data: {
+          labels: ageData.map(d => d.range),
+          datasets: [
+            {
+              label: 'Témoin (%)',
+              data: ageData.map(d => d.control != null ? d.control : 0),
+              backgroundColor: gray500 + '99',
+              borderRadius: 6,
+              barPercentage: 0.7,
+              categoryPercentage: 0.6
+            },
+            {
+              label: 'Exposé (%)',
+              data: ageData.map(d => d.exposed != null ? d.exposed : 0),
+              backgroundColor: blue,
+              borderRadius: 6,
+              barPercentage: 0.7,
+              categoryPercentage: 0.6
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { font: { family: fontFamily, size: 11, weight: '600' }, color: navy, usePointStyle: true, padding: 14 } },
+            tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ' : ' + Number(ctx.raw).toLocaleString('fr-FR', { maximumFractionDigits: 1 }) + ' %' } }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { font: { family: fontFamily, size: 11, weight: '600' }, color: navy } },
+            y: { beginAtZero: true, grid: { color: gridColor }, ticks: { font: { family: fontFamily, size: 10 }, color: gray500, callback: v => v + ' %' } }
+          }
+        }
+      });
+    }
+  }
+
+  // --- BLS by gender ---
+  const genderCanvas = document.getElementById('blsGenderChart');
+  if (genderCanvas) {
+    if (charts.blsGender) charts.blsGender.destroy();
+    const genderData = (currentData.bls.gender || []).filter(d => d && d.label);
+    if (genderData.length > 0) {
+      charts.blsGender = new Chart(genderCanvas, {
+        type: 'bar',
+        data: {
+          labels: genderData.map(d => d.label),
+          datasets: [
+            {
+              label: 'Témoin (%)',
+              data: genderData.map(d => d.control != null ? d.control : 0),
+              backgroundColor: gray500 + '99',
+              borderRadius: 6,
+              barPercentage: 0.5
+            },
+            {
+              label: 'Exposé (%)',
+              data: genderData.map(d => d.exposed != null ? d.exposed : 0),
+              backgroundColor: success,
+              borderRadius: 6,
+              barPercentage: 0.5
+            }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { font: { family: fontFamily, size: 11, weight: '600' }, color: navy, usePointStyle: true, padding: 14 } },
+            tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ' : ' + Number(ctx.raw).toLocaleString('fr-FR', { maximumFractionDigits: 1 }) + ' %' } }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { font: { family: fontFamily, size: 12, weight: '700' }, color: navy } },
+            y: { beginAtZero: true, grid: { color: gridColor }, ticks: { font: { family: fontFamily, size: 10 }, color: gray500, callback: v => v + ' %' } }
+          }
+        }
+      });
+    }
+  }
+}
+
+function renderBLS() {
+  // BLS KPIs — null-safe rendering
+  const blsImpact = document.getElementById('blsImpact');
+  if (blsImpact) {
+    blsImpact.textContent = (currentData.bls.impact != null)
+      ? ('+' + currentData.bls.impact.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' %')
+      : '—';
+  }
+  const blsUsers = document.getElementById('blsUsers');
+  if (blsUsers) blsUsers.textContent = (currentData.bls.users != null) ? fmt.compact(currentData.bls.users) : '—';
+  const blsCost = document.getElementById('blsCost');
+  if (blsCost) {
+    blsCost.textContent = (currentData.bls.cost != null)
+      ? (currentData.bls.cost.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €')
+      : '—';
+  }
+  const blsBaseline = document.getElementById('blsBaseline');
+  if (blsBaseline) {
+    blsBaseline.textContent = (currentData.bls.baseline != null)
+      ? (currentData.bls.baseline.toLocaleString('fr-FR', { minimumFractionDigits: 1 }) + ' %')
+      : '—';
+  }
+  const blsCert = document.getElementById('blsCertainty');
+  if (blsCert) blsCert.textContent = currentData.bls.certainty ? ('Certitude ' + currentData.bls.certainty) : 'Certitude —';
+
+  // BLS age + gender charts
+  renderBLSCharts();
+
+  // BLS methodology
+  const blsMeth = document.getElementById('blsMethodology');
+  if (blsMeth) {
+    if (currentData.bls.methodology) {
+      blsMeth.innerHTML = '<strong style="color: var(--db-navy);">Méthodologie :</strong> ' + currentData.bls.methodology;
+      blsMeth.style.display = 'block';
+    } else {
+      blsMeth.style.display = 'none';
+    }
+  }
+
+  // SLS KPIs — null-safe
+  const slsImpact = document.getElementById('slsImpact');
+  if (slsImpact) {
+    slsImpact.textContent = (currentData.sls.impact != null)
+      ? ('+' + currentData.sls.impact.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' %')
+      : '—';
+  }
+  const slsKw = document.getElementById('slsKeyword');
+  if (slsKw) slsKw.textContent = currentData.sls.keyword ? ('"' + currentData.sls.keyword + '"') : '—';
+  const slsIdx = document.getElementById('slsIndexedLabel');
+  if (slsIdx) {
+    slsIdx.textContent = (currentData.sls.indexedLift != null)
+      ? ('Augmentation incrémentale indexée : ' + Number(currentData.sls.indexedLift).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }))
+      : 'Augmentation incrémentale indexée : —';
+  }
+  const slsCnt = document.getElementById('slsKeywordCount');
+  if (slsCnt) slsCnt.textContent = (currentData.sls.keywordCount != null) ? currentData.sls.keywordCount : '—';
+  const slsCert = document.getElementById('slsCertainty');
+  if (slsCert) slsCert.textContent = currentData.sls.certainty ? ('Certitude ' + currentData.sls.certainty) : 'Certitude —';
+
+  // SLS methodology
+  const slsMeth = document.getElementById('slsMethodology');
+  if (slsMeth) {
+    if (currentData.sls.methodology) {
+      slsMeth.innerHTML = '<strong style="color: var(--db-navy);">Méthodologie :</strong> ' + currentData.sls.methodology;
+      slsMeth.style.display = 'block';
+    } else {
+      slsMeth.style.display = 'none';
+    }
+  }
+
+  // SLS detail table — render dynamically
+  const tbody = document.getElementById('slsTableBody');
+  if (tbody && currentData.sls.rows && Array.isArray(currentData.sls.rows)) {
+    tbody.innerHTML = currentData.sls.rows.map(r => {
+      const isGroup = !!r.isGroup;
+      const isMain = !!r.isMain;
+      const trClass = isGroup ? ' class="highlight"' : '';
+      const kwStyle = isMain ? ' style="font-weight: 700; color: var(--db-blue);"' : '';
+      const insufficient = (v) => (typeof v === 'string' && v.toLowerCase().includes('insuffisant'));
+      const fmtCell = (v, isPct, isStrong, strongColor) => {
+        if (v === '—' || v === null || v === undefined || v === '') return '<td>—</td>';
+        if (insufficient(v)) return '<td class="insufficient">Données insuffisantes</td>';
+        if (typeof v === 'number') {
+          const txt = v.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + (isPct ? ' %' : '');
+          return isStrong ? `<td><strong style="color: var(--${strongColor});">${txt}</strong></td>` : `<td>${txt}</td>`;
+        }
+        return `<td>${v}</td>`;
+      };
+      return `<tr${trClass}>
+        <td><span class="sls-keyword"${kwStyle}>${r.keyword}</span></td>
+        ${fmtCell(r.indexed, false, false)}
+        ${fmtCell(r.impact, true, isMain, 'db-success')}
+        ${fmtCell(r.certainty, false, false)}
+      </tr>`;
+    }).join('');
+  }
+}
+
+/* ============================================
+   RENDER: ALL
+   ============================================ */
+function renderAll() {
+  renderBanner();
+  renderKPIs();
+  renderPartners();
+  renderCharts();
+  renderCreatives();
+  renderBLS();
+  document.getElementById('lastUpdate').textContent = new Date().toLocaleString('fr-FR', {
+    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+  });
+}
+
+/* ============================================
+   EXCEL PARSER
+   ============================================ */
+function excelDateToJSDate(serial) {
+  if (!serial || typeof serial !== 'number') return null;
+  const utc_days = Math.floor(serial - 25569);
+  const utc_value = utc_days * 86400;
+  return new Date(utc_value * 1000);
+}
+
+function parseExcel(arrayBuffer) {
+  const wb = XLSX.read(arrayBuffer, { type: 'array', cellDates: false });
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+
+  // CRITICAL: Force the sheet range to start at A1 so sheet_to_json returns
+  // arrays with row[0] === column A. Some Excel exports have !ref="B1:..."
+  // when column A is empty, which causes SheetJS to shift all indices by -1.
+  if (sheet['!ref']) {
+    try {
+      const r = XLSX.utils.decode_range(sheet['!ref']);
+      if (r.s.c > 0 || r.s.r > 0) {
+        r.s.c = 0; r.s.r = 0;
+        sheet['!ref'] = XLSX.utils.encode_range(r);
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  const rowsRaw = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null, raw: true });
+
+  // CRITICAL FIX: SheetJS may return arrays starting at the first non-empty cell
+  // instead of col A. We detect this by looking for "Levier" — it should be at index 8 (col I).
+  // If found earlier, we left-pad every row with nulls so absolute indices line up again.
+  let perfShift = 0;
+  for (let i = 0; i < Math.min(rowsRaw.length, 15); i++) {
+    const row = rowsRaw[i] || [];
+    for (let j = 0; j < row.length; j++) {
+      const v = (row[j] || '').toString().toLowerCase().trim();
+      if (v === 'levier') {
+        if (j < 8) perfShift = 8 - j;
+        break;
+      }
+    }
+    if (perfShift !== 0) break;
+  }
+  const rows = perfShift > 0
+    ? rowsRaw.map(r => new Array(perfShift).fill(null).concat(r || []))
+    : rowsRaw;
+
+  // Detect meta info — search for labels in column 9 (index 8)
+  let client = 'Doctolib', campaign = 'Campagne', startDate = null, endDate = null;
+  for (let i = 0; i < Math.min(rows.length, 15); i++) {
+    const row = rows[i] || [];
+    for (let j = 0; j < row.length; j++) {
+      const cell = row[j];
+      if (typeof cell === 'string') {
+        const norm = cell.toLowerCase().trim();
+        if (norm === 'client' && row[j+3]) client = String(row[j+3]);
+        if (norm === 'campagne' && row[j+3]) campaign = String(row[j+3]);
+        if (norm.startsWith('date de début') && row[j+3]) startDate = row[j+3];
+        if (norm.startsWith('date de fin') && row[j+3]) endDate = row[j+3];
+      }
+    }
+  }
+
+  if (typeof startDate === 'number') startDate = excelDateToJSDate(startDate).toISOString().slice(0, 10);
+  if (typeof endDate === 'number') endDate = excelDateToJSDate(endDate).toISOString().slice(0, 10);
+
+  // Find header row
+  let headerRowIdx = -1;
+  for (let i = 0; i < Math.min(rows.length, 20); i++) {
+    const row = rows[i] || [];
+    const flat = row.map(c => (c || '').toString().toLowerCase()).join('|');
+    if (flat.includes('levier') && flat.includes('régie')) {
+      headerRowIdx = i;
+      break;
+    }
+  }
+
+  if (headerRowIdx === -1) throw new Error("Ligne d'en-têtes introuvable (recherche 'Levier' + 'Régie').");
+
+  // Column indices (0-based, matching what we observed: row 9 in 1-based = idx 8)
+  // From inspection: Levier=col 9 (idx 8), Régie=col 13 (idx 12)... but let's locate them dynamically
+  const headerRow = rows[headerRowIdx];
+  const findCol = (label) => {
+    for (let i = 0; i < headerRow.length; i++) {
+      const v = (headerRow[i] || '').toString().toLowerCase();
+      if (v.includes(label.toLowerCase())) return i;
+    }
+    return -1;
+  };
+
+  // Locate by name to be robust
+  const colLevier = findCol('levier');
+  const colRegie = findCol('régie');
+  const colCDD = findCol('cdd');
+  const colFormat = findCol('format');
+  const colMode = findCol("mode d'achat");
+
+  // For Cout/Budget/Impressions etc., headers repeat for prev and real.
+  // We'll find them by position: budget_prev = col 24 (idx 23), budget_real = col 32 (idx 31)
+  // But to be robust, use the known offsets relative to the column with "Budget Investi" / "Performances estimées" labels in row above
+  // Simpler approach: use observed indices based on the original Excel pattern
+  // Levier=col 8(0-idx), Régie=12, Format=14, Mode=21
+  // Prev block: Cout=22, Budget=23, BudgetGrac=24, Imp=25, Compl=26, V100=27, CTR=28, Clics=29
+  // Real block: Cout=30, Budget=31, %inv=32, BudgetGrac=33, Imp=34, Compl=35, V100=36, CTR=37, Clics=38, Comments=39
+  // BUT: SheetJS may shift indices if column A is entirely empty.
+  // So we detect every position dynamically from the header row.
+
+  // Find ALL occurrences of a label in the header (returns array of indices).
+  const findAllCols = (...labels) => {
+    const result = [];
+    for (let i = 0; i < headerRow.length; i++) {
+      const v = (headerRow[i] || '').toString().toLowerCase().trim();
+      if (!v) continue;
+      for (const lab of labels) {
+        if (v === lab.toLowerCase() || v.includes(lab.toLowerCase())) {
+          result.push(i);
+          break;
+        }
+      }
+    }
+    return result;
+  };
+
+  // CPM (€)/CPM réel — both contain "cpm"
+  const colsCPM = findAllCols('cpm');
+  // Budget AE / Budget AE réel — exclude "gracieux"
+  const colsBudgetAE = [];
+  for (let i = 0; i < headerRow.length; i++) {
+    const v = (headerRow[i] || '').toString().toLowerCase();
+    if (v.includes('budget ae') && !v.includes('gracieux')) colsBudgetAE.push(i);
+  }
+  // Impressions / Impressions — exact match preferred
+  const colsImpressions = findAllCols('impressions');
+  // Taux complétion
+  const colsCompletion = findAllCols('complétion', 'completion');
+  // V100 — must NOT match "CPV100"
+  const colsV100 = [];
+  for (let i = 0; i < headerRow.length; i++) {
+    const v = (headerRow[i] || '').toString().toLowerCase();
+    if ((v.includes('vidéos vues') || v.includes('videos vues') || v.includes('vues 100') || /\bv100\b/.test(v)) && !v.includes('cpv')) {
+      colsV100.push(i);
+    }
+  }
+  // CPV100
+  const colsCPV100 = [];
+  for (let i = 0; i < headerRow.length; i++) {
+    const v = (headerRow[i] || '').toString().toLowerCase();
+    if (v.includes('cpv100') || v.includes('cpv 100')) colsCPV100.push(i);
+  }
+  // CTR
+  const colsCTR = findAllCols('ctr');
+  // Clics
+  const colsClicks = findAllCols('clics');
+  // Commentaire
+  const colsComment = findAllCols('commentaire');
+  // Statut diffusion (manual user-set status)
+  let colStatut = -1;
+  for (let i = 0; i < headerRow.length; i++) {
+    const s = (headerRow[i] || '').toString().toLowerCase().trim();
+    if (s === 'statut diffusion' || s.startsWith('statut diff')) { colStatut = i; break; }
+  }
+
+  // For each duplicated header: 1st occurrence = previsionnel, 2nd = réel
+  const pickReal = (arr, fallback) => (arr.length >= 2 ? arr[1] : (arr.length >= 1 ? arr[0] : fallback));
+  const pickPrev = (arr, fallback) => (arr.length >= 1 ? arr[0] : fallback);
+
+  const IDX = {
+    levier: colLevier !== -1 ? colLevier : 8,
+    regie: colRegie !== -1 ? colRegie : 12,
+    cdd: colCDD !== -1 ? colCDD : 13,
+    format: colFormat !== -1 ? colFormat : 14,
+    mode: colMode !== -1 ? colMode : 21,
+    statut: colStatut,
+    cpm_prev: pickPrev(colsCPM, 22),
+    budget_prev: pickPrev(colsBudgetAE, 23),
+    impressions_prev: pickPrev(colsImpressions, 25),
+    completion_prev: pickPrev(colsCompletion, 26),
+    v100_prev: pickPrev(colsV100, 27),
+    cpv100_prev: pickPrev(colsCPV100, -1),
+    ctr_prev: pickPrev(colsCTR, 28),
+    clicks_prev: pickPrev(colsClicks, 29),
+    cpm_real: pickReal(colsCPM, 30),
+    budget_real: pickReal(colsBudgetAE, 31),
+    impressions_real: pickReal(colsImpressions, 34),
+    completion_real: pickReal(colsCompletion, 35),
+    v100_real: pickReal(colsV100, 36),
+    cpv100_real: pickReal(colsCPV100, -1),
+    ctr_real: pickReal(colsCTR, 37),
+    clicks_real: pickReal(colsClicks, 38),
+    comment: pickPrev(colsComment, 39)
+  };
+
+  // Build map of "Total X" markers — each partner row gets the lever of the next Total row
+  const totalMarkers = [];
+  for (let i = headerRowIdx + 1; i < rows.length; i++) {
+    const cell = (rows[i] && rows[i][IDX.levier] || '').toString().toLowerCase().trim();
+    if (cell.startsWith('total audio')) totalMarkers.push({ idx: i, lever: 'Audio', cls: 'tag-audio' });
+    else if (cell.startsWith('total vol')) totalMarkers.push({ idx: i, lever: 'VOL', cls: 'tag-vol' });
+    else if (cell.startsWith('total pbu')) totalMarkers.push({ idx: i, lever: 'PBU', cls: 'tag-pbu' });
+    else if (cell.startsWith('total some') || cell.startsWith('total social')) totalMarkers.push({ idx: i, lever: 'SoMe', cls: 'tag-some' });
+  }
+
+  const getLeverForRow = (rowIdx) => {
+    for (const m of totalMarkers) if (rowIdx < m.idx) return m;
+    return { lever: 'Autre', cls: 'tag-vol' };
+  };
+
+  // Robust "is this a total row" check — covers both "Total X" and "TOTAUX :"
+  const isTotalRow = (cellVal) => {
+    if (!cellVal || typeof cellVal !== 'string') return false;
+    const n = cellVal.toLowerCase().trim();
+    return n.startsWith('total') || n.startsWith('totaux');
+  };
+
+  const parseNum = (v) => {
+    if (v === null || v === undefined || v === '') return 0;
+    if (typeof v === 'number') return v;
+    if (typeof v === 'string') {
+      if (v.includes('#DIV') || v.includes('#REF') || v.includes('#VALUE')) return 0;
+      // Strip percent sign so "1.07%" / "1,07 %" become numbers
+      const cleaned = v.replace(/\s/g, '').replace('%', '').replace(',', '.');
+      const n = parseFloat(cleaned);
+      return isNaN(n) ? 0 : n;
+    }
+    return 0;
+  };
+
+  // Auto-detect percentage format : 0.012 → decimal (1.2%) ; 12.5 → already in % (divide by 100)
+  // Threshold = 1.5 : any completion/CTR above 150% is nonsensical, so treat as raw-% input.
+  const parsePercent = (v) => {
+    const n = parseNum(v);
+    if (Math.abs(n) > 1.5) return n / 100;
+    return n;
+  };
+
+  const partners = [];
+  let pendingSomeLines = [];
+
+  for (let i = headerRowIdx + 1; i < rows.length; i++) {
+    const row = rows[i] || [];
+    const levier = row[IDX.levier];
+    const regie = row[IDX.regie];
+    const cdd = row[IDX.cdd];
+
+    // Skip total rows (covers both "Total X" and "TOTAUX :")
+    if (isTotalRow(levier)) continue;
+
+    // Determine lever category from position relative to next "Total X" marker
+    const leverInfo = getLeverForRow(i);
+
+    // Only process rows with a Régie (partner)
+    if (!regie || typeof regie !== 'string' || regie.trim() === '') {
+      // SoMe rows often have no regie but have data — group them
+      if (leverInfo.lever === 'SoMe') {
+        const budget_prev = parseNum(row[IDX.budget_prev]);
+        const impressions_prev = parseNum(row[IDX.impressions_prev]);
+        if (budget_prev > 0 || impressions_prev > 0) {
+          pendingSomeLines.push({
+            budget_prev, impressions_prev,
+            completion_prev: parsePercent(row[IDX.completion_prev]),
+            v100_prev: parseNum(row[IDX.v100_prev]),
+            cpv100_prev: IDX.cpv100_prev >= 0 ? parseNum(row[IDX.cpv100_prev]) : 0,
+            ctr_prev: parsePercent(row[IDX.ctr_prev]),
+            clicks_prev: parseNum(row[IDX.clicks_prev]),
+            budget_real: parseNum(row[IDX.budget_real]),
+            impressions_real: parseNum(row[IDX.impressions_real]),
+            completion_real: parsePercent(row[IDX.completion_real]),
+            v100_real: parseNum(row[IDX.v100_real]),
+            cpv100_real: IDX.cpv100_real >= 0 ? parseNum(row[IDX.cpv100_real]) : 0,
+            ctr_real: parsePercent(row[IDX.ctr_real]),
+            clicks_real: parseNum(row[IDX.clicks_real])
+          });
+        }
+      }
+      continue;
+    }
+
+    // SoMe partner rows with a Régie also go into the aggregation bucket
+    if (leverInfo.lever === 'SoMe') {
+      const budget_prev = parseNum(row[IDX.budget_prev]);
+      const impressions_prev = parseNum(row[IDX.impressions_prev]);
+      if (budget_prev > 0 || impressions_prev > 0) {
+        pendingSomeLines.push({
+          budget_prev, impressions_prev,
+          completion_prev: parsePercent(row[IDX.completion_prev]),
+          v100_prev: parseNum(row[IDX.v100_prev]),
+          cpv100_prev: IDX.cpv100_prev >= 0 ? parseNum(row[IDX.cpv100_prev]) : 0,
+          ctr_prev: parsePercent(row[IDX.ctr_prev]),
+          clicks_prev: parseNum(row[IDX.clicks_prev]),
+          budget_real: parseNum(row[IDX.budget_real]),
+          impressions_real: parseNum(row[IDX.impressions_real]),
+          completion_real: parsePercent(row[IDX.completion_real]),
+          v100_real: parseNum(row[IDX.v100_real]),
+          cpv100_real: IDX.cpv100_real >= 0 ? parseNum(row[IDX.cpv100_real]) : 0,
+          ctr_real: parsePercent(row[IDX.ctr_real]),
+          clicks_real: parseNum(row[IDX.clicks_real])
+        });
+      }
+      continue;
+    }
+
+    const fmt = (row[IDX.format] || '').toString().trim().replace(/\n/g, ' ');
+    const rawStatut = IDX.statut >= 0 ? (row[IDX.statut] || '').toString().trim() : '';
+
+    const p = {
+      lever: leverInfo.lever,
+      regie: regie.toString().trim(),
+      format: fmt || 'Format vidéo',
+      cdd: (cdd || '').toString().trim().replace(/\n/g, ' '),
+      buyMode: (row[IDX.mode] || 'CPM').toString().trim(),
+      tagClass: leverInfo.cls,
+      objective: '',
+      statut: rawStatut,
+      cpm_prev: parseNum(row[IDX.cpm_prev]),
+      budget_prev: parseNum(row[IDX.budget_prev]),
+      impressions_prev: parseNum(row[IDX.impressions_prev]),
+      completion_prev: parsePercent(row[IDX.completion_prev]),
+      v100_prev: parseNum(row[IDX.v100_prev]),
+      cpv100_prev: IDX.cpv100_prev >= 0 ? parseNum(row[IDX.cpv100_prev]) : 0,
+      ctr_prev: parsePercent(row[IDX.ctr_prev]),
+      clicks_prev: parseNum(row[IDX.clicks_prev]),
+      cpm_real: parseNum(row[IDX.cpm_real]),
+      budget_real: parseNum(row[IDX.budget_real]),
+      impressions_real: parseNum(row[IDX.impressions_real]),
+      completion_real: parsePercent(row[IDX.completion_real]),
+      v100_real: parseNum(row[IDX.v100_real]),
+      cpv100_real: IDX.cpv100_real >= 0 ? parseNum(row[IDX.cpv100_real]) : 0,
+      ctr_real: parsePercent(row[IDX.ctr_real]),
+      clicks_real: parseNum(row[IDX.clicks_real]),
+      comment: (row[IDX.comment] || '').toString().replace(/_x000B_/g, '\n').trim()
+    };
+    // Fallback: compute CPV100 if missing (budget / v100)
+    if (!p.cpv100_prev && p.budget_prev > 0 && p.v100_prev > 0) p.cpv100_prev = p.budget_prev / p.v100_prev;
+    if (!p.cpv100_real && p.budget_real > 0 && p.v100_real > 0) p.cpv100_real = p.budget_real / p.v100_real;
+    partners.push(p);
+  }
+
+  // Aggregate SoMe pending lines
+  if (pendingSomeLines.length > 0) {
+    const agg = pendingSomeLines.reduce((acc, l) => {
+      Object.keys(l).forEach(k => { acc[k] = (acc[k] || 0) + l[k]; });
+      return acc;
+    }, {});
+    const totalImpressionsPrev = agg.impressions_prev || 0;
+    const totalImpressionsReal = agg.impressions_real || 0;
+    const weightedCompletionPrev = totalImpressionsPrev > 0 ? pendingSomeLines.reduce((s, l) => s + l.completion_prev * l.impressions_prev, 0) / totalImpressionsPrev : 0;
+    const weightedCompletionReal = totalImpressionsReal > 0 ? pendingSomeLines.reduce((s, l) => s + l.completion_real * l.impressions_real, 0) / totalImpressionsReal : 0;
+    const weightedCtrPrev = totalImpressionsPrev > 0 ? pendingSomeLines.reduce((s, l) => s + l.ctr_prev * l.impressions_prev, 0) / totalImpressionsPrev : 0;
+    const weightedCtrReal = totalImpressionsReal > 0 ? pendingSomeLines.reduce((s, l) => s + l.ctr_real * l.impressions_real, 0) / totalImpressionsReal : 0;
+
+    partners.push({
+      lever: 'SoMe', regie: 'Social Media', format: 'Branding / Performance', cdd: 'Multi-format',
+      buyMode: 'CPM / CPC', tagClass: 'tag-some', objective: 'Mix branding & performance',
+      cpm_prev: 0, budget_prev: agg.budget_prev,
+      impressions_prev: totalImpressionsPrev, completion_prev: weightedCompletionPrev,
+      v100_prev: agg.v100_prev,
+      cpv100_prev: agg.v100_prev > 0 ? agg.budget_prev / agg.v100_prev : 0,
+      ctr_prev: weightedCtrPrev, clicks_prev: agg.clicks_prev,
+      cpm_real: 0, budget_real: agg.budget_real,
+      impressions_real: totalImpressionsReal, completion_real: weightedCompletionReal,
+      v100_real: agg.v100_real,
+      cpv100_real: agg.v100_real > 0 ? agg.budget_real / agg.v100_real : 0,
+      ctr_real: weightedCtrReal, clicks_real: agg.clicks_real,
+      comment: 'Mix de campagnes SoMe : branding awareness + performance click. Données consolidées multi-plateformes.'
+    });
+  }
+
+  if (partners.length === 0) throw new Error('Aucun partenaire détecté dans le fichier.');
+
+  // ============================================================
+  // Parse the optional "Créas" sheet
+  // ============================================================
+  let creatives = [];
+  const creativesSheetName = wb.SheetNames.find(n => {
+    const lower = n.toLowerCase();
+    return lower === 'créas' || lower === 'creas' || lower === 'créatifs' || lower === 'creatifs' || lower.includes('créa') || lower.includes('crea');
+  });
+
+  if (creativesSheetName) {
+    try {
+      const cSheet = wb.Sheets[creativesSheetName];
+      if (cSheet['!ref']) {
+        try {
+          const cr = XLSX.utils.decode_range(cSheet['!ref']);
+          if (cr.s.c > 0 || cr.s.r > 0) {
+            cr.s.c = 0; cr.s.r = 0;
+            cSheet['!ref'] = XLSX.utils.encode_range(cr);
+          }
+        } catch (e) { /* ignore */ }
+      }
+      const cRowsRaw = XLSX.utils.sheet_to_json(cSheet, { header: 1, defval: null, raw: true });
+
+      // Find header row (contains "Nom" or "Créa")
+      let cHeaderIdx = -1;
+      for (let i = 0; i < Math.min(cRowsRaw.length, 15); i++) {
+        const row = cRowsRaw[i] || [];
+        const hasName = row.some(v => {
+          const s = (v || '').toString().toLowerCase().trim();
+          return s === 'nom' || s === 'créa' || s === 'crea' || s.startsWith('nom de la créa') || s.startsWith('nom de la crea');
+        });
+        const hasFormat = row.some(v => (v || '').toString().toLowerCase().trim().includes('format'));
+        if (hasName && hasFormat) { cHeaderIdx = i; break; }
+      }
+
+      if (cHeaderIdx >= 0) {
+        const cHeader = cRowsRaw[cHeaderIdx];
+        const cFindAll = (...labels) => {
+          const out = [];
+          for (let i = 0; i < cHeader.length; i++) {
+            const s = (cHeader[i] || '').toString().toLowerCase().trim();
+            if (!s) continue;
+            for (const lab of labels) {
+              if (s === lab.toLowerCase() || s.includes(lab.toLowerCase())) { out.push(i); break; }
+            }
+          }
+          return out;
+        };
+
+        const colName = cFindAll('nom de la créa', 'nom de la crea', 'nom', 'créa', 'crea')[0];
+        const colFormat = cFindAll('format')[0];
+        const colsCPM = cFindAll('cpm');
+        const colsBudget = [];
+        for (let i = 0; i < cHeader.length; i++) {
+          const s = (cHeader[i] || '').toString().toLowerCase();
+          if (s.includes('budget') && !s.includes('gracieux')) colsBudget.push(i);
+        }
+        const colsImp = cFindAll('impressions');
+        const colsCompl = cFindAll('complétion', 'completion');
+        // V100 — must NOT match "CPV100"
+        const colsV100 = [];
+        for (let i = 0; i < cHeader.length; i++) {
+          const s = (cHeader[i] || '').toString().toLowerCase();
+          if ((s.includes('v100') || s.includes('vidéos vues') || s.includes('videos vues') || s.includes('vues 100')) && !s.includes('cpv')) {
+            colsV100.push(i);
+          }
+        }
+        const colsCTR = cFindAll('ctr');
+        const colsClk = cFindAll('clics');
+        // CPV100
+        const colsCpv = [];
+        for (let i = 0; i < cHeader.length; i++) {
+          const s = (cHeader[i] || '').toString().toLowerCase();
+          if (s.includes('cpv100') || s.includes('cpv 100')) colsCpv.push(i);
+        }
+        const colComment = cFindAll('commentaire')[0];
+
+        const pickReal = (arr, n) => (arr.length >= 2 ? arr[1] : (arr.length === 1 ? arr[0] : -1));
+        const pickPrev = (arr, n) => (arr.length >= 1 ? arr[0] : -1);
+
+        const CIDX = {
+          name: colName ?? -1, format: colFormat ?? -1,
+          cpm_prev: pickPrev(colsCPM), cpm_real: pickReal(colsCPM),
+          budget_prev: pickPrev(colsBudget), budget_real: pickReal(colsBudget),
+          impressions_prev: pickPrev(colsImp), impressions_real: pickReal(colsImp),
+          completion_prev: pickPrev(colsCompl), completion_real: pickReal(colsCompl),
+          v100_prev: pickPrev(colsV100), v100_real: pickReal(colsV100),
+          ctr_prev: pickPrev(colsCTR), ctr_real: pickReal(colsCTR),
+          clicks_prev: pickPrev(colsClk), clicks_real: pickReal(colsClk),
+          cpv100_prev: pickPrev(colsCpv), cpv100_real: pickReal(colsCpv),
+          comment: colComment ?? -1
+        };
+
+        const getCell = (row, idx) => (idx >= 0 && idx < row.length) ? row[idx] : null;
+
+        for (let i = cHeaderIdx + 1; i < cRowsRaw.length; i++) {
+          const row = cRowsRaw[i] || [];
+          const name = getCell(row, CIDX.name);
+          if (!name || !String(name).trim()) continue;
+          const nameStr = String(name).trim();
+          // Skip TOTAUX/Total markers
+          const nameLower = nameStr.toLowerCase();
+          if (nameLower.startsWith('total') || nameLower.startsWith('totaux')) continue;
+          // Skip instruction / note rows (typically very long text)
+          if (nameStr.length > 80) continue;
+          // Skip rows where Nom contains emoji-led instructions
+          if (/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]\s*(règle|note|astuce|info|attention|important)/iu.test(nameStr)) continue;
+
+          creatives.push({
+            name: String(name).trim(),
+            format: getCell(row, CIDX.format) ? String(getCell(row, CIDX.format)).trim() : '',
+            cpm_prev: parseNum(getCell(row, CIDX.cpm_prev)),
+            budget_prev: parseNum(getCell(row, CIDX.budget_prev)),
+            impressions_prev: parseNum(getCell(row, CIDX.impressions_prev)),
+            completion_prev: parsePercent(getCell(row, CIDX.completion_prev)),
+            v100_prev: parseNum(getCell(row, CIDX.v100_prev)),
+            ctr_prev: parsePercent(getCell(row, CIDX.ctr_prev)),
+            clicks_prev: parseNum(getCell(row, CIDX.clicks_prev)),
+            cpv100_prev: parseNum(getCell(row, CIDX.cpv100_prev)),
+            cpm_real: parseNum(getCell(row, CIDX.cpm_real)),
+            budget_real: parseNum(getCell(row, CIDX.budget_real)),
+            impressions_real: parseNum(getCell(row, CIDX.impressions_real)),
+            completion_real: parsePercent(getCell(row, CIDX.completion_real)),
+            v100_real: parseNum(getCell(row, CIDX.v100_real)),
+            ctr_real: parsePercent(getCell(row, CIDX.ctr_real)),
+            clicks_real: parseNum(getCell(row, CIDX.clicks_real)),
+            cpv100_real: parseNum(getCell(row, CIDX.cpv100_real)),
+            comment: getCell(row, CIDX.comment) ? String(getCell(row, CIDX.comment)) : ''
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('Erreur parsing onglet Créas :', err);
+    }
+  }
+
+  // ============================================================
+  // Parse the optional "Brand & Search Lift" sheet for BLS/SLS data
+  // ============================================================
+  let blsData = JSON.parse(JSON.stringify(currentData.bls));
+  let slsData = JSON.parse(JSON.stringify(currentData.sls));
+
+  const liftSheetName = wb.SheetNames.find(n => {
+    const lower = n.toLowerCase();
+    return lower.includes('lift') || lower.includes('brand') || lower.includes('bls') || lower.includes('sls');
+  });
+
+  if (liftSheetName) {
+    try {
+      const liftSheet = wb.Sheets[liftSheetName];
+      // Same A1-normalization as the Performances sheet
+      if (liftSheet['!ref']) {
+        try {
+          const lr = XLSX.utils.decode_range(liftSheet['!ref']);
+          if (lr.s.c > 0 || lr.s.r > 0) {
+            lr.s.c = 0; lr.s.r = 0;
+            liftSheet['!ref'] = XLSX.utils.encode_range(lr);
+          }
+        } catch (e) { /* ignore */ }
+      }
+      const liftRowsRaw = XLSX.utils.sheet_to_json(liftSheet, { header: 1, defval: null, raw: true });
+
+      // Apply the same column-shift fix as for the Performances sheet :
+      // labels like "Impact absolu (%)" or "Brand & Search Lift" should be in col B (index 1).
+      let liftShift = 0;
+      outer: for (let i = 0; i < Math.min(liftRowsRaw.length, 10); i++) {
+        const row = liftRowsRaw[i] || [];
+        for (let j = 0; j < row.length; j++) {
+          const v = (row[j] || '').toString().toLowerCase();
+          if (v.includes('brand') && v.includes('lift')) {
+            if (j < 1) liftShift = 1 - j;
+            break outer;
+          }
+        }
+      }
+      const liftRows = liftShift > 0
+        ? liftRowsRaw.map(r => new Array(liftShift).fill(null).concat(r || []))
+        : liftRowsRaw;
+
+      // Read key-value pairs: label in col B (idx 1), value in col C (idx 2)
+      // Match labels case-insensitively and tolerantly
+      const normalize = (s) => s ? s.toString().toLowerCase().replace(/[^a-zàâäéèêëîïôöùûüç0-9%€]/g, '') : '';
+
+      // BLS label mapping → field in blsData
+      const blsLabelMap = {
+        'impactabsolu': 'impact',
+        'utilisateursimpactés': 'users',
+        'utilisateursimpactes': 'users',
+        'coûtparutilisateur': 'cost',
+        'coutparutilisateur': 'cost',
+        'awarenessorganique': 'baseline',
+        'tauxdediscovery': 'discovery',
+        'certitude': 'certainty',
+        'méthodologie': 'methodology',
+        'methodologie': 'methodology'
+      };
+      const slsLabelMap = {
+        'impactrelatif': 'impact',
+        'motcléprincipal': 'keyword',
+        'motcleprincipal': 'keyword',
+        'augmentationindexée': 'indexedLift',
+        'augmentationindexee': 'indexedLift',
+        'termesmesurés': 'keywordCount',
+        'termesmesures': 'keywordCount',
+        'certitude': 'certainty',
+        'méthodologie': 'methodology',
+        'methodologie': 'methodology'
+      };
+
+      // Track section context — we switch between BLS / SLS based on section header rows
+      let section = null;
+      for (let i = 0; i < liftRows.length; i++) {
+        const row = liftRows[i] || [];
+        const cellB = row[1];
+
+        if (typeof cellB === 'string') {
+          const norm = cellB.toLowerCase();
+          // BLS age & gender tables — switch into table-reading sections
+          if (norm.includes('par âge') || norm.includes('par age')) {
+            section = 'bls_age';
+            continue;
+          }
+          if (norm.includes('par genre')) {
+            section = 'bls_gender';
+            continue;
+          }
+          if (norm.includes('bls') || (norm.includes('brand') && norm.includes('lift'))) {
+            section = 'bls';
+            continue;
+          }
+          if (norm.includes('sls') || (norm.includes('search') && norm.includes('lift'))) {
+            section = 'sls';
+            continue;
+          }
+          if (norm.includes('détail par mot') || norm.includes('detail par mot')) {
+            section = 'sls_table';
+            continue;
+          }
+        }
+
+        // BLS by age table — cols: Tranche d'âge (B), Exposé % (C), Témoin % (D)
+        if (section === 'bls_age') {
+          const range = row[1];
+          if (!range || typeof range !== 'string' || !range.trim()) continue;
+          const rangeStr = range.trim();
+          // Skip the header row of the sub-table
+          if (rangeStr.toLowerCase().startsWith('tranche')) continue;
+          const exposed = row[2];
+          const control = row[3];
+          if (exposed === null && control === null) continue;
+          if (!blsData.age) blsData.age = [];
+          // First entry triggers reset (we want fresh data, not appended to defaults)
+          if (blsData.age === currentData.bls.age) blsData.age = [];
+          blsData.age.push({
+            range: rangeStr,
+            exposed: typeof exposed === 'number' ? exposed : parseFloat(String(exposed).replace(',', '.')),
+            control: typeof control === 'number' ? control : parseFloat(String(control).replace(',', '.'))
+          });
+          continue;
+        }
+
+        // BLS by gender table — cols: Genre (B), Exposé % (C), Témoin % (D)
+        if (section === 'bls_gender') {
+          const label = row[1];
+          if (!label || typeof label !== 'string' || !label.trim()) continue;
+          const labelStr = label.trim();
+          if (labelStr.toLowerCase().startsWith('genre')) continue;
+          const exposed = row[2];
+          const control = row[3];
+          if (exposed === null && control === null) continue;
+          if (!blsData.gender) blsData.gender = [];
+          if (blsData.gender === currentData.bls.gender) blsData.gender = [];
+          blsData.gender.push({
+            label: labelStr,
+            exposed: typeof exposed === 'number' ? exposed : parseFloat(String(exposed).replace(',', '.')),
+            control: typeof control === 'number' ? control : parseFloat(String(control).replace(',', '.'))
+          });
+          continue;
+        }
+
+        // Stop key-value parsing once we hit the SLS detail table
+        if (section === 'sls' || section === 'bls') {
+          const label = normalize(cellB);
+          const val = row[2];
+          if (!label || val === null || val === undefined || val === '') continue;
+          const map = section === 'bls' ? blsLabelMap : slsLabelMap;
+          const target = section === 'bls' ? blsData : slsData;
+          // Match by prefix on the normalized label
+          const key = Object.keys(map).find(k => label.startsWith(k));
+          if (key) {
+            const field = map[key];
+            // Numeric fields get parsed as numbers, text fields stay as strings
+            if (['certainty', 'keyword', 'methodology'].includes(field)) {
+              target[field] = val.toString().trim();
+            } else {
+              const n = typeof val === 'number' ? val : parseFloat(val.toString().replace(',', '.'));
+              if (!isNaN(n)) target[field] = n;
+            }
+          }
+        }
+      }
+
+      // Parse the SLS detail table (rows under "Détail par mot-clé")
+      // The table header has "Recherche / Mot-clé" and the data rows follow
+      const slsRows = [];
+      let tableHeaderIdx = -1;
+      for (let i = 0; i < liftRows.length; i++) {
+        const row = liftRows[i] || [];
+        const cellB = row[1];
+        if (typeof cellB === 'string' && cellB.toLowerCase().includes('recherche')) {
+          tableHeaderIdx = i;
+          break;
+        }
+      }
+
+      if (tableHeaderIdx >= 0) {
+        for (let i = tableHeaderIdx + 1; i < liftRows.length; i++) {
+          const row = liftRows[i] || [];
+          const keyword = row[1];
+          if (!keyword || typeof keyword !== 'string' || !keyword.trim()) continue;
+          // Stop at the instructions block ("RÈGLES DE SAISIE")
+          if (keyword.includes('RÈGLES DE SAISIE') || keyword.includes('REGLES DE SAISIE') || keyword.startsWith('📌')) break;
+
+          const indexed = row[2];
+          const impact = row[3];
+          const certainty = row[4];
+
+          const isGroup = keyword.toLowerCase().startsWith('groupe');
+          const isMain = keyword.trim().toLowerCase() === slsData.keyword.toLowerCase();
+
+          slsRows.push({
+            keyword: keyword.trim(),
+            indexed: indexed === null || indexed === undefined || indexed === '' ? '—' : indexed,
+            impact: impact === null || impact === undefined || impact === '' ? '—' : impact,
+            certainty: certainty === null || certainty === undefined || certainty === '' ? '—' : (typeof certainty === 'number' ? certainty.toString() : certainty.toString().trim()),
+            isGroup,
+            isMain
+          });
+        }
+        if (slsRows.length > 0) slsData.rows = slsRows;
+      }
+    } catch (err) {
+      console.warn('Erreur lecture sheet Brand & Search Lift :', err);
+    }
+  }
+
+  return {
+    client: client || 'Doctolib',
+    campaign: campaign || 'Campagne',
+    startDate: startDate || currentData.startDate,
+    endDate: endDate || currentData.endDate,
+    partners,
+    creatives,
+    bls: blsData,
+    sls: slsData
+  };
+}
+
+/* ============================================
+   UPLOAD HANDLING
+   ============================================ */
+function openUploadModal() { document.getElementById('uploadModal').classList.add('show'); }
+function closeUploadModal() { document.getElementById('uploadModal').classList.remove('show'); }
+
+document.getElementById('uploadModal').addEventListener('click', (e) => {
+  if (e.target.id === 'uploadModal') closeUploadModal();
+});
+
+const uploadZone = document.getElementById('uploadZone');
+const fileInput = document.getElementById('fileInput');
+
+uploadZone.addEventListener('click', () => fileInput.click());
+uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]);
+});
+
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files.length > 0) handleFile(e.target.files[0]);
+});
+
+function handleFile(file) {
+  if (!/\.(xlsx|xls)$/i.test(file.name)) {
+    showToast('Format invalide. Merci d\'uploader un fichier .xlsx', 'error');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = parseExcel(e.target.result);
+      currentData = data;
+      renderAll();
+      closeUploadModal();
+      showToast(`Données mises à jour · ${data.partners.length} partenaires importés`, 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Erreur de parsing : ' + err.message, 'error');
+    }
+  };
+  reader.onerror = () => showToast('Erreur de lecture du fichier', 'error');
+  reader.readAsArrayBuffer(file);
+}
+
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+/* ============================================
+   EXPORT
+   ============================================ */
+function exportData() {
+  const t = computeTotals(currentData.partners);
+  const csv = [
+    ['Partenaire', 'Levier', 'Format', 'Budget prévisionnel', 'Budget réalisé', '% investi', 'Impressions prévues', 'Impressions réalisées', 'Complétion prévue', 'Complétion réalisée', 'Clics prévus', 'Clics réalisés'].join(';'),
+    ...currentData.partners.map(p => [
+      p.regie, p.lever, p.format,
+      p.budget_prev, p.budget_real, p.budget_prev > 0 ? (p.budget_real / p.budget_prev * 100).toFixed(2) + '%' : '0%',
+      p.impressions_prev, p.impressions_real,
+      (p.completion_prev * 100).toFixed(2) + '%', (p.completion_real * 100).toFixed(2) + '%',
+      p.clicks_prev, p.clicks_real
+    ].join(';')),
+    ['TOTAL', '', '', t.budget_prev, t.budget_real, (t.budget_real / t.budget_prev * 100).toFixed(2) + '%', t.impressions_prev, t.impressions_real, '', '', t.clicks_prev, t.clicks_real].join(';')
+  ].join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `Performance_${currentData.client}_${currentData.campaign.replace(/\s/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Export CSV téléchargé', 'success');
+}
+
+/* ============================================
+   BOOT
+   ============================================ */
+document.getElementById('brandLogo').src = EMBEDDED_IMAGES.doctolib_logo;
+
+renderAll();
+</script>
+
+</body>
+</html>

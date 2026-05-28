@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Média Planning — Cheat Sheet Expert France</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════
+   BASE
+══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --font: 'Outfit', -apple-system, sans-serif;
+  --bg: #E8EAF0;
+  --srf: #FFFFFF;
+  --srf2: #F5F6F9;
+  --bdr: #DDE0EA;
+  --bdrl: #EAECF2;
+  --t1: #0B0F1A;
+  --t2: #434D66;
+  --t3: #8990A8;
+  --sh1: 0 1px 3px rgba(11,15,26,.06), 0 1px 2px rgba(11,15,26,.04);
+  --sh2: 0 4px 16px rgba(11,15,26,.08), 0 1px 4px rgba(11,15,26,.04);
+  --sh3: 0 12px 36px rgba(11,15,26,.12), 0 4px 8px rgba(11,15,26,.06);
+  --r: 14px; --rsm: 9px; --rxs: 6px;
+
+  --cd: #1A63F0; --cdl: #EBF0FF; --cdm: #BCCEFF; --cdd: #0E47CC;
+  --cr: #6A23D4; --crl: #F0EBFF; --crm: #D2BBFF; --crd: #4D18A0;
+  --ct: #D02828; --ctl: #FFF0F0; --ctm: #FFBBBB; --ctd: #A81E1E;
+  --cp: #0A7850; --cpl: #E8FAF4; --cpm: #A8E8CE; --cpd: #075C3C;
+  --co: #BF7600; --col: #FFF7E0; --com: #FFD97A; --cod: #996000;
+  --ca: #C01278; --cal: #FEF0F8; --cam: #F8B8E2; --cad: #960D5E;
+}
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--t1);
+  font-size: 13px;
+  line-height: 1.65;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* ══════════════════════════════════════
+   HEADER
+══════════════════════════════════════ */
+.hdr {
+  background: #0B0F1A;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.06) 1px, transparent 0);
+  background-size: 24px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px; height: 58px;
+  position: sticky; top: 0; z-index: 300;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.hdr-l { display: flex; align-items: center; gap: 12px; }
+.hdr-mark {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #1A63F0, #6A23D4);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(26,99,240,.4);
+}
+.hdr-name { font-size: 14px; font-weight: 700; color: #fff; letter-spacing: -.3px; }
+.hdr-name em { color: #5B8BFF; font-style: normal; }
+.hdr-tag {
+  font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px;
+  color: #5B8BFF; background: rgba(91,139,255,.12);
+  padding: 3px 9px; border-radius: 20px;
+  border: 1px solid rgba(91,139,255,.2);
+}
+.hdr-r { font-size: 11px; color: rgba(255,255,255,.25); letter-spacing: .3px; }
+
+/* ══════════════════════════════════════
+   TAB NAV
+══════════════════════════════════════ */
+.nav-bar {
+  background: var(--srf);
+  border-bottom: 1px solid var(--bdr);
+  position: sticky; top: 58px; z-index: 200;
+  box-shadow: 0 2px 8px rgba(11,15,26,.05);
+}
+.nav-inner {
+  display: flex; max-width: 1520px; margin: 0 auto;
+  padding: 0 28px; overflow-x: auto; scrollbar-width: none;
+}
+.nav-inner::-webkit-scrollbar { display: none; }
+.tbtn {
+  position: relative; display: flex; align-items: center; gap: 7px;
+  padding: 0 20px; height: 50px;
+  border: none; background: none; cursor: pointer;
+  font-family: var(--font); font-size: 12.5px; font-weight: 600;
+  color: var(--t3); white-space: nowrap; letter-spacing: .05px;
+  transition: color .18s ease;
+}
+.tbtn .ic { font-size: 15px; transition: transform .18s ease; }
+.tbtn:hover { color: var(--t1); }
+.tbtn:hover .ic { transform: scale(1.15); }
+.tbtn::after {
+  content: ''; position: absolute; bottom: 0; left: 16px; right: 16px;
+  height: 3px; border-radius: 3px 3px 0 0; background: transparent;
+  transition: background .18s ease;
+}
+.tbtn.on-digital  { color: var(--cd); } .tbtn.on-digital::after  { background: var(--cd); }
+.tbtn.on-radio    { color: var(--cr); } .tbtn.on-radio::after    { background: var(--cr); }
+.tbtn.on-tv       { color: var(--ct); } .tbtn.on-tv::after       { background: var(--ct); }
+.tbtn.on-presse   { color: var(--cp); } .tbtn.on-presse::after   { background: var(--cp); }
+.tbtn.on-ooh      { color: var(--co); } .tbtn.on-ooh::after      { background: var(--co); }
+.tbtn.on-autres   { color: var(--ca); } .tbtn.on-autres::after   { background: var(--ca); }
+
+/* ══════════════════════════════════════
+   TAB CONTENT
+══════════════════════════════════════ */
+.tcon { display: none; }
+.tcon.go { display: block; animation: appear .25s cubic-bezier(.22,.68,0,1); }
+@keyframes appear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.wrap { max-width: 1520px; margin: 0 auto; padding: 26px 32px 64px; }
+
+/* ══════════════════════════════════════
+   HERO BAND
+══════════════════════════════════════ */
+.hero {
+  display: flex; align-items: flex-start; gap: 18px;
+  padding: 22px 26px; border-radius: var(--r);
+  margin-bottom: 20px;
+  background: var(--srf);
+  border: 1px solid var(--bdr);
+  box-shadow: var(--sh1);
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+}
+.hero-ico {
+  width: 52px; height: 52px; border-radius: 13px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; flex-shrink: 0; margin-top: 2px;
+}
+.hero-copy h2 {
+  font-size: 17px; font-weight: 800; letter-spacing: -.4px; line-height: 1.2;
+}
+.hero-copy p {
+  font-size: 12.5px; color: var(--t2); margin-top: 5px; line-height: 1.55;
+  max-width: 700px;
+}
+
+/* Per-tab hero overrides */
+#T-digital  .hero::before { background: var(--cd); }
+#T-digital  .hero-ico     { background: var(--cdl); }
+#T-digital  .hero-copy h2 { color: var(--cd); }
+#T-radio    .hero::before { background: var(--cr); }
+#T-radio    .hero-ico     { background: var(--crl); }
+#T-radio    .hero-copy h2 { color: var(--cr); }
+#T-tv       .hero::before { background: var(--ct); }
+#T-tv       .hero-ico     { background: var(--ctl); }
+#T-tv       .hero-copy h2 { color: var(--ct); }
+#T-presse   .hero::before { background: var(--cp); }
+#T-presse   .hero-ico     { background: var(--cpl); }
+#T-presse   .hero-copy h2 { color: var(--cp); }
+#T-ooh      .hero::before { background: var(--co); }
+#T-ooh      .hero-ico     { background: var(--col); }
+#T-ooh      .hero-copy h2 { color: var(--co); }
+#T-autres   .hero::before { background: var(--ca); }
+#T-autres   .hero-ico     { background: var(--cal); }
+#T-autres   .hero-copy h2 { color: var(--ca); }
+
+/* ══════════════════════════════════════
+   GRID
+══════════════════════════════════════ */
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+
+/* ══════════════════════════════════════
+   CARDS
+══════════════════════════════════════ */
+.card {
+  background: var(--srf);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r);
+  box-shadow: var(--sh1);
+  overflow: hidden;
+  transition: box-shadow .18s ease;
+}
+.card:hover { box-shadow: var(--sh2); }
+
+.card-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 20px 13px;
+  border-bottom: 1px solid var(--bdrl);
+  position: relative;
+}
+.card-head::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3.5px;
+}
+.card-icon {
+  width: 30px; height: 30px; border-radius: var(--rxs);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
+.card-head h3 {
+  font-size: 10.5px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .8px; color: var(--t1);
+}
+.card-body { padding: 18px 20px; }
+
+/* Per-tab card accents */
+#T-digital  .card-head::before { background: var(--cd); }
+#T-digital  .card-icon          { background: var(--cdl); color: var(--cd); }
+#T-radio    .card-head::before { background: var(--cr); }
+#T-radio    .card-icon          { background: var(--crl); color: var(--cr); }
+#T-tv       .card-head::before { background: var(--ct); }
+#T-tv       .card-icon          { background: var(--ctl); color: var(--ct); }
+#T-presse   .card-head::before { background: var(--cp); }
+#T-presse   .card-icon          { background: var(--cpl); color: var(--cp); }
+#T-ooh      .card-head::before { background: var(--co); }
+#T-ooh      .card-icon          { background: var(--col); color: var(--co); }
+#T-autres   .card-head::before { background: var(--ca); }
+#T-autres   .card-icon          { background: var(--cal); color: var(--ca); }
+
+/* ══════════════════════════════════════
+   SUB-TITLES
+══════════════════════════════════════ */
+.sub {
+  font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .8px;
+  color: var(--t3);
+  margin: 16px 0 8px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--bdrl);
+}
+.sub:first-child { margin-top: 0; }
+
+/* ══════════════════════════════════════
+   INFO LISTS  — left-border approach (no overflow issues)
+══════════════════════════════════════ */
+.ilist { display: flex; flex-direction: column; gap: 0; }
+.ilist li {
+  list-style: none;
+  padding: 7px 0 7px 13px;
+  border-left: 2.5px solid transparent;
+  border-bottom: 1px solid var(--bdrl);
+  font-size: 12.5px; line-height: 1.6; color: var(--t2);
+  word-wrap: break-word; overflow-wrap: break-word;
+}
+.ilist li:last-child { border-bottom: none; }
+.ilist li strong { color: var(--t1); font-weight: 700; }
+
+#T-digital  .ilist li { border-left-color: var(--cdl); }
+#T-digital  .ilist li:hover { border-left-color: var(--cd); background: var(--cdl); }
+#T-radio    .ilist li { border-left-color: var(--crl); }
+#T-radio    .ilist li:hover { border-left-color: var(--cr); background: var(--crl); }
+#T-tv       .ilist li { border-left-color: var(--ctl); }
+#T-tv       .ilist li:hover { border-left-color: var(--ct); background: var(--ctl); }
+#T-presse   .ilist li { border-left-color: var(--cpl); }
+#T-presse   .ilist li:hover { border-left-color: var(--cp); background: var(--cpl); }
+#T-ooh      .ilist li { border-left-color: var(--col); }
+#T-ooh      .ilist li:hover { border-left-color: var(--co); background: var(--col); }
+#T-autres   .ilist li { border-left-color: var(--cal); }
+#T-autres   .ilist li:hover { border-left-color: var(--ca); background: var(--cal); }
+
+/* ══════════════════════════════════════
+   KPI GRID — redesigned for clarity
+══════════════════════════════════════ */
+.kgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.kcard {
+  background: var(--srf2);
+  border: 1px solid var(--bdrl);
+  border-radius: var(--rsm);
+  padding: 13px 14px 12px;
+  display: flex; flex-direction: column; gap: 0;
+  transition: box-shadow .16s ease, border-color .16s ease;
+  overflow: hidden;
+}
+.kcard:hover { box-shadow: var(--sh2); border-color: var(--bdr); }
+.kcard-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 6px; margin-bottom: 6px;
+}
+.k-acr {
+  font-size: 15px; font-weight: 900; letter-spacing: -.4px; line-height: 1;
+}
+.k-tag {
+  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .45px;
+  padding: 2.5px 7px; border-radius: 20px; white-space: nowrap;
+  flex-shrink: 0; margin-top: 2px;
+}
+.k-name { font-size: 12px; font-weight: 700; color: var(--t1); line-height: 1.3; margin-bottom: 3px; }
+.k-def  { font-size: 11.5px; color: var(--t2); line-height: 1.5; word-wrap: break-word; }
+
+/* Tag color variants */
+.tg-brand { background: #E6EEFF; color: #1A63F0; }
+.tg-perf  { background: #FFF2E6; color: #B85400; }
+.tg-roi   { background: #E6F9F0; color: #0A7850; }
+.tg-vol   { background: #F0EAFF; color: #6A23D4; }
+.tg-qual  { background: #FFEEEE; color: #D02828; }
+.tg-vid   { background: #FEF0F8; color: #C01278; }
+.tg-eng   { background: #FFF7E0; color: #BF7600; }
+.tg-dig   { background: #EDE8FF; color: #6A23D4; }
+.tg-aud   { background: #E6F4FF; color: #0062A8; }
+.tg-eff   { background: #EDFFF4; color: #0A6B35; }
+
+/* ══════════════════════════════════════
+   SEASON TABLE
+══════════════════════════════════════ */
+.szone { overflow-x: auto; border-radius: var(--rsm); border: 1px solid var(--bdrl); }
+.stab  { width: 100%; border-collapse: collapse; font-size: 12.5px; table-layout: fixed; }
+.stab thead th {
+  padding: 9px 14px; text-align: left;
+  font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .7px;
+  color: var(--t3); background: var(--srf2);
+  border-bottom: 1px solid var(--bdr); white-space: nowrap;
+}
+.stab thead th:nth-child(1) { width: 115px; }
+.stab thead th:nth-child(2) { width: 140px; }
+.stab thead th:nth-child(3) { width: auto; }
+.stab tbody tr { border-bottom: 1px solid var(--bdrl); transition: background .1s; }
+.stab tbody tr:last-child { border-bottom: none; }
+.stab tbody tr:hover { background: var(--srf2); }
+.stab td { padding: 9px 14px; vertical-align: top; line-height: 1.55; color: var(--t2); word-wrap: break-word; overflow-wrap: break-word; }
+.stab td:first-child { font-weight: 700; color: var(--t1); font-size: 12.5px; }
+
+/* Tension badges */
+.tbg {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 800; padding: 3px 10px;
+  border-radius: 20px; white-space: nowrap;
+}
+.tbg::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.t-peak { background: #FFECEC; color: #B81C1C; } .t-peak::before { background: #B81C1C; }
+.t-high { background: #FFF2E8; color: #AF5100; } .t-high::before { background: #AF5100; }
+.t-mid  { background: #FFFBE6; color: #9A6A00; } .t-mid::before  { background: #9A6A00; }
+.t-mid2 { background: #E8EFFF; color: #1A63F0; } .t-mid2::before { background: #1A63F0; }
+.t-low  { background: #E8F8F0; color: #0A7850; } .t-low::before  { background: #0A7850; }
+.t-var  { background: #F0EAFF; color: #6A23D4; } .t-var::before  { background: #6A23D4; }
+
+/* ══════════════════════════════════════
+   TOOLS GRID
+══════════════════════════════════════ */
+.tgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(172px, 1fr)); gap: 8px; }
+.tcard {
+  background: var(--srf2); border: 1px solid var(--bdrl);
+  border-radius: var(--rsm); padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 3px;
+  transition: box-shadow .16s ease, border-color .16s ease;
+  word-wrap: break-word;
+}
+.tcard:hover { box-shadow: var(--sh2); border-color: var(--bdr); }
+.t-cat {
+  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px;
+  padding: 2px 7px; border-radius: 4px; display: inline-block; margin-bottom: 1px;
+}
+.t-name { font-size: 12.5px; font-weight: 800; color: var(--t1); line-height: 1.2; }
+.t-desc { font-size: 11px; color: var(--t2); line-height: 1.5; }
+
+#T-digital  .t-cat { background: var(--cdl); color: var(--cdd); }
+#T-radio    .t-cat { background: var(--crl); color: var(--crd); }
+#T-tv       .t-cat { background: var(--ctl); color: var(--ctd); }
+#T-presse   .t-cat { background: var(--cpl); color: var(--cpd); }
+#T-ooh      .t-cat { background: var(--col); color: var(--cod); }
+#T-autres   .t-cat { background: var(--cal); color: var(--cad); }
+
+/* ══════════════════════════════════════
+   NOTE STRIP
+══════════════════════════════════════ */
+.note {
+  display: flex; align-items: flex-start; gap: 9px;
+  padding: 10px 13px; border-radius: var(--rxs);
+  margin-top: 13px;
+  font-size: 12px; line-height: 1.55; color: var(--t2);
+  word-wrap: break-word;
+}
+.note strong { color: var(--t1); }
+#T-digital .note  { background: var(--cdl); }
+#T-radio   .note  { background: var(--crl); }
+#T-tv      .note  { background: var(--ctl); }
+#T-presse  .note  { background: var(--cpl); }
+#T-ooh     .note  { background: var(--col); }
+#T-autres  .note  { background: var(--cal); }
+
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+@media (max-width: 960px) {
+  .grid  { grid-template-columns: 1fr; }
+  .kgrid { grid-template-columns: 1fr; }
+  .wrap  { padding: 18px 16px 48px; }
+  .hdr   { padding: 0 16px; }
+  .nav-inner { padding: 0 8px; }
+  .tbtn  { padding: 0 13px; }
+}
+
+/* ══════════════════════════════════════
+   LEXIQUE TAB — STYLES
+══════════════════════════════════════ */
+.lex-wrap { max-width: 1200px; }
+
+/* ─ Header search zone ─ */
+.lex-hdr {
+  background: var(--srf);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r);
+  padding: 22px 26px 18px;
+  margin-bottom: 16px;
+  box-shadow: var(--sh1);
+  position: relative; overflow: hidden;
+}
+.lex-hdr::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg,#1A63F0 0%,#6A23D4 20%,#D02828 38%,#0A7850 55%,#BF7600 73%,#C01278 90%);
+}
+.lex-hdr-title {
+  font-size: 16px; font-weight: 800; letter-spacing: -.35px; color: var(--t1);
+  margin-bottom: 2px;
+}
+.lex-hdr-sub {
+  font-size: 12px; color: var(--t2); margin-bottom: 16px; line-height: 1.5;
+}
+
+/* ─ Search input ─ */
+.lex-search-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.lex-srch-wrap {
+  flex: 1; position: relative; max-width: 600px;
+}
+.lex-srch-ic {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 15px; pointer-events: none; line-height: 1;
+}
+.lex-kbd {
+  position: absolute; right: 44px; top: 50%; transform: translateY(-50%);
+  font-size: 10px; font-weight: 700; color: var(--t3);
+  background: var(--srf2); border: 1px solid var(--bdr);
+  padding: 2px 6px; border-radius: 4px; pointer-events: none;
+  font-family: var(--font);
+}
+#lex-inp {
+  width: 100%; height: 48px;
+  border: 1.5px solid var(--bdr); border-radius: 10px;
+  padding: 0 40px 0 44px;
+  font-family: var(--font); font-size: 13.5px; font-weight: 500;
+  color: var(--t1); background: var(--bg);
+  outline: none; transition: border-color .16s, box-shadow .16s, background .16s;
+}
+#lex-inp:focus {
+  border-color: #1A63F0;
+  box-shadow: 0 0 0 3px rgba(26,99,240,.12);
+  background: #fff;
+}
+#lex-inp::placeholder { color: var(--t3); }
+#lex-inp.has-val ~ .lex-kbd { display: none; }
+.lex-clear-btn {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--bdr); border: none; cursor: pointer;
+  font-size: 11px; color: var(--t2); display: none;
+  align-items: center; justify-content: center;
+  transition: background .14s;
+}
+.lex-clear-btn:hover { background: var(--t3); color: #fff; }
+.lex-clear-btn.show { display: flex; }
+
+/* ─ Filter pills ─ */
+.lex-pills {
+  display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px;
+}
+.lpill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px; border-radius: 20px;
+  border: 1.5px solid var(--bdr); background: var(--srf2);
+  font-family: var(--font); font-size: 11.5px; font-weight: 700;
+  color: var(--t2); cursor: pointer; white-space: nowrap;
+  transition: all .14s ease; user-select: none;
+}
+.lpill:hover { border-color: var(--t2); color: var(--t1); }
+.lpill-count {
+  font-size: 9.5px; font-weight: 800;
+  background: rgba(0,0,0,.06); border-radius: 20px;
+  padding: 1px 6px; letter-spacing: .1px;
+}
+.lpill.on { color: #fff !important; border-color: transparent !important; }
+.lpill.on .lpill-count { background: rgba(255,255,255,.25); }
+.lpill[data-m="all"].on      { background: #1E2537; }
+.lpill[data-m="digital"].on  { background: var(--cd); }
+.lpill[data-m="radio"].on    { background: var(--cr); }
+.lpill[data-m="tv"].on       { background: var(--ct); }
+.lpill[data-m="presse"].on   { background: var(--cp); }
+.lpill[data-m="ooh"].on      { background: var(--co); }
+.lpill[data-m="autres"].on   { background: var(--ca); }
+.lpill[data-m="transversal"].on { background: #2D3450; }
+
+/* ─ Meta bar ─ */
+.lex-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; gap: 8px; flex-wrap: wrap;
+}
+.lex-count-label {
+  font-size: 12px; color: var(--t3); font-weight: 600;
+}
+.lex-count-label strong { color: var(--t1); font-weight: 800; }
+.lex-sort-wrap {
+  display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--t3);
+}
+.lex-sort-btn {
+  background: var(--srf); border: 1px solid var(--bdr);
+  border-radius: var(--rxs); padding: 4px 10px;
+  font-family: var(--font); font-size: 11px; font-weight: 700;
+  color: var(--t2); cursor: pointer; transition: border-color .14s, color .14s;
+}
+.lex-sort-btn:hover, .lex-sort-btn.on { border-color: #1A63F0; color: #1A63F0; }
+
+/* ─ A-Z Index bar ─ */
+.lex-az {
+  display: flex; flex-wrap: wrap; gap: 3px;
+  margin-bottom: 16px; padding: 10px 14px;
+  background: var(--srf); border: 1px solid var(--bdr);
+  border-radius: var(--rsm); box-shadow: var(--sh1);
+}
+.az-btn {
+  width: 26px; height: 26px; border-radius: 5px;
+  border: none; background: transparent; cursor: pointer;
+  font-family: var(--font); font-size: 11px; font-weight: 800;
+  color: var(--t3); transition: background .12s, color .12s;
+  display: flex; align-items: center; justify-content: center;
+}
+.az-btn:hover { background: var(--srf2); color: var(--t1); }
+.az-btn.has-terms { color: var(--t1); }
+.az-btn.has-terms:hover { background: #1A63F0; color: #fff; }
+.az-btn.active { background: #1A63F0 !important; color: #fff !important; }
+.az-sep { width: 1px; background: var(--bdrl); margin: 4px 2px; }
+
+/* ─ Letter group header ─ */
+.lex-letter {
+  grid-column: 1/-1;
+  font-size: 11px; font-weight: 900; letter-spacing: .8px;
+  text-transform: uppercase; color: var(--t3);
+  padding: 6px 0 4px; border-bottom: 1px solid var(--bdrl);
+  margin-top: 4px;
+}
+.lex-letter:first-child { margin-top: 0; }
+
+/* ─ Cards grid ─ */
+.lex-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+.lex-card {
+  background: var(--srf);
+  border: 1px solid var(--bdr);
+  border-left: 3px solid transparent;
+  border-radius: var(--rsm);
+  padding: 13px 15px;
+  box-shadow: var(--sh1);
+  transition: box-shadow .15s, border-color .15s, transform .15s;
+  word-wrap: break-word; overflow-wrap: break-word;
+  cursor: default;
+}
+.lex-card:hover {
+  box-shadow: var(--sh2);
+  transform: translateY(-1px);
+}
+.lex-card[data-m="digital"]     { border-left-color: var(--cd); }
+.lex-card[data-m="radio"]       { border-left-color: var(--cr); }
+.lex-card[data-m="tv"]          { border-left-color: var(--ct); }
+.lex-card[data-m="presse"]      { border-left-color: var(--cp); }
+.lex-card[data-m="ooh"]         { border-left-color: var(--co); }
+.lex-card[data-m="autres"]      { border-left-color: var(--ca); }
+.lex-card[data-m="transversal"] { border-left-color: #2D3450; }
+
+.lc-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 8px; margin-bottom: 7px;
+}
+.lc-term {
+  font-size: 13px; font-weight: 800; color: var(--t1);
+  line-height: 1.25; letter-spacing: -.15px;
+}
+.lc-term mark, .lc-def mark {
+  background: #FFF176; color: var(--t1);
+  border-radius: 3px; padding: 0 2px;
+}
+.lc-badge {
+  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px;
+  padding: 3px 7px; border-radius: 20px; white-space: nowrap;
+  flex-shrink: 0; margin-top: 1px;
+}
+.lb-digital     { background: var(--cdl); color: var(--cdd); }
+.lb-radio       { background: var(--crl); color: var(--crd); }
+.lb-tv          { background: var(--ctl); color: var(--ctd); }
+.lb-presse      { background: var(--cpl); color: var(--cpd); }
+.lb-ooh         { background: var(--col); color: var(--cod); }
+.lb-autres      { background: var(--cal); color: var(--cad); }
+.lb-transversal { background: #ECEEF8; color: #2D3450; }
+
+.lc-def {
+  font-size: 11.5px; color: var(--t2); line-height: 1.6;
+}
+
+/* ─ Empty state ─ */
+.lex-empty {
+  grid-column: 1/-1;
+  text-align: center; padding: 64px 20px; color: var(--t3);
+}
+.lex-empty .em-emoji { font-size: 44px; margin-bottom: 12px; line-height: 1; }
+.lex-empty strong { display: block; font-size: 14px; color: var(--t2); margin-bottom: 4px; }
+.lex-empty span { font-size: 12.5px; }
+
+@media (max-width: 960px) {
+  .lex-grid { grid-template-columns: 1fr; }
+  .lex-srch-wrap { max-width: 100%; }
+  .lex-az { gap: 2px; padding: 8px 10px; }
+  .az-btn { width: 22px; height: 22px; font-size: 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header class="hdr">
+  <div class="hdr-l">
+    <div class="hdr-mark">📋</div>
+    <div class="hdr-name">Média Planning — <em>Cheat Sheet Expert</em></div>
+    <div class="hdr-tag">FR · 2025</div>
+  </div>
+  <div class="hdr-r">6 médias · 4 sections · Marché français</div>
+</header>
+
+<!-- ═══════════ TAB NAV ═══════════ -->
+<div class="nav-bar">
+  <nav class="nav-inner">
+    <button class="tbtn" data-t="digital" onclick="go('digital')"><span class="ic">💻</span>Digital</button>
+    <button class="tbtn" data-t="radio"   onclick="go('radio')"><span class="ic">🎙️</span>Radio &amp; Audio</button>
+    <button class="tbtn" data-t="tv"      onclick="go('tv')"><span class="ic">📺</span>TV &amp; CTV</button>
+    <button class="tbtn" data-t="presse"  onclick="go('presse')"><span class="ic">📰</span>Presse</button>
+    <button class="tbtn" data-t="ooh"     onclick="go('ooh')"><span class="ic">🏙️</span>OOH &amp; DOOH</button>
+    <button class="tbtn" data-t="autres"  onclick="go('autres')"><span class="ic">🎬</span>Autres Leviers</button>
+    <button class="tbtn" data-t="lexique" onclick="go('lexique')"><span class="ic">📖</span>Lexique</button>
+  </nav>
+</div>
+
+
+<!-- ══════════════════════════════════════
+  DIGITAL
+══════════════════════════════════════ -->
+<div id="T-digital" class="tcon">
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-ico">💻</div>
+    <div class="hero-copy">
+      <h2>Digital — Display · Programmatique · Social · Search · Retail Media</h2>
+      <p>Inventaires ouverts, plateformes walled gardens, enchères temps réel et accords directs. Médias à la performance et au branding.</p>
+    </div>
+  </div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">💡</div><h3>Fonctionnement de l'achat d'espace</h3></div>
+      <div class="card-body">
+        <div class="sub">Display &amp; Programmatique</div>
+        <ul class="ilist">
+          <li><strong>Open Auction (RTB) :</strong> enchères temps réel via SSP/DSP — CPM variable selon pression concurrentielle. Accès via Trading Desk ou DSP propriétaire (DV360, TTD).</li>
+          <li><strong>Private Marketplace (PMP) :</strong> enchères privées sur invitation, deal ID négocié — CPM plancher garanti, brand safety renforcé.</li>
+          <li><strong>Programmatic Guaranteed (PG) :</strong> volume + CPM fixes, réservation automatisée via DSP avec garantie d'impressions.</li>
+          <li><strong>Gré à gré (Direct) :</strong> achat direct auprès de la régie. Formats premium, brand safety maîtrisé, tarifs card-rate.</li>
+          <li><strong>Unités tarifaires :</strong> CPM (1 000 impressions), CPC (clic), CPV (vue vidéo), CPCV (vue complète), vCPM (impression visible MRC).</li>
+        </ul>
+        <div class="sub">Social Media (Walled Gardens)</div>
+        <ul class="ilist">
+          <li><strong>Interfaces propriétaires :</strong> Meta Ads Manager, TikTok Ads, LinkedIn Campaign Manager, Snapchat, Pinterest. Self-serve ou via API partenaires.</li>
+          <li><strong>Objectifs d'enchères :</strong> CPM, CPR (résultat), CPL, CPA, ROAS. L'algorithme optimise selon l'objectif de campagne déclaré.</li>
+          <li><strong>Ciblages clés :</strong> socio-démo, intérêts, lookalike, custom audience (CRM upload, pixel), ciblage contextuel post-cookie.</li>
+        </ul>
+        <div class="sub">Search (SEA)</div>
+        <ul class="ilist">
+          <li><strong>Google Ads / Microsoft Ads :</strong> enchères au mot-clé (CPC max ou Target CPA/ROAS). Le Quality Score module le coût réel payé.</li>
+          <li><strong>Smart Bidding :</strong> tCPA, tROAS, Maximiser conversions. Apprentissage sur données first-party propriétaires.</li>
+        </ul>
+        <div class="sub">Retail Media</div>
+        <ul class="ilist">
+          <li><strong>On-site :</strong> sponsored products &amp; display sur sites retail — Amazon Ads, Criteo, Carrefour Links, Fnac-Darty. CPC pour search sponsorisé, CPM pour display.</li>
+          <li><strong>Off-site :</strong> activation data retailer sur inventaires externes via DSP. Ciblage acheteur ultra-précis avec données 1st party commerçant.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">📊</div><h3>Principaux KPIs</h3></div>
+      <div class="card-body">
+        <div class="kgrid">
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cd)">CPM</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Coût Pour Mille impressions</div><div class="k-def">Coût de 1 000 impressions servies. KPI volume central en display et vidéo.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cd)">vCPM</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Viewable CPM</div><div class="k-def">CPM sur impressions visibles (norme MRC : 50% pixels / 1 sec minimum).</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cd)">CTR</span><span class="k-tag tg-perf">Perf.</span></div><div class="k-name">Click-Through Rate</div><div class="k-def">Clics ÷ Impressions. Benchmark display : 0,05–0,3%. Mesure l'activation directe.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cd)">CPC</span><span class="k-tag tg-perf">Perf.</span></div><div class="k-name">Coût Par Clic</div><div class="k-def">Budget ÷ Nb de clics. Indicateur clé Search et campagnes trafic.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cd)">CPA</span><span class="k-tag tg-roi">ROI</span></div><div class="k-name">Coût Par Action</div><div class="k-def">Coût pour générer une conversion (lead, achat, inscription…).</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cd)">ROAS</span><span class="k-tag tg-roi">ROI</span></div><div class="k-name">Return On Ad Spend</div><div class="k-def">CA généré ÷ Budget pub. ROAS 4× = 4 € générés pour 1 € investi.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cd)">VCR</span><span class="k-tag tg-vid">Vidéo</span></div><div class="k-name">Video Completion Rate</div><div class="k-def">% de vidéos vues jusqu'au bout (CPCV). Indicateur clé d'engagement vidéo.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cd)">IVT</span><span class="k-tag tg-qual">Qualité</span></div><div class="k-name">Invalid Traffic</div><div class="k-def">% trafic frauduleux (bots). Seuil acceptable &lt;10% GIVT. Vérifié via IAS/DV.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cd)">Reach</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Couverture unique</div><div class="k-def">% d'UU exposés. Fréquence = nb moyen d'expositions. Via DV360 ou panel.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cd)">Brand Lift</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Lift de mémorisation</div><div class="k-def">Hausse notoriété exposé vs non-exposé. Via Meta / Google Brand Lift Studies.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">📅</div><h3>Saisonnalité &amp; Climat de marché</h3></div>
+      <div class="card-body">
+        <div class="szone">
+          <table class="stab">
+            <thead><tr><th>Période</th><th>Tension</th><th>Notes stratégiques</th></tr></thead>
+            <tbody>
+              <tr><td>Janv – Fév</td><td><span class="tbg t-low">Creuse</span></td><td>CPM bas — fenêtre idéale pour tests A/B et branding à coût optimisé.</td></tr>
+              <tr><td>Mars – Avr</td><td><span class="tbg t-mid">Modérée</span></td><td>Reprise budgétaire Q1. Remontée progressive des CPM.</td></tr>
+              <tr><td>Mai – Juin</td><td><span class="tbg t-mid2">Modérée+</span></td><td>Fête des Mères/Pères, sorties produits. Bonne période Retail Media.</td></tr>
+              <tr><td>Juil – Août</td><td><span class="tbg t-var">Variable</span></td><td>Moins de pression B2B. E-commerce voyage en hausse. CPM social en baisse.</td></tr>
+              <tr><td>Sep – Oct</td><td><span class="tbg t-high">Forte</span></td><td>Rentrée = pic budgétaire. CPM en hausse +20–30% vs été.</td></tr>
+              <tr><td>Nov – Déc</td><td><span class="tbg t-peak">Pic absolu</span></td><td>Black Friday + Noël : CPM au sommet (+50–100%). Réservations à anticiper tôt.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">⚠️ <span><strong>Cookie deprecation :</strong> adoption croissante du ciblage contextuel et solutions cookieless (UID 2.0, ID5, LiveRamp). Anticiper la migration 1st party data.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">🛠️</div><h3>Outils de référence du marché</h3></div>
+      <div class="card-body">
+        <div class="tgrid">
+          <div class="tcard"><div class="t-cat">DSP</div><div class="t-name">DV360</div><div class="t-desc">Demand-Side Platform Google. Achat programmatique open web + YouTube.</div></div>
+          <div class="tcard"><div class="t-cat">DSP</div><div class="t-name">The Trade Desk</div><div class="t-desc">DSP indépendant leader. CTV, audio, DOOH. UID 2.0 natif.</div></div>
+          <div class="tcard"><div class="t-cat">DSP/SSP</div><div class="t-name">Xandr (Microsoft)</div><div class="t-desc">Plateforme achat/vente programmatique. Forte présence Europe.</div></div>
+          <div class="tcard"><div class="t-cat">Search</div><div class="t-name">Google Ads / SA360</div><div class="t-desc">Gestion Search, Shopping. SA360 pour multi-moteurs et grands comptes.</div></div>
+          <div class="tcard"><div class="t-cat">Social</div><div class="t-name">Meta Ads Manager</div><div class="t-desc">Achat FB/IG/Threads. Advantage+ pour automatisation des campagnes.</div></div>
+          <div class="tcard"><div class="t-cat">Mesure</div><div class="t-name">Médiamétrie//NetRatings</div><div class="t-desc">Panel audience digital France. UU, temps passé, données démo.</div></div>
+          <div class="tcard"><div class="t-cat">Brand Safety</div><div class="t-name">IAS / DoubleVerify</div><div class="t-desc">Vérification viewabilité, IVT, brand safety sur tous inventaires.</div></div>
+          <div class="tcard"><div class="t-cat">Pige</div><div class="t-name">Kantar AdMonitor</div><div class="t-desc">Pige publicitaire digitale. Créas et investissements estimés concurrents.</div></div>
+          <div class="tcard"><div class="t-cat">Analyse</div><div class="t-name">Semrush / SimilarWeb</div><div class="t-desc">Trafic, compétiteurs, mots-clés, share of voice Search.</div></div>
+          <div class="tcard"><div class="t-cat">Médiaplanning</div><div class="t-name">Prisma (Mediaocean)</div><div class="t-desc">Planification, achat et réconciliation. Standard agences media France.</div></div>
+          <div class="tcard"><div class="t-cat">Retail Media</div><div class="t-name">Criteo / Carrefour Links</div><div class="t-desc">Plateformes Retail Media on-site et off-site. Data 1st party retailers.</div></div>
+          <div class="tcard"><div class="t-cat">Identity</div><div class="t-name">LiveRamp / ID5</div><div class="t-desc">Solutions d'identité cookieless pour ciblage et mesure post-3PC.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div></div><!-- /digital -->
+
+
+<!-- ══════════════════════════════════════
+  RADIO & AUDIO
+══════════════════════════════════════ -->
+<div id="T-radio" class="tcon">
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-ico">🎙️</div>
+    <div class="hero-copy">
+      <h2>Radio &amp; Audio Digital</h2>
+      <p>Radio hertzienne nationale &amp; locale, streaming audio, podcasts et replay — le média de l'oreille et de la mobilité.</p>
+    </div>
+  </div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">💡</div><h3>Fonctionnement de l'achat d'espace</h3></div>
+      <div class="card-body">
+        <div class="sub">Radio linéaire (hertzienne)</div>
+        <ul class="ilist">
+          <li><strong>Achat au GRP radio :</strong> 1 GRP = 1% de la cible exposé une fois. Plans médias composés de spots sur grilles tarifaires card-rate avec remises dégressives.</li>
+          <li><strong>Régies :</strong> NRJ Global (NRJ, Chérie FM, Nostalgie, RFM), M6 Publicité (RTL, Fun Radio), Radio France Publicité (France Inter, France Info…), Lagardère Pub (Europe 1).</li>
+          <li><strong>Formats :</strong> spots 20"/30" standards. Parrainage d'émission, jingle, opération spéciale en gré à gré direct avec la régie.</li>
+          <li><strong>Délai de réservation :</strong> 1 à 3 semaines selon les régies. Plus flexible que la TV. BAT audio selon spécifications techniques de la station.</li>
+          <li><strong>Prime time :</strong> tranche 6h–9h la plus onéreuse (×2 à ×3 vs après-midi). Audience maximale sur actifs en mobilité.</li>
+        </ul>
+        <div class="sub">Audio Digital (streaming &amp; podcast)</div>
+        <ul class="ilist">
+          <li><strong>Plateformes :</strong> Spotify Ads, Deezer Ads, Targetspot, Triton Digital, SoundCloud. CPM audio ou CPM companion display intégré.</li>
+          <li><strong>Formats :</strong> pre-roll audio (15–30"), mid-roll podcast, sponsored content, branded playlist. Programmatique via Spotify DSP et Targetspot.</li>
+          <li><strong>Ciblage :</strong> socio-démo, contexte musical (playlist/genre), comportemental, géo, device type.</li>
+          <li><strong>Podcast :</strong> CPM 50–120 € ou placement garanti sur épisode. Régies : Acast, Audiomeans, OuiMedia. Lecture hôte pour une authenticité maximale.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">📊</div><h3>Principaux KPIs</h3></div>
+      <div class="card-body">
+        <div class="kgrid">
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cr)">GRP</span><span class="k-tag tg-vol">Volume</span></div><div class="k-name">Gross Rating Point</div><div class="k-def">Pression brute = Couverture × Répétition. KPI central de planification radio.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cr)">Couv. 1+</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Couverture (Reach)</div><div class="k-def">% de la cible exposé au moins une fois sur la durée de la campagne.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cr)">ODV</span><span class="k-tag tg-eff">Efficacité</span></div><div class="k-name">Occasions D'entendre</div><div class="k-def">Nombre moyen d'expositions par individu touché. Cible : 3 à 5 ODV.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cr)">CPP</span><span class="k-tag tg-roi">ROI</span></div><div class="k-name">Coût Par Point de GRP</div><div class="k-def">Budget ÷ Nb de GRP. Indicateur d'efficience entre stations et périodes.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cr)">AC</span><span class="k-tag tg-vol">Volume</span></div><div class="k-name">Audience Cumulée (5 min+)</div><div class="k-def">Nb d'auditeurs ayant écouté la station au moins 5 min. Donnée Médiamétrie vague.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cr)">PDA</span><span class="k-tag tg-vol">Volume</span></div><div class="k-name">Part d'Audience</div><div class="k-def">% d'écoute d'une station parmi les auditeurs totaux radio présents.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cr)">VCR</span><span class="k-tag tg-eng">Engagement</span></div><div class="k-name">Completion Rate (digital)</div><div class="k-def">% d'audios écoutés en totalité. Benchmark podcast : 70–85%. Pre-roll : 85%+.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cr)">Recall</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Mémorisation publicitaire</div><div class="k-def">% d'auditeurs se souvenant du spot. Post-campagne panel Médiamétrie ou Ipsos.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">📅</div><h3>Saisonnalité &amp; Climat de marché</h3></div>
+      <div class="card-body">
+        <div class="szone">
+          <table class="stab">
+            <thead><tr><th>Période</th><th>Tension</th><th>Notes stratégiques</th></tr></thead>
+            <tbody>
+              <tr><td>Janv – Fév</td><td><span class="tbg t-mid">Modérée</span></td><td>Soldes hiver actifs. Pression distribution GMS. CPP encore accessible.</td></tr>
+              <tr><td>Mars – Avr</td><td><span class="tbg t-mid">Modérée</span></td><td>Reprise post-soldes. Secteurs auto et alimentation actifs.</td></tr>
+              <tr><td>Mai – Juin</td><td><span class="tbg t-mid2">Modérée+</span></td><td>Fête des Mères/Pères. Secteur GMS très actif sur toutes les tranches horaires.</td></tr>
+              <tr><td>Juil – Août</td><td><span class="tbg t-low">Creuse</span></td><td>Forte baisse d'écoute (vacances). CPP bas — opportunité pour budgets locaux.</td></tr>
+              <tr><td>Sep – Oct</td><td><span class="tbg t-high">Forte</span></td><td>Rentrée = pic radio. Toutes cibles actives, concurrence forte, spots saturés.</td></tr>
+              <tr><td>Nov – Déc</td><td><span class="tbg t-peak">Pic absolu</span></td><td>Fêtes : pression max GMS, retail, luxe. Card-rate souvent non-négociable.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">📻 <span><strong>Prime time matinal (6h–9h) :</strong> coûts ×2 à ×3 vs après-midi. Le podcast est peu impacté par la saisonnalité — CPM stable hors pic Q4.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">🛠️</div><h3>Outils de référence du marché</h3></div>
+      <div class="card-body">
+        <div class="tgrid">
+          <div class="tcard"><div class="t-cat">Mesure audience</div><div class="t-name">Médiamétrie Radio</div><div class="t-desc">Panel 126 000 individus. Vague mensuelle 13 ans+. GRP, couverture, répétition.</div></div>
+          <div class="tcard"><div class="t-cat">Pige</div><div class="t-name">Yacast</div><div class="t-desc">Pige radio automatique. Détection spots et investissements concurrentiels.</div></div>
+          <div class="tcard"><div class="t-cat">Pige</div><div class="t-name">Kantar Media</div><div class="t-desc">Estimation d'investissements radio. Vue 360° radio + TV + presse.</div></div>
+          <div class="tcard"><div class="t-cat">Local</div><div class="t-name">Médialocales</div><div class="t-desc">Outil de planification radios locales. Couverture géo fine pour campagnes régionales.</div></div>
+          <div class="tcard"><div class="t-cat">Audio digital</div><div class="t-name">Targetspot</div><div class="t-desc">Réseau programmatique audio digital. Stations et webradios, ciblage data-driven.</div></div>
+          <div class="tcard"><div class="t-cat">Mesure digital</div><div class="t-name">Triton Digital</div><div class="t-desc">Mesure d'audience streaming audio. Standard pour plateformes et webradios.</div></div>
+          <div class="tcard"><div class="t-cat">Plateforme</div><div class="t-name">Spotify Ad Studio</div><div class="t-desc">Self-serve Spotify. Création audio AI, ciblage playlist / moment / démo.</div></div>
+          <div class="tcard"><div class="t-cat">Médiaplanning</div><div class="t-name">Prisma / Powertool</div><div class="t-desc">Simulation plans radio. Calcul GRP/couverture/répétition sur cibles SIMM.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div></div><!-- /radio -->
+
+
+<!-- ══════════════════════════════════════
+  TV & CTV
+══════════════════════════════════════ -->
+<div id="T-tv" class="tcon">
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-ico">📺</div>
+    <div class="hero-copy">
+      <h2>TV &amp; CTV — Linéaire · Segmentée · Replay · Streaming OTT</h2>
+      <p>Télévision nationale gratuite et payante, TNT, IPTV, CTV/OTT. Le média de la couverture massive et du reach familial.</p>
+    </div>
+  </div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">💡</div><h3>Fonctionnement de l'achat d'espace</h3></div>
+      <div class="card-body">
+        <div class="sub">TV Linéaire nationale</div>
+        <ul class="ilist">
+          <li><strong>Achat au GRP TV :</strong> unité étalon. Acheté à la régie sur grilles card-rate avec barèmes dégressifs selon volume annuel (contrats-cadres).</li>
+          <li><strong>Régies :</strong> TF1 Publicité (TF1, TMC, TFX), M6 Publicité (M6, W9, 6ter), France TV Publicité (F2–F5), Canal+ Régie (C+, C8, CNews), Altice Media (BFMTV).</li>
+          <li><strong>Modes d'achat :</strong> contrats annuels (garanties GRP + pénalités si non-livraison), achats spots à la semaine, packages thématiques sur mesure.</li>
+          <li><strong>Formats :</strong> spots 15"/20"/30" standards, habillage d'émission, parrainage, écrans coupés. Prime time vs day time vs access prime.</li>
+          <li><strong>Délais :</strong> minimum J-7 pour TV nationale. Négociations annuelles en septembre-octobre pour l'année N+1.</li>
+        </ul>
+        <div class="sub">TV Segmentée (Addressable TV)</div>
+        <ul class="ilist">
+          <li><strong>Mécanisme :</strong> remplacement du spot linéaire par un spot ciblé via box IPTV (SFR, Bouygues, Orange, Free). Autorisé par décret Arcom depuis 2020.</li>
+          <li><strong>Achat :</strong> CPM sur segment (géo, CSP, intérêt, comportement). Régie principale : Audience Square (JV TF1+M6+FTV). CPM indicatif : 30–60 €.</li>
+        </ul>
+        <div class="sub">CTV / OTT (streaming avec publicité)</div>
+        <ul class="ilist">
+          <li><strong>Plateformes :</strong> Netflix (AVOD), Amazon Prime Video Ads, Disney+ Star, Molotov, TF1+, M6+. CPM via régie directe ou programmatique (TTD, DV360).</li>
+          <li><strong>Formats :</strong> pre/mid-roll non-skippables 15"–30" sur grand écran connecté. Contexte premium, brand safety très élevé, attention maximale.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">📊</div><h3>Principaux KPIs</h3></div>
+      <div class="card-body">
+        <div class="kgrid">
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ct)">GRP TV</span><span class="k-tag tg-vol">Volume</span></div><div class="k-name">Gross Rating Point</div><div class="k-def">1 GRP = 1% de la cible exposé 1 fois. Achat en blocs de GRP sur cibles Médiamat.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ct)">Couverture</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Reach n+</div><div class="k-def">R1+ = notoriété. R3+ = mémorisation. R5+ = transformation. Sur cible SIMM.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ct)">OVE</span><span class="k-tag tg-eff">Efficacité</span></div><div class="k-name">Occasions De Voir (moy.)</div><div class="k-def">Répétition moyenne. Cible : 3 à 5 OVE pour campagne de notoriété standard.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ct)">CPP</span><span class="k-tag tg-roi">ROI</span></div><div class="k-name">Coût Par Point de GRP</div><div class="k-def">Budget ÷ Nb de GRP. Indicateur d'efficience entre régies et périodes.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ct)">PDA</span><span class="k-tag tg-vol">Volume</span></div><div class="k-name">Part d'Audience</div><div class="k-def">% d'audience TV sur l'ensemble des téléspectateurs présents. Données Médiamat quotidiennes.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ct)">Mémorisation</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Taux de mémorisation</div><div class="k-def">% se rappelant du spot. Post-test panel Ipsos / Kantar MillwardBrown.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ct)">Brand Lift</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Lift publicitaire TV</div><div class="k-def">Impact sur notoriété, image et intention d'achat. Méthode exposé/non-exposé.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ct)">Déflation</span><span class="k-tag tg-roi">ROI</span></div><div class="k-name">Taux de déflation</div><div class="k-def">Écart entre tarif card-rate et CPP réel négocié. Indicateur de pouvoir d'achat agence.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">📅</div><h3>Saisonnalité &amp; Climat de marché</h3></div>
+      <div class="card-body">
+        <div class="szone">
+          <table class="stab">
+            <thead><tr><th>Période</th><th>Tension</th><th>Notes stratégiques</th></tr></thead>
+            <tbody>
+              <tr><td>Janvier</td><td><span class="tbg t-low">Creuse</span></td><td>Soldes, galette. Encombrement minimum — CPP attractif pour branding.</td></tr>
+              <tr><td>Fév – Mars</td><td><span class="tbg t-mid">Modérée</span></td><td>Hiver ski, Saint-Valentin. Secteurs alimentaire et distribution actifs.</td></tr>
+              <tr><td>Avr – Juin</td><td><span class="tbg t-mid2">Modérée+</span></td><td>Fêtes Mères/Pères, championnats. Pression croissante sur chaînes généralistes.</td></tr>
+              <tr><td>Juil – Août</td><td><span class="tbg t-var">Variable</span></td><td>PDA en baisse (vacances). Coûts plus bas — opportunité ciblage 15–34 ans.</td></tr>
+              <tr><td>Sep – Oct</td><td><span class="tbg t-high">Très forte</span></td><td>Rentrée : retour massif des annonceurs. Auto, grande conso, distribution. Saturation écrans.</td></tr>
+              <tr><td>Nov – Déc</td><td><span class="tbg t-peak">Pic absolu</span></td><td>Black Friday + Noël = CPP maximum annuel. Réservations à effectuer en juillet-août.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">⚽ <span><strong>Événements sportifs majeurs</strong> (JO, Coupe du Monde, Roland Garros) : effets d'attractivité et de saturation spécifiques sur les chaînes diffusantes — surveiller l'agenda Arcom.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">🛠️</div><h3>Outils de référence du marché</h3></div>
+      <div class="card-body">
+        <div class="tgrid">
+          <div class="tcard"><div class="t-cat">Mesure audience</div><div class="t-name">Médiamat (Médiamétrie)</div><div class="t-desc">Panel TV 4 500 foyers. Données quotidiennes PDA, GRP, couverture. Outil : eStat'TV.</div></div>
+          <div class="tcard"><div class="t-cat">Pige</div><div class="t-name">Kantar Media</div><div class="t-desc">Pige automatique TV. Tous spots détectés, investissements pub, analyse concurrentielle.</div></div>
+          <div class="tcard"><div class="t-cat">Pige</div><div class="t-name">Yacast</div><div class="t-desc">Surveillance audiovisuelle TV et radio. Veille créa et plans médias concurrents.</div></div>
+          <div class="tcard"><div class="t-cat">Planification TV</div><div class="t-name">eStat'TV</div><div class="t-desc">Simulation de plans TV. Calcul GRP, couverture, répétition sur cibles Médiamat.</div></div>
+          <div class="tcard"><div class="t-cat">TVS / Adressable</div><div class="t-name">Audience Square</div><div class="t-desc">JV TF1+M6+France TV pour TV segmentée. Planification et achat adressable.</div></div>
+          <div class="tcard"><div class="t-cat">CTV Programmatique</div><div class="t-name">The Trade Desk</div><div class="t-desc">Achat programmatique inventaires CTV/OTT. Ciblage data + mesure cross-device.</div></div>
+          <div class="tcard"><div class="t-cat">Mesure cross-média</div><div class="t-name">Nielsen One</div><div class="t-desc">Mesure unifiée TV linéaire + streaming. Déduplication reach cross-écran.</div></div>
+          <div class="tcard"><div class="t-cat">Réglementaire</div><div class="t-name">Arcom / SNPTV</div><div class="t-desc">Arcom : régulateur audiovisuel. SNPTV : syndicat régies TV, baromètres recettes.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div></div><!-- /tv -->
+
+
+<!-- ══════════════════════════════════════
+  PRESSE
+══════════════════════════════════════ -->
+<div id="T-presse" class="tcon">
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-ico">📰</div>
+    <div class="hero-copy">
+      <h2>Presse — PQN · PQR · Magazine · Presse digitale</h2>
+      <p>Quotidiens nationaux et régionaux, magazines spécialisés et généralistes, titres numériques — le média de l'attention et de la crédibilité.</p>
+    </div>
+  </div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">💡</div><h3>Fonctionnement de l'achat d'espace</h3></div>
+      <div class="card-body">
+        <div class="sub">Presse Quotidienne Nationale (PQN)</div>
+        <ul class="ilist">
+          <li><strong>Achat à la place :</strong> tarif fixe à la page, demi-page, quart de page ou encart. Tarifs card-rate publiés avec conditions générales annuelles.</li>
+          <li><strong>Régies :</strong> Figaro Médias (Le Figaro), Le Monde Publicité (Le Monde, L'Obs, Télérama), Les Échos–Le Parisien Médias, Libération Publicité.</li>
+          <li><strong>Délais :</strong> 3 à 10 jours ouvrés selon les titres. BAT (PDF haute déf) à fournir selon gabarit technique de la régie.</li>
+          <li><strong>Encarts pub :</strong> encartes jetées, encarts brochés, suppléments thématiques — tarifés séparément, délai façonnage 2–3 semaines.</li>
+        </ul>
+        <div class="sub">Presse Quotidienne Régionale (PQR)</div>
+        <ul class="ilist">
+          <li><strong>Structure :</strong> 70+ titres régionaux (Ouest-France, La Voix du Nord, La Dépêche…). Achat national centralisé via IP Régions ou titre par titre.</li>
+          <li><strong>Ciblage géo fin :</strong> zone de diffusion, département, agglomération. Idéal pour retail, immobilier, collectivités territoriales.</li>
+        </ul>
+        <div class="sub">Magazines</div>
+        <ul class="ilist">
+          <li><strong>Achat à la place :</strong> 4e de couverture (tarif premium), 2e/3e couv., DPS (double-page spread), pages intérieures. Parution hebdo, mensuelle ou trimestrielle.</li>
+          <li><strong>Régies :</strong> Reworld Media (Grazia, Science &amp; Vie), Prisma Media Solutions (Capital, Femme Actuelle), Condé Nast (Vogue, GQ), Hachette (Elle, Psychologies).</li>
+          <li><strong>Délais longs :</strong> 4 à 8 semaines avant parution pour les mensuels. Réserver la 4e couverture dès juillet pour les numéros de nov-déc.</li>
+        </ul>
+        <div class="sub">Presse digitale</div>
+        <ul class="ilist">
+          <li><strong>Display et natif :</strong> CPM direct ou programmatique via régies digitales des éditeurs. Formats IAB + natifs + newsletters sponsorisées.</li>
+          <li><strong>Brand content :</strong> article sponsorisé, publi-rédactionnel digital. Tarification au forfait ou au CPM selon le titre et la mise en avant éditoriale.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">📊</div><h3>Principaux KPIs</h3></div>
+      <div class="card-body">
+        <div class="kgrid">
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cp)">Diffusion</span><span class="k-tag tg-vol">Volume</span></div><div class="k-name">Exemplaires diffusés</div><div class="k-def">Total payante (abonnés + kiosque) + gratuite. Certifiée ACPM. Base des tarifs.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cp)">LNM</span><span class="k-tag tg-aud">Audience</span></div><div class="k-name">Lecteurs / Numéro Moyen</div><div class="k-def">Nb moyen de lecteurs par numéro (panel OneNext). Toujours supérieur à la diffusion.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cp)">Couverture</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Reach cible (plan presse)</div><div class="k-def">% de la cible exposé à l'annonce sur la durée du plan. Calculé via OneNext.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cp)">CPM</span><span class="k-tag tg-roi">ROI</span></div><div class="k-name">Coût Pour Mille contacts</div><div class="k-def">Tarif ÷ (LNM × %cible). Indicateur de rentabilité entre titres comparables.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cp)">GRP Presse</span><span class="k-tag tg-vol">Volume</span></div><div class="k-name">Gross Rating Point</div><div class="k-def">Couverture × Répétition sur plan plurititres. Permet comparaison cross-médias.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cp)">Attention</span><span class="k-tag tg-eff">Efficacité</span></div><div class="k-name">Temps de lecture / min.</div><div class="k-def">Atout clé presse : contexte d'attention haute. 30 à 45 min pour un magazine.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cp)">UV</span><span class="k-tag tg-dig">Digital</span></div><div class="k-name">Visiteurs uniques (digital)</div><div class="k-def">Audience site/appli (Médiamétrie//NetRatings). Complète l'audience print du titre.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--cp)">Recall</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Mémorisation de l'annonce</div><div class="k-def">% de lecteurs ayant vu ou mémorisé l'annonce. Post-test (Ipsos, NRJ MediaPulse).</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">📅</div><h3>Saisonnalité &amp; Climat de marché</h3></div>
+      <div class="card-body">
+        <div class="szone">
+          <table class="stab">
+            <thead><tr><th>Période</th><th>Tension</th><th>Notes stratégiques</th></tr></thead>
+            <tbody>
+              <tr><td>Janv – Fév</td><td><span class="tbg t-mid">Modérée</span></td><td>Post-fêtes, soldes. Magazines mode A/H au pic lecteurs. Numéros cadeaux liquidés.</td></tr>
+              <tr><td>Mars – Avr</td><td><span class="tbg t-mid">Modérée</span></td><td>Printemps : déco, jardinage, beauté. Presse spécialisée saisonnière active.</td></tr>
+              <tr><td>Mai – Juin</td><td><span class="tbg t-high">Forte (magaz.)</span></td><td>Numéros estivaux préparés. 4e couvertures très demandées — réserver tôt.</td></tr>
+              <tr><td>Juil – Août</td><td><span class="tbg t-var">Variable</span></td><td>Diffusion PQN en baisse. Presse TV et people au pic. Magazines voyage actifs.</td></tr>
+              <tr><td>Sep – Oct</td><td><span class="tbg t-high">Forte</span></td><td>Rentrée littéraire. Numéros de rentrée très lus. Forte pression mode, auto, puériculture.</td></tr>
+              <tr><td>Nov – Déc</td><td><span class="tbg t-peak">Pic absolu</span></td><td>Numéros Noël = pages pub max. Réservation 4e couv. magazines à faire en juillet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">📉 <span><strong>Marché :</strong> diffusion print en déclin structurel. Valoriser le CPM "attention" élevé presse vs display. Offres bundling print + digital + événements à négocier.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">🛠️</div><h3>Outils de référence du marché</h3></div>
+      <div class="card-body">
+        <div class="tgrid">
+          <div class="tcard"><div class="t-cat">Mesure audience</div><div class="t-name">OneNext (ex-ACPM/EPIQ)</div><div class="t-desc">Étude de référence unique. Diffusion + audience print + digital. Outil planification intégré.</div></div>
+          <div class="tcard"><div class="t-cat">Certification</div><div class="t-name">ACPM</div><div class="t-desc">Alliance pour les Chiffres de la Presse. Certifie diffusions payantes, gratuites, numériques.</div></div>
+          <div class="tcard"><div class="t-cat">Pige</div><div class="t-name">Kantar Media</div><div class="t-desc">Pige publicitaire presse papier et digitale. Investissements concurrents estimés.</div></div>
+          <div class="tcard"><div class="t-cat">PQR nationale</div><div class="t-name">IP Régions</div><div class="t-desc">Centrale d'achat PQR nationale. Coordonne l'achat multi-titres régionaux.</div></div>
+          <div class="tcard"><div class="t-cat">Médiaplanning</div><div class="t-name">Prisma / Optiplan</div><div class="t-desc">Optimisation plans presse. Calcul couverture/répétition, CPM, simulation multi-titres.</div></div>
+          <div class="tcard"><div class="t-cat">Syndicats</div><div class="t-name">SPQR / SPQN</div><div class="t-desc">Publient baromètres, standards techniques et conditions générales de vente presse.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div></div><!-- /presse -->
+
+
+<!-- ══════════════════════════════════════
+  OOH & DOOH
+══════════════════════════════════════ -->
+<div id="T-ooh" class="tcon">
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-ico">🏙️</div>
+    <div class="hero-copy">
+      <h2>Affichage — OOH Classique · DOOH · Mobilier urbain · Transport</h2>
+      <p>Panneaux grand format, mobilier urbain, abribus, transports, galeries marchandes et écrans digitaux en milieu urbain.</p>
+    </div>
+  </div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">💡</div><h3>Fonctionnement de l'achat d'espace</h3></div>
+      <div class="card-body">
+        <div class="sub">OOH Classique (papier)</div>
+        <ul class="ilist">
+          <li><strong>Achat à la semaine :</strong> lundi → dimanche. Réservation d'un réseau de panneaux (abribus, 4×3, mupi, sucette…) défini par son emprise géographique.</li>
+          <li><strong>Régies :</strong> JCDecaux (mobilier urbain, métros, aéroports), Clear Channel (panneaux routiers, centres commerciaux), Médiatransports (régie officielle RATP+SNCF).</li>
+          <li><strong>Formats :</strong> 4×3 (12 m²), 8 m² (abribus), 2 m² (mupi/sucette), grand spectacle (bâches, mégaformats), vitrine transport.</li>
+          <li><strong>Modes d'achat :</strong> réseau préconstitué régie, réseau sur-mesure (sélection face par face), ou achat national/local combiné.</li>
+          <li><strong>Tarification :</strong> à la face/semaine ou au forfait réseau. Remises sur volume, packages contre-saison et engagements annuels.</li>
+        </ul>
+        <div class="sub">DOOH (Digital Out-of-Home)</div>
+        <ul class="ilist">
+          <li><strong>Achat au CPM ou à la diffusion :</strong> spot 5–15 sec sur écrans en rotation. CPM calculé sur contacts (base Affimétrie/Score Mobilité).</li>
+          <li><strong>Programmatique DOOH :</strong> activation temps réel via DSP (The Trade Desk, Hivestack, Vistar Media). Déclenchement conditionnel : météo, heure, événement, data mobile.</li>
+          <li><strong>Délais DOOH :</strong> 24–48h en programmatique. 5–7 jours en gré à gré régie. Contenus modifiables en temps réel (MP4 ou HTML5).</li>
+        </ul>
+        <div class="sub">Transports (RATP / SNCF)</div>
+        <ul class="ilist">
+          <li><strong>Médiatransports :</strong> régie officielle RATP+SNCF. Réseaux quais, couloirs, formats spectaculaires gares. Forfait à la semaine ou réseau thématique ciblé.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">📊</div><h3>Principaux KPIs</h3></div>
+      <div class="card-body">
+        <div class="kgrid">
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--co)">GRP Aff.</span><span class="k-tag tg-vol">Volume</span></div><div class="k-name">Gross Rating Point OOH</div><div class="k-def">Contacts cible ÷ Population × 100. Mesure via Affimétrie (Score Mobilité).</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--co)">Contacts</span><span class="k-tag tg-vol">Volume</span></div><div class="k-name">Contacts bruts</div><div class="k-def">Passages devant le panneau × coeff de visibilité. Données Affimétrie / Score.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--co)">CPM</span><span class="k-tag tg-roi">ROI</span></div><div class="k-name">Coût Pour Mille contacts</div><div class="k-def">Budget ÷ (contacts ÷ 1 000). Compare l'efficience entre réseaux, villes et formats.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--co)">Couverture</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Reach géographique</div><div class="k-def">% de la population couverte par le réseau sur la zone de campagne définie.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--co)">Fréquence</span><span class="k-tag tg-eff">Efficacité</span></div><div class="k-name">Répétition contacts</div><div class="k-def">Nombre moyen de contacts par individu sur la période de campagne.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--co)">Nb de faces</span><span class="k-tag tg-vol">Volume</span></div><div class="k-name">Densité réseau</div><div class="k-def">Nombre de panneaux ou faces dans le réseau. Indicateur de densité spatiale.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--co)">Drive-to-Store</span><span class="k-tag tg-roi">ROI</span></div><div class="k-name">Footfall incrémental</div><div class="k-def">Visites en magasin générées par l'exposition OOH. Mesure mobile data (Adsquare).</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--co)">Brand Lift</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Notoriété spontanée</div><div class="k-def">Mesure post-campagne via panel ou mobile survey (attribution géoloc exposé/non-exposé).</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">📅</div><h3>Saisonnalité &amp; Climat de marché</h3></div>
+      <div class="card-body">
+        <div class="szone">
+          <table class="stab">
+            <thead><tr><th>Période</th><th>Tension</th><th>Notes stratégiques</th></tr></thead>
+            <tbody>
+              <tr><td>Janv – Fév</td><td><span class="tbg t-low">Creuse</span></td><td>Post-fêtes. Peu d'annonceurs actifs — CPM bas, idéal pour lancement de marque.</td></tr>
+              <tr><td>Mars – Avr</td><td><span class="tbg t-mid">Modérée</span></td><td>Printemps, sorties produits saisonniers. Demande croissante sur grandes villes.</td></tr>
+              <tr><td>Mai – Juin</td><td><span class="tbg t-mid2">Modérée+</span></td><td>Fête des Mères/Pères, départs vacances, festivals. DOOH très actif en centres-villes.</td></tr>
+              <tr><td>Juil – Août</td><td><span class="tbg t-var">Variable</span></td><td>Fréquentation touristique forte (Paris, littoral). Moins d'annonceurs B2B — opportunité prix.</td></tr>
+              <tr><td>Sep – Oct</td><td><span class="tbg t-high">Forte</span></td><td>Rentrée = retour massif des campagnes. Forte pression mobilier urbain et transports.</td></tr>
+              <tr><td>Nov – Déc</td><td><span class="tbg t-peak">Pic absolu</span></td><td>Saturation des grandes villes. Réservations à effectuer en juillet. Majorations emplacements premium.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">🛠️</div><h3>Outils de référence du marché</h3></div>
+      <div class="card-body">
+        <div class="tgrid">
+          <div class="tcard"><div class="t-cat">Mesure audience</div><div class="t-name">Affimétrie / Score</div><div class="t-desc">GIE de mesure OOH France. Score Mobilité : contacts par panneau, GRP affichage.</div></div>
+          <div class="tcard"><div class="t-cat">Données mobilité</div><div class="t-name">Geomobility</div><div class="t-desc">Data géospatiale et mobilité. Optimise le choix des réseaux et l'analyse de zone.</div></div>
+          <div class="tcard"><div class="t-cat">DOOH Programmatique</div><div class="t-name">Hivestack / Vistar</div><div class="t-desc">DSP spécialisés DOOH. Activation temps réel, ciblage contextuel, météo, heure, géo.</div></div>
+          <div class="tcard"><div class="t-cat">DSP Cross-canal</div><div class="t-name">The Trade Desk</div><div class="t-desc">Inventaire DOOH intégré dans plans cross-canal. Vision unifiée avec digital et CTV.</div></div>
+          <div class="tcard"><div class="t-cat">Attribution</div><div class="t-name">Adsquare</div><div class="t-desc">Attribution mobile-OOH. Mesure du drive-to-store et uplift de visites après exposition.</div></div>
+          <div class="tcard"><div class="t-cat">Institutionnel</div><div class="t-name">UPE (DOOH.fr)</div><div class="t-desc">Union de la Publicité Extérieure. Baromètres investissements, standards techniques.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div></div><!-- /ooh -->
+
+
+<!-- ══════════════════════════════════════
+  AUTRES LEVIERS
+══════════════════════════════════════ -->
+<div id="T-autres" class="tcon">
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-ico">🎬</div>
+    <div class="hero-copy">
+      <h2>Autres Leviers — Cinéma · Événementiel · Marketing d'influence</h2>
+      <p>Médias de l'attention et de l'engagement émotionnel : salle obscure, activation terrain, créateurs de contenu.</p>
+    </div>
+  </div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">💡</div><h3>Fonctionnement de l'achat d'espace</h3></div>
+      <div class="card-body">
+        <div class="sub">Cinéma</div>
+        <ul class="ilist">
+          <li><strong>Achat à la semaine :</strong> spots 30"–2 min en avant-programme. Réservation par réseau national ou local, par ville, voire par salle. Cycle mercredi → mardi.</li>
+          <li><strong>Régies :</strong> Screenvision (UGC, Cinéville, indépendants). CGR Screen pour le réseau CGR. CPM élevé (50–150 €) justifié par l'attention captive totale.</li>
+          <li><strong>Formats spéciaux :</strong> roadblocks (exclusivité d'écran), branded content avant-programme, partenariats autour des sorties événements.</li>
+        </ul>
+        <div class="sub">Événementiel</div>
+        <ul class="ilist">
+          <li><strong>Sponsoring :</strong> co-branding sur événements tiers (festival, concert, sport, salon). Achat de droits de naming, activation stands. Tarification négociée au cas par cas.</li>
+          <li><strong>Activation terrain :</strong> street marketing (tracts, échantillonnage, animations), pop-up stores, expériences immersives. Coût au contact ou forfait journée équipe.</li>
+          <li><strong>Événements propriétaires :</strong> organisation marque (conférences, soirées). Budget = production + venue + médiatisation + RP.</li>
+        </ul>
+        <div class="sub">Marketing d'influence</div>
+        <ul class="ilist">
+          <li><strong>Macro-influence :</strong> créateurs 500K–5M+ abonnés. Forfait 3 000–50 000 €+ selon créateur, format et droits de réutilisation négociés.</li>
+          <li><strong>Micro &amp; nano-influence :</strong> créateurs 5K–100K. Engagement plus fort, coût plus faible (500–3 000 €). Géré via Reech, Hivency, Kolsquare.</li>
+          <li><strong>Droits de diffusion :</strong> négocier la réutilisation des contenus pour pub payante (whitelisting, dark posts). Prévoir +20–50% au devis de base.</li>
+          <li><strong>Loi Influence (2023) :</strong> mention #Publicité ou #Partenariat obligatoire. Contrat écrit requis. Déclaration produits offerts au-dessus de 500 €. Conformité ARPP.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">📊</div><h3>Principaux KPIs</h3></div>
+      <div class="card-body">
+        <div class="sub">Cinéma</div>
+        <div class="kgrid" style="margin-bottom:14px">
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ca)">Entrées</span><span class="k-tag tg-vol">Volume</span></div><div class="k-name">Spectateurs exposés</div><div class="k-def">Total spectateurs ayant vu le spot. Données CNC hebdomadaires + Screenvision.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ca)">Mémorisation</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Taux de mémorisation</div><div class="k-def">60–75% : parmi les plus élevés tous médias. Attention captive et immersion totale.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ca)">CPM</span><span class="k-tag tg-roi">ROI</span></div><div class="k-name">Coût Pour Mille</div><div class="k-def">50–150 € CPM — à qualifier par la qualité d'attention captive unique à la salle.</div></div>
+        </div>
+        <div class="sub">Événementiel</div>
+        <div class="kgrid" style="margin-bottom:14px">
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ca)">CPL</span><span class="k-tag tg-perf">Perf.</span></div><div class="k-name">Coût Par Lead</div><div class="k-def">Budget ÷ Nb de contacts qualifiés générés lors de l'événement. Clé pour salons B2B.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ca)">Earned Media</span><span class="k-tag tg-brand">Branding</span></div><div class="k-name">Retombées médias</div><div class="k-def">Valorisation presse/sociale générée par l'événement. Souvent ×3–10 le coût de l'event.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ca)">NPS</span><span class="k-tag tg-eng">Engagement</span></div><div class="k-name">Net Promoter Score</div><div class="k-def">% participants recommandant la marque après l'expérience. Engagement émotionnel.</div></div>
+        </div>
+        <div class="sub">Influence</div>
+        <div class="kgrid">
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ca)">ER</span><span class="k-tag tg-eng">Engagement</span></div><div class="k-name">Taux d'engagement</div><div class="k-def">(Likes + Comm. + Partages) ÷ Abonnés. Benchmark : &gt;2% micro, &gt;1% macro.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ca)">Reach</span><span class="k-tag tg-vol">Volume</span></div><div class="k-name">Portée unique</div><div class="k-def">Nb d'UU ayant vu le contenu. À demander en livraison post-campagne (screenshot stats).</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ca)">CPE</span><span class="k-tag tg-roi">ROI</span></div><div class="k-name">Coût Par Engagement</div><div class="k-def">Budget ÷ nb d'engagements. Compare l'efficience entre créateurs de même niveau.</div></div>
+          <div class="kcard"><div class="kcard-top"><span class="k-acr" style="color:var(--ca)">EMV</span><span class="k-tag tg-roi">ROI</span></div><div class="k-name">Earned Media Value</div><div class="k-def">Valeur médiatique équivalente des contenus créateurs. Engagement × coeff CPM média.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">📅</div><h3>Saisonnalité &amp; Climat de marché</h3></div>
+      <div class="card-body">
+        <div class="szone">
+          <table class="stab">
+            <thead><tr><th>Levier</th><th>Tension</th><th>Notes stratégiques</th></tr></thead>
+            <tbody>
+              <tr><td>Cinéma — Jan–Mar</td><td><span class="tbg t-mid">Modérée</span></td><td>Audience plus réduite, CPM attractif. Bonne période pour campagnes branding durée.</td></tr>
+              <tr><td>Cinéma — Avr–Août</td><td><span class="tbg t-high">Forte</span></td><td>Blockbusters printemps-été (Marvel, Disney, animation). Pic d'entrées = CPM au max.</td></tr>
+              <tr><td>Cinéma — Sep–Déc</td><td><span class="tbg t-high">Forte</span></td><td>Rentrée ciné + films Noël. Forte fréquentation familiale en décembre.</td></tr>
+              <tr><td>Event. — Sep–Nov</td><td><span class="tbg t-peak">Pic</span></td><td>Salons B2B (Mondial Auto, SIAL, Vivatech). Saturation venues et prestataires.</td></tr>
+              <tr><td>Influence — Nov–Déc</td><td><span class="tbg t-peak">Très forte</span></td><td>Unboxing Noël, hauls, listes cadeaux. Tarifs créateurs en hausse +30–50% vs Q1.</td></tr>
+              <tr><td>Influence — Jan–Mar</td><td><span class="tbg t-low">Creuse</span></td><td>Tarifs bas, créateurs disponibles. Idéal pour tester de nouveaux profils à petit budget.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note">⚖️ <span><strong>Influence :</strong> planifier les briefs 4–6 semaines avant mise en ligne. Délais de validation juridique (loi 2023 + ARPP). Réserver les venues événementielles 3–6 mois à l'avance sur Paris.</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-icon">🛠️</div><h3>Outils de référence du marché</h3></div>
+      <div class="card-body">
+        <div class="sub">Cinéma</div>
+        <div class="tgrid" style="margin-bottom:12px">
+          <div class="tcard"><div class="t-cat">Données entrées</div><div class="t-name">CNC</div><div class="t-desc">Statistiques hebdomadaires entrées par film, réseau, ville. Référence pour planification.</div></div>
+          <div class="tcard"><div class="t-cat">Régie</div><div class="t-name">Screenvision</div><div class="t-desc">Régie cinéma leader. Outil de planification, segmentation réseau par public et géo.</div></div>
+          <div class="tcard"><div class="t-cat">Post-test</div><div class="t-name">Kantar / Ipsos</div><div class="t-desc">Mesure de mémorisation et d'impact publicitaire post-campagne cinéma.</div></div>
+        </div>
+        <div class="sub">Influence</div>
+        <div class="tgrid" style="margin-bottom:12px">
+          <div class="tcard"><div class="t-cat">Plateforme</div><div class="t-name">Kolsquare</div><div class="t-desc">Solution européenne d'influence. Identification, scoring, brief, suivi et reporting.</div></div>
+          <div class="tcard"><div class="t-cat">Plateforme</div><div class="t-name">Reech</div><div class="t-desc">Mise en relation marques-créateurs. Gestion contrats, validation contenu, statistiques.</div></div>
+          <div class="tcard"><div class="t-cat">Audit fraude</div><div class="t-name">HypeAuditor</div><div class="t-desc">Audit authenticité des audiences. Détection faux abonnés, qualité d'engagement réel.</div></div>
+          <div class="tcard"><div class="t-cat">Enterprise</div><div class="t-name">CreatorIQ</div><div class="t-desc">Solution grands comptes. APIs plateformes sociales, reporting centralisé, attribution.</div></div>
+        </div>
+        <div class="sub">Événementiel</div>
+        <div class="tgrid">
+          <div class="tcard"><div class="t-cat">Earned Media</div><div class="t-name">Cision / Talkwalker</div><div class="t-desc">Monitoring et valorisation des retombées presse et sociales générées par un événement.</div></div>
+          <div class="tcard"><div class="t-cat">Veille</div><div class="t-name">Meltwater</div><div class="t-desc">Veille médiatique et analyse de l'impact d'événements sur la présence digitale de marque.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div></div><!-- /autres -->
+
+
+
+<!-- ══════════════════════════════════════
+  LEXIQUE
+══════════════════════════════════════ -->
+<div id="T-lexique" class="tcon">
+<div class="wrap lex-wrap">
+
+  <div class="lex-hdr">
+    <div class="lex-hdr-title">📖 Lexique Média Planning — France</div>
+    <div class="lex-hdr-sub">160+ termes du métier, tous leviers confondus. Tapez un mot-clé ou filtrez par média.</div>
+
+    <div class="lex-search-row">
+      <div class="lex-srch-wrap">
+        <span class="lex-srch-ic">🔍</span>
+        <input id="lex-inp" type="text" placeholder="Rechercher un terme… (ex. CPM, GRP, RTB, ROAS, OTT)" autocomplete="off" spellcheck="false" />
+        <span class="lex-kbd">/ pour rechercher</span>
+        <button class="lex-clear-btn" id="lex-clr" onclick="lexClear()" title="Effacer">✕</button>
+      </div>
+    </div>
+
+    <div class="lex-pills" id="lex-pills">
+      <button class="lpill on" data-m="all"         onclick="lexFilter('all')">Tous<span class="lpill-count" id="pc-all">—</span></button>
+      <button class="lpill" data-m="digital"        onclick="lexFilter('digital')">💻 Digital<span class="lpill-count" id="pc-digital">—</span></button>
+      <button class="lpill" data-m="radio"          onclick="lexFilter('radio')">🎙️ Radio &amp; Audio<span class="lpill-count" id="pc-radio">—</span></button>
+      <button class="lpill" data-m="tv"             onclick="lexFilter('tv')">📺 TV &amp; CTV<span class="lpill-count" id="pc-tv">—</span></button>
+      <button class="lpill" data-m="presse"         onclick="lexFilter('presse')">📰 Presse<span class="lpill-count" id="pc-presse">—</span></button>
+      <button class="lpill" data-m="ooh"            onclick="lexFilter('ooh')">🏙️ OOH &amp; DOOH<span class="lpill-count" id="pc-ooh">—</span></button>
+      <button class="lpill" data-m="autres"         onclick="lexFilter('autres')">🎬 Autres Leviers<span class="lpill-count" id="pc-autres">—</span></button>
+      <button class="lpill" data-m="transversal"    onclick="lexFilter('transversal')">🔗 Transversal<span class="lpill-count" id="pc-transversal">—</span></button>
+    </div>
+  </div>
+
+  <div class="lex-meta">
+    <div class="lex-count-label"><strong id="lex-n">—</strong> termes affichés</div>
+    <div class="lex-sort-wrap">
+      Tri :
+      <button class="lex-sort-btn on" id="sort-az" onclick="lexSort('az')">A → Z</button>
+      <button class="lex-sort-btn" id="sort-media" onclick="lexSort('media')">Par média</button>
+    </div>
+  </div>
+
+  <div class="lex-az" id="lex-az"></div>
+
+  <div class="lex-grid" id="lex-grid"></div>
+
+</div>
+</div><!-- /lexique -->
+
+<script>
+(function(){
+  var TABS=['digital','radio','tv','presse','ooh','autres','lexique'];
+  window.go=function(id){
+    TABS.forEach(function(t){
+      var el=document.getElementById('T-'+t);
+      if(el) el.classList.remove('go');
+    });
+    document.querySelectorAll('.tbtn').forEach(function(b){
+      b.className='tbtn';
+    });
+    var target=document.getElementById('T-'+id);
+    if(target){ target.classList.add('go'); }
+    document.querySelectorAll('[data-t="'+id+'"]').forEach(function(b){
+      b.classList.add('on-'+id);
+    });
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+  go('digital');
+})();
+
+/* ══════════════════════════════════
+   LEXIQUE DATA & LOGIC
+══════════════════════════════════ */
+var LX = {
+  f: 'all', q: '', sort: 'az', az: null,
+  inp: null, grid: null, azBar: null
+};
+
+var TERMS = [
+/* ══ DIGITAL ═════════════════════════════════════════════════════════ */
+{t:"Ad Server (Serveur publicitaire)",m:"digital",d:"Infrastructure technologique qui stocke les créas publicitaires, les sert sur les pages éditeurs, comptabilise les impressions et clics, et rapporte les statistiques de campagne. Ex : Google Campaign Manager 360 (CM360), Adform."},
+{t:"Ad Fraud / Fraude publicitaire",m:"digital",d:"Ensemble des pratiques frauduleuses visant à générer des impressions ou clics artificiels (bots, fermes de clics, ad injection). Coûte plusieurs milliards d'euros par an à l'industrie. Protections : IAS, DoubleVerify, Pixalate."},
+{t:"Affinity Audience",m:"digital",d:"Audience construite par Google/Meta à partir des centres d'intérêt durables d'un utilisateur (passions, styles de vie). Adapté aux campagnes de notoriété cherchant à toucher des profils affinitaires avec la marque."},
+{t:"Attribution",m:"digital",d:"Méthode d'allocation du crédit d'une conversion entre les points de contact du parcours client. Modèles : Last Click, First Click, Linéaire, Décroissance temporelle, Data-Driven (IA). Enjeu majeur du marketing performance."},
+{t:"Bid Shading",m:"digital",d:"Technique d'optimisation des enchères permettant à un DSP de soumettre une enchère inférieure au maximum autorisé dans les environnements de deuxième prix unifié. Réduit le coût effectif payé."},
+{t:"Brand Lift",m:"digital",d:"Mesure de l'impact d'une campagne sur la notoriété, la préférence et l'intention d'achat via étude exposé vs groupe contrôle non-exposé. Proposée nativement par Meta, Google Ads, TikTok Ads et DV360."},
+{t:"Brand Safety",m:"digital",d:"Ensemble de technologies (listes noires, catégories IAB, ciblage contextuel) garantissant que les publicités n'apparaissent pas dans des contextes inappropriés pour l'image de la marque. Vérifié par IAS et DoubleVerify."},
+{t:"Companion Display",m:"digital",d:"Bannière visuelle accompagnant un spot audio sur les plateformes de streaming (Spotify, Deezer, podcast). Renforce l'impact du message sonore par un visuel cliquable simultané."},
+{t:"Contextual Targeting",m:"digital",d:"Ciblage des publicités basé sur le contenu de la page consultée plutôt que sur le profil de l'utilisateur. Solution cookieless de référence : Seedtag, Integral Ad Science, Oracle Contextual Intelligence."},
+{t:"Conversion Rate (CVR)",m:"digital",d:"Taux de conversion. Nb de conversions ÷ Nb de clics × 100. Mesure l'efficacité d'une landing page et d'une expérience post-clic. Optimisable via A/B testing et CRO (Conversion Rate Optimization)."},
+{t:"Cookieless",m:"digital",d:"Stratégies de ciblage et mesure ne reposant pas sur les cookies tiers, suite à leur dépréciation par Chrome (Google) et Safari (Apple). Solutions : identifiants universels (UID 2.0, ID5), ciblage contextuel, cohortes, données first-party."},
+{t:"CPA (Coût Par Acquisition)",m:"digital",d:"Budget total ÷ nombre de conversions (achats, leads, inscriptions). KPI central pour les campagnes performance. Objectif : minimiser le CPA tout en maintenant un volume de conversions acceptable."},
+{t:"CPC (Coût Par Clic)",m:"digital",d:"Budget ÷ nombre de clics. Indicateur clé en Search (Google Ads, Microsoft Ads) et en campagnes trafic social. Influencé par le Quality Score en Search et la concurrence sur la cible."},
+{t:"CPL (Coût Par Lead)",m:"digital",d:"Budget ÷ nombre de contacts qualifiés générés (formulaire, inscription, essai gratuit). KPI principal pour les campagnes Lead Generation B2B ou services à valeur élevée."},
+{t:"CPM (Coût Pour Mille)",m:"digital",d:"Coût de 1 000 impressions servies. Unité tarifaire de base du display, vidéo et audio digital. Budget ÷ (impressions ÷ 1 000). Indicateur de volume et de branding."},
+{t:"CPCV (Coût Par Vue Complète)",m:"digital",d:"Modèle où l'annonceur ne paie que les vues 100% complètes d'un spot vidéo. Plus qualitatif que le CPV (coût par vue partielle). Standard pour les campagnes vidéo branding haut de funnel."},
+{t:"CTR (Click-Through Rate)",m:"digital",d:"Taux de clic = clics ÷ impressions × 100. Benchmark display : 0,05–0,3%. Search : 2–10%. Social : 0,5–2%. Mesure l'activation directe d'une publicité. Attention : CTR élevé ≠ qualité de trafic."},
+{t:"Deal ID",m:"digital",d:"Identifiant unique d'un accord PMP (Private Marketplace) ou PG (Programmatic Guaranteed) entre un acheteur (DSP) et un vendeur (SSP). Permet l'accès à l'inventaire spécifique négocié via les plateformes d'achat."},
+{t:"DCO (Dynamic Creative Optimization)",m:"digital",d:"Technologie qui assemble automatiquement des publicités personnalisées en temps réel à partir de composants créatifs modulaires (visuels, textes, CTA, prix) selon le profil et le contexte de l'internaute."},
+{t:"DSP (Demand-Side Platform)",m:"digital",d:"Plateforme d'achat programmatique côté annonceur. Permet d'accéder simultanément à des milliers de SSP pour acheter des impressions aux enchères. Ex : DV360 (Google), The Trade Desk, Amazon DSP, Xandr."},
+{t:"First-Party Data",m:"digital",d:"Données collectées directement par l'annonceur auprès de ses propres clients (CRM, site web, appli). La plus fiable et précieuse : propriété exclusive, non soumise à la dépréciation des cookies tiers. Base de toute stratégie cookieless."},
+{t:"Floor Price (Prix plancher)",m:"digital",d:"CPM minimum en dessous duquel un éditeur refuse de vendre ses impressions via SSP. Protège la valeur de l'inventaire premium contre les enchères trop basses en open auction."},
+{t:"Frequency Capping",m:"digital",d:"Limitation du nombre maximum d'expositions d'une même publicité à un même utilisateur sur une période définie. Protège contre la sur-exposition (ad fatigue) et optimise l'allocation du budget."},
+{t:"Header Bidding",m:"digital",d:"Technique programmatique permettant à un éditeur de soumettre son impression simultanément à plusieurs SSP et acheteurs avant l'appel au ad server. Maximise les revenus éditeurs vs le waterfall traditionnel."},
+{t:"In-Market Audience",m:"digital",d:"Audience construite à partir de signaux comportementaux indiquant une intention d'achat active sur une catégorie de produit (recherches, comparaisons, visites de sites). Très efficace pour la conversion."},
+{t:"In-stream / Out-stream",m:"digital",d:"In-stream : vidéo pub diffusée au sein d'un contenu vidéo (YouTube, Facebook). Out-stream : vidéo pub dans un environnement non-vidéo (article de presse, entre paragraphes). CPM out-stream généralement plus bas."},
+{t:"IVT (Invalid Traffic)",m:"digital",d:"Trafic publicitaire non-humain. GIVT (General) = bots connus, datacenters — détectable automatiquement. SIVT (Sophisticated) = ad injection, hijacking, faux engagements. Seuil acceptable GIVT : <10% selon l'IAB."},
+{t:"Lookalike Audience",m:"digital",d:"Audience de prospection construite algorithmiquement à partir des caractéristiques d'une audience source (clients, convertis, visiteurs les plus engagés). Standard Meta et TikTok pour l'acquisition à grande échelle."},
+{t:"Native Advertising (digital)",m:"digital",d:"Format publicitaire intégré nativement dans l'expérience éditoriale d'un site. Se fond dans le contenu environnant (articles sponsorisés, promoted content). Moins intrusif, taux d'engagement supérieur aux bannières."},
+{t:"Open Auction (RTB)",m:"digital",d:"Marché programmatique ouvert où chaque impression est vendue en temps réel (<100ms) au plus offrant via des enchères entre DSP et SSP. Volume maximal mais brand safety et qualité d'inventaire variables."},
+{t:"Performance Max (PMax)",m:"digital",d:"Type de campagne Google Ads automatisée diffusant sur tous les canaux Google (Search, Display, YouTube, Gmail, Maps, Discover) depuis un seul actif créatif. Optimisation automatique par Machine Learning sur les objectifs de conversion."},
+{t:"PMP (Private Marketplace)",m:"digital",d:"Enchères privées sur invitation. Un deal ID unique est négocié entre l'acheteur (DSP) et le vendeur (SSP) avec CPM plancher garanti, inventaire premium et brand safety renforcée. Équilibre entre automatisation et contrôle."},
+{t:"Programmatic Guaranteed (PG)",m:"digital",d:"Achat programmatique avec volume ET CPM garantis, définis à l'avance. Automatisation du trafficking mais sans enchère — impression réservée. Idéal pour les grandes campagnes branding nécessitant certitude + efficacité opérationnelle."},
+{t:"Quality Score (Google)",m:"digital",d:"Note Google Ads (1–10) évaluant la pertinence combinée d'un mot-clé, d'une annonce et de la landing page. Un Quality Score élevé réduit le CPC réel et améliore le Ad Rank (position de l'annonce)."},
+{t:"Retail Media",m:"digital",d:"Activation publicitaire on-site (plateformes retailers) et off-site (inventaires externes) utilisant les données d'achat 1st party des retailers. Acteurs : Amazon Ads, Criteo, Carrefour Links, Fnac-Darty. CPM on-site : 5–15 €."},
+{t:"Retargeting / Reciblage",m:"digital",d:"Ciblage d'utilisateurs ayant déjà interagi avec la marque (visiteurs site, abandonneurs panier, clients passés). Nécessite pixel ou tag. Taux de conversion 2–5× supérieur à la prospection à froid."},
+{t:"ROAS (Return On Ad Spend)",m:"digital",d:"CA généré ÷ Budget publicitaire investi. ROAS 4× = 4 € générés pour 1 € dépensé. KPI central e-commerce et retail. Cible sectorielle : 3–8× selon les marges. Piloté en Smart Bidding tROAS."},
+{t:"Rich Media",m:"digital",d:"Formats publicitaires interactifs et animés dépassant la bannière standard : expandable, floating, video-in-banner, gamification, 3D. Fort engagement mais poids créatif élevé. Serveur spécialisé requis (Celtra, Flashtalking)."},
+{t:"Second-Party Data",m:"digital",d:"Données first-party d'un partenaire partagées en direct dans un accord B2B privé. Ex : data d'un retailer partenaire activée sur DSP annonceur. Plus qualitative que la 3rd party data, plus volumineuse que la 1st party."},
+{t:"Skippable vs Non-skippable",m:"digital",d:"Skippable : vidéo publ. que l'utilisateur peut ignorer après 5 sec (YouTube TrueView). Non-skippable : diffusée en intégralité (15 sec–30 sec). Non-skippable = taux de complétion 100% garanti mais CPM plus élevé."},
+{t:"Smart Bidding",m:"digital",d:"Famille de stratégies d'enchères automatiques Google basées sur le Machine Learning : Target CPA, Target ROAS, Maximiser Conversions, Maximiser Valeur Conversion. Exploite des milliers de signaux temps réel pour optimiser chaque enchère."},
+{t:"SPO (Supply Path Optimization)",m:"digital",d:"Stratégie d'acheteur visant à simplifier et qualifier le chemin entre DSP et SSP pour réduire les intermédiaires, améliorer la transparence des coûts et l'authenticité de l'inventaire."},
+{t:"SSP (Supply-Side Platform)",m:"digital",d:"Plateforme de vente programmatique côté éditeur. Agrège la demande de multiples DSP/acheteurs pour maximiser le revenue par impression via enchères compétitives. Ex : Xandr, Google AdX, Magnite, Index Exchange."},
+{t:"Third-Party Data",m:"digital",d:"Données collectées par des tiers (DMP, data brokers) sur des millions d'internautes, vendues à des annonceurs pour le ciblage. En fort déclin avec la fin des cookies tiers. Qualité et fraîcheur variables."},
+{t:"Trading Desk",m:"digital",d:"Structure spécialisée dans l'achat programmatique pour le compte d'annonceurs. ATD (Agence Trading Desk) intégré en agence ou ITD (Indépendant). Maîtrise DSP, data et stratégie d'enchères."},
+{t:"UID 2.0 / ID5",m:"digital",d:"Solutions d'identité cookieless basées sur des identifiants pseudonymisés générés à partir d'emails hashés. Permettent ciblage et mesure cross-site sans cookie tiers. Adoptés par The Trade Desk, LiveRamp et nombreux éditeurs."},
+{t:"vCPM (Viewable CPM)",m:"digital",d:"CPM calculé uniquement sur les impressions réellement visibles selon les normes MRC : 50% des pixels visibles pendant au moins 1 seconde (display) ou 2 secondes (vidéo). Plus qualitatif et comparable que le CPM brut."},
+{t:"VCR (Video Completion Rate)",m:"digital",d:"Taux de complétion vidéo = vues 100% ÷ impressions totales × 100. Indicateur d'engagement et de pertinence créative. Benchmark : 60–75% instream, 30–50% outstream. Base du modèle CPCV."},
+{t:"Viewability (Visibilité)",m:"digital",d:"Standard MRC mesurant si une impression avait une chance réelle d'être vue. Seuil minimum : 50% des pixels visibles / 1 sec. Taux viewable moyen du marché : 50–70% display. Facteur clé de la valeur de l'inventaire."},
+{t:"Walled Garden",m:"digital",d:"Écosystème fermé où une plateforme contrôle intégralement l'achat, la data et la mesure (Meta, Google, TikTok, Amazon). Les données ne sont pas exportables vers des tiers. Nécessite une gestion indépendante par plateforme."},
+
+/* ══ RADIO & AUDIO ═══════════════════════════════════════════════════ */
+{t:"Audience Cumulée (AC)",m:"radio",d:"Nombre d'individus ayant écouté une station au moins 5 minutes consécutives sur une période donnée. Donnée de référence Médiamétrie. Base du calcul des GRP et de la couverture radio."},
+{t:"Branded Podcast",m:"radio",d:"Podcast produit et financé entièrement par une marque (ex : Content by Deezer, Renault Talk'Up). Contrôle éditorial total, durée longue, audience qualifiée et engagée. Coût de production significatif."},
+{t:"Companion Display",m:"radio",d:"Bannière visuelle (300×250 ou 320×50) accompagnant simultanément un spot audio sur les interfaces de streaming (Spotify, Deezer). Renforce la mémorisation et permet un call-to-action direct."},
+{t:"CPP Radio (Coût Par Point GRP)",m:"radio",d:"Budget total ÷ nombre de GRP radio achetés. Indicateur d'efficience tarifaire permettant de comparer stations, périodes et régies. Varie fortement entre prime time (6h–9h) et off-peak."},
+{t:"DAI (Dynamic Ad Insertion)",m:"radio",d:"Technologie podcast et streaming insérant dynamiquement les spots publicitaires au moment de l'écoute (vs pre-recorded). Permet un ciblage plus précis, une géolocalisation et une mesure en temps réel."},
+{t:"GRP Radio (Gross Rating Point)",m:"radio",d:"Unité de pression publicitaire radio = Couverture (%) × ODV (Répétition). 500 GRP = 50% de couverture × 10 ODV, ou 100% × 5 ODV. Base de l'achat radio en France via les régies nationales."},
+{t:"Host-read Ad (Lecture hôte)",m:"radio",d:"Publicité lue directement par l'animateur ou le podcasteur dans son propre style. Format le plus authentique et mémorisé : taux d'engagement 4–8× supérieur à un spot produit classique. Tarification premium."},
+{t:"Mid-roll audio",m:"radio",d:"Format publicitaire inséré au milieu d'un contenu audio (podcast, émission replay). Capte une audience plus engagée qu'un pre-roll. Durée standard : 30 sec–60 sec. Taux de complétion très élevé en podcast."},
+{t:"ODV (Occasions D'entendre)",m:"radio",d:"Répétition moyenne d'un spot pour les individus touchés. GRP ÷ Couverture (%). Cible recommandée : 3 à 5 ODV pour une mémorisation efficace. Au-delà de 7–8 ODV, risque de saturation."},
+{t:"Part d'Audience (PDA) radio",m:"radio",d:"% d'écoute d'une station parmi l'ensemble des auditeurs radio présents sur la période. Indicateur de positionnement concurrentiel entre radios. Données publiées mensuellement par Médiamétrie."},
+{t:"Pre-roll audio",m:"radio",d:"Format publicitaire audio diffusé avant le contenu demandé sur les plateformes de streaming. Durée standard : 15–30 sec. Non-skippable. Taux de complétion >85%. CPM : 10–25 € en programmatique."},
+{t:"Prime time radio",m:"radio",d:"Tranche 6h–9h en semaine. Pic d'audience radio sur les actifs en déplacement matinal. Tarifs ×2 à ×3 vs après-midi. Passage obligé pour les campagnes de grande consommation."},
+{t:"Sonic Branding",m:"radio",d:"Identité sonore d'une marque : jingle, signature audio, musique de marque. Éléments mémorisables qui fonctionnent indépendamment du visuel. Forte valeur de reconnaissance instantanée (ex : Intel, Mc Donald's)."},
+{t:"Targetspot",m:"radio",d:"Réseau programmatique audio digital leader en France. Agrège les inventaires de webradios et plateformes de streaming avec ciblage data-driven. CPM : 5–20 € selon audience et ciblage."},
+{t:"Triton Digital",m:"radio",d:"Standard de mesure d'audience pour le streaming audio digital et les podcasts. Certifie les audiences des plateformes et webradios. Équivalent du Médiamat pour l'audio digital."},
+{t:"Vague Médiamétrie radio",m:"radio",d:"Publication mensuelle des audiences radio en France. Panel de 126 000 individus 13 ans+, interrogés en continu. Produit les données GRP, couverture, ODV et PDA par station et tranche horaire."},
+
+/* ══ TV & CTV ═════════════════════════════════════════════════════════ */
+{t:"Access Prime Time",m:"tv",d:"Tranche horaire 19h–20h30. Audience en forte montée, tarifs intermédiaires. Importante pour toucher des audiences de masse avant le pic du prime time. Forte présence jeux télévisés et JT."},
+{t:"AVOD (Advertising VOD)",m:"tv",d:"Modèle de streaming financé partiellement par la publicité : Netflix (plan avec pub), Amazon Prime Video Ads, Disney+ (offre standard), TF1+, M6+. CPM très premium : 30–80 €. Contexte brand safety maximal."},
+{t:"Catch-up TV / BVOD",m:"tv",d:"Broadcaster Video On Demand. Replay des programmes TV sur les plateformes des chaînes (TF1+, France.tv, M6+, MyCanal). Inventaire premium, audience jeune et connectée. Achat via régies ou programmatique."},
+{t:"Contrat-cadre TV",m:"tv",d:"Accord annuel entre une agence ou un annonceur et une régie TV définissant volume, GRP garantis, CPP et conditions de rémunération. Négocié chaque automne (oct–nov) pour l'année N+1. Fonde la déflation obtenue."},
+{t:"CPP TV (Coût Par Point GRP)",m:"tv",d:"Budget ÷ GRP achetés. Indicateur central d'efficience TV. Varie selon la régie (TF1 Pub vs France TV Pub), la cible, la période et le volume. Base de comparaison des plans TV."},
+{t:"CTV (Connected TV)",m:"tv",d:"Télévision connectée à internet via smart TV intégrée ou boîtier externe (Apple TV, Chromecast, Fire Stick). Permet la diffusion de streaming. Inventaire premium pour annonces non-skippables sur grand écran."},
+{t:"Day Time",m:"tv",d:"Tranches horaires diurnes 6h–19h. Audience plus réduite (retraités, inactifs). CPP moins élevé. Adapté aux budgets serrés ou pour maximiser la couverture des cibles larges (femmes, retraités) à moindre coût."},
+{t:"Déflation TV",m:"tv",d:"Remise obtenue sur le tarif card-rate après négociation. Peut atteindre 50–80% chez les grands annonceurs sur contrats annuels. Indicateur du pouvoir d'achat d'une agence et de son volume de billings TV."},
+{t:"GRP TV (Gross Rating Point)",m:"tv",d:"Unité étalon de pression publicitaire TV. 1 GRP = 1% de la cible exposé 1 fois. GRP = Couverture (%) × OVE. Achat en blocs de GRP sur cibles définies (Médiamat 4+ ans, FRDA 25–49, CSP+…)."},
+{t:"Habillage d'émission",m:"tv",d:"Dispositif publicitaire enveloppant une émission : générique d'ouverture/fermeture, logo pendant le programme, jingles. Tarification spécifique, hors GRP. Forte association image marque / univers du programme."},
+{t:"Médiamat",m:"tv",d:"Système de mesure d'audience TV de Médiamétrie. Panel de 4 500 foyers représentatifs équipés d'audimètres People Meter. Produit quotidiennement les PDA, GRP et couvertures. Référence absolue du marché TV français."},
+{t:"OOT (Over-The-Top)",m:"tv",d:"Contenus vidéo diffusés via internet en contournant les canaux TV traditionnels (câble, satellite, TNT). Désigne les services de streaming : Netflix, Amazon, Disney+, Molotov. Support privilégié de la pub CTV premium."},
+{t:"OVE (Occasions De Voir)",m:"tv",d:"Répétition moyenne d'un spot TV pour les individus touchés. GRP ÷ Couverture. Cible : 3 à 5 OVE pour une campagne de notoriété standard. Modèle de recency planning : 1–2 OVE suffisent en entretien."},
+{t:"Parrainage TV",m:"tv",d:"Association d'une marque à un programme TV via mention verbale et logo. Moins intrusif qu'un spot classique, réglementé par l'Arcom. Bénéficie du halo positif du programme parrainé. Tarifé en € / mois."},
+{t:"PDA TV (Part d'Audience)",m:"tv",d:"% de téléspectateurs regardant une chaîne sur l'ensemble des téléspectateurs présents à un instant T. Données Médiamat publiées quotidiennement. Base de l'analyse concurrentielle des chaînes."},
+{t:"Prime Time TV",m:"tv",d:"Tranche 20h30–22h30. Audience maximale sur les chaînes généralistes (TF1, M6, France 2). Tarifs les plus élevés de la grille. Fortement concurrentiel ; réservations à effectuer des mois à l'avance."},
+{t:"SVOD (Subscription VOD)",m:"tv",d:"Modèle de streaming par abonnement sans publicité : Netflix Premium, Canal+, Amazon Prime. Pas d'inventaire publicitaire direct, mais audience qualifiée pour les solutions d'activation contextuelle (brand integration)."},
+{t:"Tunnel publicitaire",m:"tv",d:"Séquence de spots publicitaires diffusée pendant une coupure de programme. Durée réglementée par l'Arcom. La première et la dernière position sont les plus mémorisées (prime spot / last spot). Tarif majoré."},
+{t:"TV Segmentée (Addressable TV)",m:"tv",d:"Diffusion d'un spot TV ciblé (géo, CSP, comportement) en remplacement du spot linéaire standard via box IPTV (SFR, Orange, Free, Bouygues). Autorisée depuis 2020. CPM : 30–60 €. Régie : Audience Square."},
+
+/* ══ PRESSE ═══════════════════════════════════════════════════════════ */
+{t:"4e de couverture",m:"presse",d:"Dernière de couverture d'un magazine. Format publicitaire le plus valorisé : vu en rayon avant tout autre emplacement. Tarif 30–100% supérieur à une page intérieure. Disponibilité très limitée, réservation tôt."},
+{t:"ACPM",m:"presse",d:"Alliance pour les Chiffres de la Presse et des Médias. Certifie les diffusions des titres de presse papier et digital en France. Données de référence absolue pour les négociations publicitaires presse."},
+{t:"Brand Content (presse)",m:"presse",d:"Contenu rédactionnel ou vidéo créé en partenariat avec un titre de presse. Mêle l'expertise éditoriale du titre et le message de la marque. Format : article co-brandé, dossier thématique, vidéo éditoriale."},
+{t:"Card-rate presse",m:"presse",d:"Tarif officiel publié dans le media kit d'un titre. Point de départ de la négociation. Les remises varient selon le volume annuel, la fidélité, les conditions (couleur, emplacement, délai)."},
+{t:"Diffusion certifiée",m:"presse",d:"Nombre d'exemplaires vendus et distribués, certifié par l'ACPM. Distingue diffusion payante totale (abonnés + kiosque + numérique), gratuite et hors-série. Base du calcul des tarifs publicitaires presse."},
+{t:"DPS (Double Page Spread)",m:"presse",d:"Format publicitaire occupant deux pages en vis-à-vis dans un magazine ou quotidien. Impact visuel maximal, continuité du regard gauche-droite. Format premium utilisé pour les grandes campagnes d'image."},
+{t:"Encart broché",m:"presse",d:"Insert publicitaire relié dans le corps du magazine (cousu ou collé). Papier différent du titre, haute qualité d'impression. Fort impact tactile. Délai façonnage minimum 3 semaines. Coût production élevé."},
+{t:"Encarte jetée",m:"presse",d:"Insert publicitaire non relié tombant librement du magazine. Papier libre, format sur-mesure possible. Moins coûteux que l'encart broché. Le lecteur l'a en main indépendamment du titre."},
+{t:"GRP Presse",m:"presse",d:"Mesure de pression publicitaire sur un plan presse plurititres = Couverture (%) × Répétition. Calculé via OneNext sur les cibles SIMM. Permet la comparaison cross-médias avec TV et radio."},
+{t:"IP Régions",m:"presse",d:"Centrale d'achat PQR nationale. Coordonne l'achat publicitaire dans l'ensemble des quotidiens régionaux français depuis un interlocuteur unique. Simplifie la planification et la négociation nationale PQR."},
+{t:"LNM (Lecteurs/Numéro Moyen)",m:"presse",d:"Nombre moyen de lecteurs par numéro d'un titre, mesuré par le panel OneNext. Toujours supérieur à la diffusion (un exemplaire est lu par plusieurs personnes). Base du calcul du CPM presse."},
+{t:"Native Advertising (presse)",m:"presse",d:"Format publicitaire intégré dans le flux éditorial d'un titre, reprenant la charte graphique et le ton rédactionnel. Mention obligatoire 'Contenu sponsorisé'. Engagement supérieur aux formats display classiques."},
+{t:"Newsletter sponsorisée",m:"presse",d:"Intégration publicitaire (bannière, post natif ou contenu exclusif) dans les newsletters éditoriales d'un titre de presse. Audience très ciblée et engagée, CPM élevé. Format en forte croissance."},
+{t:"OneNext",m:"presse",d:"Étude de référence française des audiences presse et médias (fusion EPIQ + Médiamétrie, 2022). Fournit LNM, couverture et GRP presse. Outil intégré de planification plurimédias."},
+{t:"PQN (Presse Quotidienne Nationale)",m:"presse",d:"Quotidiens d'information générale à diffusion nationale : Le Figaro, Le Monde, Les Échos, Le Parisien, Libération. Audience qualifiée CSP+ et décideurs. CPM élevé mais fort impact affinitaire."},
+{t:"PQR (Presse Quotidienne Régionale)",m:"presse",d:"70+ titres régionaux à forte emprise locale (Ouest-France, La Voix du Nord, La Dépêche du Midi…). Idéal pour ciblage géo fin : retail, immobilier, services locaux, collectivités. Via IP Régions en national."},
+{t:"Publi-rédactionnel",m:"presse",d:"Contenu rédactionnel financé par un annonceur avec mention obligatoire 'Publi-rédactionnel'. Combine la crédibilité éditoriale du support et la maîtrise du message publicitaire. Format classique mais efficace."},
+{t:"Taux de lecture presse",m:"presse",d:"Durée et profondeur de lecture d'un titre par ses lecteurs. Atout différenciant majeur de la presse vs digital : 25–45 min pour un magazine vs quelques secondes pour un display. Argument de vente du CPM attentionnel."},
+
+/* ══ OOH & DOOH ═══════════════════════════════════════════════════════ */
+{t:"4×3 (Grand Format)",m:"ooh",d:"Format affichage papier de référence : 3,20m × 2,40m (=12 m²). Supports sur poteaux, murs ou structures métalliques. Format national pour campagnes grand public. Changement hebdomadaire du visuel."},
+{t:"Adsquare",m:"ooh",d:"Plateforme de données mobiles permettant de mesurer le drive-to-store OOH et d'activer des audiences géolocalisées pour le ciblage DOOH programmatique. Référence du marché pour la mesure d'efficacité OOH."},
+{t:"Affimétrie / Score Mobilité",m:"ooh",d:"GIE de mesure OOH fondé par JCDecaux et Clear Channel. Produit les données de contacts bruts et GRP affichage par panneau, en se basant sur les flux de mobilité de la population."},
+{t:"Contacts bruts OOH",m:"ooh",d:"Nombre de passages devant un panneau pondéré par un coefficient de visibilité (angle de vue, distance, vitesse, durée d'exposition). Données Affimétrie. Base du calcul du GRP affichage et CPM OOH."},
+{t:"DOOH (Digital Out-of-Home)",m:"ooh",d:"Affichage extérieur numérique sur écrans LED/LCD en milieu urbain, commercial ou de transport. Rotation de plusieurs annonceurs, modification créas en temps réel, activation conditionnelle. CPM : 3–20 € selon réseau."},
+{t:"Drive-to-Store OOH",m:"ooh",d:"Mesure de l'impact d'une campagne OOH sur les visites en point de vente, via comparaison des données de mobilité mobile entre population exposée et groupe contrôle non-exposé. Standard : Adsquare, Retargetly."},
+{t:"Geofencing DOOH",m:"ooh",d:"Activation DOOH ciblant des zones géographiques précises (rayon autour d'un point de vente, quartier, zone de concurrence). Permet un ciblage drive-to-store très précis combiné à la data mobile."},
+{t:"Grand spectacle",m:"ooh",d:"Formats OOH XXL : bâches d'immeuble, mégaformats (> 50 m²), triptyques, colonnes monumentales. Très forte valeur de prestige et d'impact en métropoles. Tarification élevée, délai de réservation long."},
+{t:"GRP Affichage",m:"ooh",d:"Mesure de pression pub OOH = Contacts cible ÷ Population totale × 100. Calculé via Affimétrie / Score Mobilité de Médiamétrie. Permet la comparaison cross-médias (TV, radio, presse)."},
+{t:"Hivestack / Vistar Media",m:"ooh",d:"Plateformes DSP spécialisées dans l'achat programmatique DOOH. Permettent une activation en temps réel selon la météo, l'heure, les données mobiles ou les événements. Standard européen et nord-américain."},
+{t:"Médiatransports",m:"ooh",d:"Régie officielle de la RATP et de SNCF pour la publicité dans les transports en commun (métros, RER, gares SNCF). Formats : quais, couloirs, vitres, mégaformats gares. Cibles : actifs, jeunes, voyageurs."},
+{t:"Moment Marketing DOOH",m:"ooh",d:"Stratégie activant un message DOOH conditionnel selon un moment précis : météo (spot imperméable si pluie), heure (petit déj le matin), événement sportif, cours de bourse. Technologie programmatique DOOH."},
+{t:"Mupi",m:"ooh",d:"Mobilier Urbain Pour l'Information. Format 2m² (1,20×1,76m) intégré aux abribus, colonnes et mobilier de rue. Très forte densité en zones urbaines piétonnes. Régie principale : JCDecaux. Rétroéclairé de nuit."},
+{t:"Programmatique DOOH",m:"ooh",d:"Achat en temps réel d'espaces DOOH via DSP (The Trade Desk, Hivestack, Vistar). Permet ciblage conditionnel (météo, heure, data mobile), gestion multi-villes et reporting digital standard. Délai : 24–48h."},
+{t:"Score Mobilité",m:"ooh",d:"Outil de mesure OOH de Médiamétrie / Affimétrie. Quantifie les flux de déplacement de la population et les contacts générés avec chaque panneau selon l'angle de vue, la vitesse et la durée d'exposition."},
+{t:"Sucette",m:"ooh",d:"Format mobilier urbain 2m², colonne ou couloir de métro. Double face, souvent rétroéclairé. Très efficace en milieu de transport (couloirs RATP, centres commerciaux) pour la répétition des contacts."},
+{t:"UPE (Union de la Pub Extérieure)",m:"ooh",d:"Syndicat professionnel des régies OOH et DOOH françaises. Publie les baromètres d'investissements, les standards techniques et les certifications d'audience. Interlocuteur institutionnel du marché affichage."},
+
+/* ══ AUTRES LEVIERS ═══════════════════════════════════════════════════ */
+{t:"Activation terrain",m:"autres",d:"Présence physique de la marque en dehors des médias traditionnels : animations en magasin, stands, démos produit, sampling. Contact direct avec le consommateur, mesure par coût au contact qualifié."},
+{t:"Avant-programme cinéma",m:"autres",d:"Séquence publicitaire diffusée avant le film dans la salle. Attention captive totale, obscurité, grand écran. Taux de mémorisation 60–75% — le plus élevé de tous les médias classiques. Achat via Screenvision ou CGR Screen."},
+{t:"Brand Content (Leviers)",m:"autres",d:"Contenu à valeur ajoutée créé par ou pour une marque (vidéo, série, documentaire, jeu). Vise à attirer et engager une audience par la qualité éditoriale plutôt que la pression publicitaire. Mesure : engagement, partages, views."},
+{t:"CPE (Coût Par Engagement)",m:"autres",d:"Budget ÷ nombre d'engagements (likes + commentaires + partages + sauvegardes). Permet de comparer l'efficience entre créateurs de même tier ou entre campagnes d'influence."},
+{t:"CPL événementiel",m:"autres",d:"Budget ÷ contacts qualifiés générés lors d'un salon ou événement (cartes de visite, formulaires, rendez-vous). KPI central B2B. Comparaison avec le CPL digital pour justifier l'investissement terrain."},
+{t:"Dark post (influence)",m:"autres",d:"Publication sponsorisée non visible sur le profil du créateur. Diffusée uniquement en publicité payante ciblée via les API des plateformes. Nécessite un accord de whitelisting. Permet un ciblage audience très précis."},
+{t:"Earned Media",m:"autres",d:"Visibilité obtenue naturellement sans achat d'espace : RP, bouche-à-oreille, partages, buzz. Souvent valorisée à ×3–10 le coût d'une action payante. Amplifié par des événements ou des campagnes d'influence réussies."},
+{t:"EMV (Earned Media Value)",m:"autres",d:"Valeur médiatique équivalente des contenus créateurs ou PR. Calculée en multipliant les engagements ou impressions par un coefficient CPM équivalent en achat media. Indicateur ROI influence et RP."},
+{t:"ER (Engagement Rate)",m:"autres",d:"(Likes + Commentaires + Partages + Sauvegardes) ÷ Abonnés × 100. Benchmark : >5% nano, >2% micro, >1% macro. Indicateur de la qualité et de l'authenticité d'une audience de créateur."},
+{t:"Gaming / In-Game Advertising",m:"autres",d:"Publicités intégrées dans les jeux vidéo : panneaux dans les décors, habillages, vidéos récompensées. Cible : 15–35 ans masculins. Formats : Anzu.io, Frameplay, SuperAwesome. CPM : 5–30 €."},
+{t:"Guerrilla / Ambient Marketing",m:"autres",d:"Actions publicitaires non conventionnelles dans l'espace public, à faible budget mais fort impact viral : installations artistiques, détournements d'espaces, expériences immersives. Amplifié par les réseaux sociaux."},
+{t:"Loi Influence 2023",m:"autres",d:"Loi française du 9 juin 2023. Obligations : mention #Publicité ou #Partenariat visible, contrat écrit avec la marque, déclaration des produits et cadeaux >500€, interdiction de pub pour chirurgie esthétique. Conformité ARPP."},
+{t:"Macro-influence",m:"autres",d:"Créateurs avec 500 000 à 5 millions d'abonnés. Très fort reach, engagement plus faible (0,5–2%). Adaptés aux campagnes de notoriété massives. Tarif : 5 000–50 000 € par publication selon plateforme et profil."},
+{t:"Micro-influence",m:"autres",d:"Créateurs avec 10 000 à 100 000 abonnés. Forte proximité communautaire, engagement 2–5%. Excellent rapport qualité-prix pour la conversion. Gérés via plateformes (Reech, Hivency, Kolsquare). Tarif : 500–3 000 €."},
+{t:"Nano-influence",m:"autres",d:"Créateurs avec moins de 10 000 abonnés. Très forte authenticité, engagement 5–10%. Coût très faible (0–500 €) ou produit offert. Idéal pour marketing de proximité, niches spécialisées et test de produits."},
+{t:"NPS (Net Promoter Score)",m:"autres",d:"% Promoteurs (9–10) − % Détracteurs (0–6) sur une échelle de recommandation. Score de −100 à +100. Mesure l'engagement émotionnel post-événement ou post-expérience de marque."},
+{t:"Product Placement",m:"autres",d:"Intégration d'un produit ou d'une marque dans un film, une série ou un contenu. Réglementé par l'Arcom pour la TV française (mention obligatoire). Format discret, très mémorisé, cible large."},
+{t:"Roadblock cinéma",m:"autres",d:"Dispositif d'exclusivité publicitaire sur toutes les salles d'un réseau lors d'une séance. L'annonceur est seul à l'écran. Impact et prestige maximaux. Tarification élevée. Disponible via Screenvision."},
+{t:"Sponsoring",m:"autres",d:"Association contractuelle d'une marque à un événement, équipe ou contenu en échange d'une contribution financière. Droits : naming, logo, activation stand, mentions. Objectifs : notoriété, image, affinité."},
+{t:"Street Marketing",m:"autres",d:"Actions publicitaires dans l'espace public : distribution de flyers, animations de rue, habillage de mobilier urbain. Très géo-ciblé, coût au contact faible, fort impact en termes de proximité et mémorisation."},
+{t:"UGC (User Generated Content)",m:"autres",d:"Contenus créés spontanément par les utilisateurs autour d'une marque (photos, avis, vidéos). Très authentiques et crédibles. Les marques peuvent les amplifier via paid media ou les intégrer dans leurs créas (sous droits)."},
+{t:"Whitelisting (influence)",m:"autres",d:"Permission accordée par un créateur à une marque d'utiliser son compte pour diffuser des publicités payantes en dark post. Permet de cibler des audiences plus larges que les abonnés du créateur tout en conservant son authenticité."},
+
+/* ══ TRANSVERSAL ══════════════════════════════════════════════════════ */
+{t:"Adstock / Carry-over Effect",m:"transversal",d:"Effet de report temporel d'une campagne publicitaire. Un investissement media continue d'influencer les ventes plusieurs semaines après la fin de la diffusion. Modélisé en Marketing Mix Analysis (MMA)."},
+{t:"Affinité / Indice d'affinité",m:"transversal",d:"Ratio (% de la cible exposée au support ÷ % de la population générale exposée) × 100. Indice 150 = la cible est 50% surreprésentée parmi les lecteurs/téléspectateurs du support. Critère de sélection des supports."},
+{t:"AIDA (Funnel de communication)",m:"transversal",d:"Modèle en 4 étapes du parcours publicitaire : Attention → Intérêt → Désir → Action. Chaque étape nécessite des médias, formats et KPIs adaptés. Structure encore utilisée pour définir les objectifs de communication."},
+{t:"Attribution (cross-canal)",m:"transversal",d:"Méthode de valorisation du rôle de chaque point de contact dans le chemin de conversion. Modèles : Last Click (par défaut), First Click, Linéaire, Data-Driven. Enjeu majeur du marketing omnicanal."},
+{t:"Brand Equity",m:"transversal",d:"Valeur de la marque perçue par les consommateurs, au-delà des attributs produit. Composantes : notoriété, image, préférence, fidélité. L'investissement publicitaire continu protège et développe le brand equity."},
+{t:"Brand Lift Study",m:"transversal",d:"Étude mesurant l'impact d'une campagne digitale sur les indicateurs de marque (notoriété spontanée/assistée, mémorisation, préférence, intention d'achat). Méthode exposé vs groupe contrôle non-exposé. Via Meta, Google, TikTok, DV360."},
+{t:"Card-rate",m:"transversal",d:"Tarif officiel affiché par une régie ou un éditeur avant toute négociation. Point de départ de la discussion commerciale. La déflation mesure l'écart entre ce tarif et le prix réel payé après remises."},
+{t:"CDP (Customer Data Platform)",m:"transversal",d:"Plateforme centralisant toutes les données first-party identifiées d'un annonceur (CRM, site, app, offline) en profils clients unifiés et activables en temps réel pour ciblage, personnalisation et mesure."},
+{t:"Couverture (Reach)",m:"transversal",d:"% d'une cible exposé au moins une fois à une campagne. R1+ = notoriété. R3+ = mémorisation. R5+ = transformation d'attitude. Objectif branding : maximiser la couverture. Objectif perf : optimiser la répétition sur les convertisseurs."},
+{t:"DMP (Data Management Platform)",m:"transversal",d:"Plateforme de gestion de données anonymisées (cookies, device IDs) permettant la construction d'audiences pour le ciblage programmatique. En fort déclin avec la fin des cookies tiers, remplacée progressivement par les CDP."},
+{t:"Déflation",m:"transversal",d:"Remise obtenue lors de la négociation d'achats media par rapport au tarif card-rate. Exprimée en %. Dépend du volume annuel, de la fidélité, de la saisonnalité et du rapport de force agence/régie."},
+{t:"ESOV (Excess Share of Voice)",m:"transversal",d:"ESOV = SOV − SOM (Share of Market). Stratégie de croissance : investir avec un SOV supérieur à sa SOM actuelle pour gagner des parts de marché sur le long terme. Théorisé par Les Binet & Peter Field."},
+{t:"GRP (Gross Rating Point)",m:"transversal",d:"Unité de mesure universelle de pression publicitaire = Couverture (%) × Répétition. S'applique à tous les médias (TV, radio, presse, OOH). Permet la comparaison cross-médias et la planification de la pression optimale."},
+{t:"KPI (Key Performance Indicator)",m:"transversal",d:"Indicateur clé de performance. Défini AVANT le lancement de campagne selon les objectifs : notoriété (reach, GRP), considération (brand lift, mémorisation), conversion (CPA, ROAS) ou fidélisation (LTV, NPS)."},
+{t:"Marketing Mix Modeling (MMM)",m:"transversal",d:"Analyse économétrique modélisant la contribution de chaque levier media (TV, digital, presse…) et non-media (prix, distribution, météo) sur les ventes. Permet d'optimiser l'allocation budgétaire cross-canal."},
+{t:"Mediamix / Plan 360°",m:"transversal",d:"Combinaison coordonnée de plusieurs médias dans une même campagne. Objectifs : maximiser la couverture de la cible, créer des synergies inter-médias et s'adapter aux parcours consommateurs multi-touchpoints."},
+{t:"Médiaplanning",m:"transversal",d:"Discipline consistant à sélectionner les médias, supports, formats et périodes les plus pertinents pour atteindre une cible avec un budget donné. Matérialisé dans un plan média avec simulations GRP, couverture et CPM."},
+{t:"Notoriété spontanée vs assistée",m:"transversal",d:"Spontanée : % de personnes citant spontanément une marque sur une catégorie. Assistée : % reconnaissant la marque quand elle est proposée. Les deux métriques mesurent le retour publicitaire à long terme."},
+{t:"Pige publicitaire",m:"transversal",d:"Surveillance systématique des publicités diffusées par les concurrents, permettant d'estimer leurs investissements et d'analyser leurs stratégies créatives. Outils : Kantar Media, Yacast, Ekimetrics."},
+{t:"Plan média",m:"transversal",d:"Document stratégique présentant les médias, supports, formats, calendrier et budget d'une campagne. Inclut les simulations GRP/couverture/répétition, les justifications des choix médias et le coût total avec CPM comparatif."},
+{t:"Post-test",m:"transversal",d:"Étude quantitative réalisée après une campagne pour mesurer ses effets sur la notoriété spontanée, la mémorisation publicitaire, l'image de marque et l'intention d'achat. Standard de validation de l'efficacité publicitaire."},
+{t:"Reach déduplication",m:"transversal",d:"Calcul du nombre d'individus uniques touchés par un plan cross-médias, en retirant les doublons (individus touchés sur plusieurs médias). Indicateur de l'efficacité réelle d'un plan plurimédias."},
+{t:"Répétition (Fréquence)",m:"transversal",d:"Nombre moyen d'expositions à une campagne pour les individus touchés = GRP ÷ Couverture. Optimum : 3 à 5 expositions. En dessous : sous-mémorisation. Au-dessus : saturation et gaspillage budgétaire."},
+{t:"ROI publicitaire",m:"transversal",d:"(Revenus incrémentaux − Coût campagne) ÷ Coût campagne × 100. Mesuré via MMM (Marketing Mix Analysis), tests d'incrémentalité ou attribution data-driven. Objectif de toute démarche de planification media efficiente."},
+{t:"Share of Voice (SOV)",m:"transversal",d:"Part des investissements publicitaires d'une marque ÷ total des investissements de sa catégorie. Indicateur de présence relative. Stratégie : maintenir SOV > SOM pour croître (ESOV positif)."},
+{t:"SIMM",m:"transversal",d:"Survey on Intermarket Media & Merchandise. Panel de 25 000 individus en France utilisé comme référence pour la définition des cibles socio-démo et comportementales en planification media (agences et régies)."},
+{t:"Top of mind",m:"transversal",d:"Première marque citée spontanément par un consommateur sur une catégorie de produit. Objectif publicitaire ultime de notoriété. Fortement corrélé au maintien d'un SOV élevé et d'une présence media continue."}
+];
+
+/* ── Init & helpers ──────────────────────────────────────── */
+var LX_F = 'all', LX_Q = '', LX_SORT = 'az', LX_AZ = null;
+var MEDIA_LABELS = {
+  digital:'Digital', radio:'Radio & Audio', tv:'TV & CTV',
+  presse:'Presse', ooh:'OOH & DOOH', autres:'Autres Leviers', transversal:'Transversal'
+};
+
+function esc(t) {
+  return t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+}
+function highlight(str, q) {
+  if (!q) return str;
+  return str.replace(new RegExp('(' + esc(q) + ')','gi'),
+    '<mark>$1</mark>');
+}
+function letterOf(t) {
+  var c = t.toUpperCase()[0];
+  return /[A-Z]/.test(c) ? c : '#';
+}
+
+/* ── Counts & pills ─────────────────────────────────────── */
+function updatePillCounts() {
+  var meds = ['all','digital','radio','tv','presse','ooh','autres','transversal'];
+  meds.forEach(function(m) {
+    var n = m === 'all'
+      ? TERMS.length
+      : TERMS.filter(function(x){ return x.m === m; }).length;
+    var el = document.getElementById('pc-' + m);
+    if (el) el.textContent = n;
+  });
+}
+
+/* ── A-Z bar ────────────────────────────────────────────── */
+function buildAZ(visible) {
+  var bar = document.getElementById('lex-az');
+  if (!bar) return;
+  var letters = {};
+  visible.forEach(function(it){ letters[letterOf(it.t)] = true; });
+  var alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#'.split('');
+  bar.innerHTML = alpha.map(function(l) {
+    var has = !!letters[l];
+    var act = LX_AZ === l ? ' active' : '';
+    var cls = has ? ' has-terms' : '';
+    return has
+      ? '<button class="az-btn' + cls + act + '" onclick="lexJump(\'' + l + '\')">' + l + '</button>'
+      : '<button class="az-btn" disabled style="opacity:.25">' + l + '</button>';
+  }).join('');
+}
+
+/* ── Render ─────────────────────────────────────────────── */
+function lexRender() {
+  var inp = document.getElementById('lex-inp');
+  var q = LX_Q.toLowerCase().trim();
+  var filtered = TERMS.filter(function(it) {
+    var mOk = LX_F === 'all' || it.m === LX_F;
+    var qOk = !q || it.t.toLowerCase().includes(q) || it.d.toLowerCase().includes(q);
+    return mOk && qOk;
+  });
+
+  /* sort */
+  if (LX_SORT === 'az') {
+    filtered.sort(function(a,b){ return a.t.localeCompare(b.t,'fr'); });
+  } else {
+    var order = ['digital','radio','tv','presse','ooh','autres','transversal'];
+    filtered.sort(function(a,b){
+      var oi = order.indexOf(a.m) - order.indexOf(b.m);
+      return oi !== 0 ? oi : a.t.localeCompare(b.t,'fr');
+    });
+  }
+
+  /* filter on AZ jump (only when no search) */
+  if (LX_AZ && !q) {
+    filtered = filtered.filter(function(it){ return letterOf(it.t) === LX_AZ; });
+  }
+
+  /* count */
+  var nEl = document.getElementById('lex-n');
+  if (nEl) nEl.textContent = filtered.length;
+
+  /* grid */
+  var grid = document.getElementById('lex-grid');
+  if (!grid) return;
+
+  buildAZ(TERMS.filter(function(it){
+    return (LX_F === 'all' || it.m === LX_F);
+  }));
+
+  if (!filtered.length) {
+    grid.innerHTML = '<div class="lex-empty"><div class="em-emoji">🔍</div><strong>Aucun terme trouvé</strong><span>Essayez un autre mot-clé ou réinitialisez les filtres.</span></div>';
+    return;
+  }
+
+  var html = '';
+  var lastL = '';
+  filtered.forEach(function(it) {
+    var l = LX_SORT === 'az' && !q ? letterOf(it.t) : (LX_SORT === 'media' ? '' : '');
+    if (LX_SORT === 'az' && !q && l !== lastL) {
+      html += '<div class="lex-letter">' + l + '</div>';
+      lastL = l;
+    }
+    var term = LX_Q ? highlight(it.t, LX_Q) : it.t;
+    var def  = LX_Q ? highlight(it.d, LX_Q) : it.d;
+    var badge = (LX_F === 'all' || LX_SORT === 'media')
+      ? '<span class="lc-badge lb-' + it.m + '">' + (MEDIA_LABELS[it.m]||it.m) + '</span>'
+      : '';
+    html +=
+      '<div class="lex-card" data-m="' + it.m + '">' +
+        '<div class="lc-top">' +
+          '<div class="lc-term">' + term + '</div>' +
+          badge +
+        '</div>' +
+        '<div class="lc-def">' + def + '</div>' +
+      '</div>';
+  });
+  grid.innerHTML = html;
+}
+
+/* ── Public functions ───────────────────────────────────── */
+function lexFilter(m) {
+  LX_F = m; LX_AZ = null;
+  document.querySelectorAll('.lpill').forEach(function(p){ p.classList.remove('on'); });
+  var btn = document.querySelector('.lpill[data-m="' + m + '"]');
+  if (btn) btn.classList.add('on');
+  lexRender();
+}
+function lexSort(s) {
+  LX_SORT = s; LX_AZ = null;
+  document.getElementById('sort-az').classList.toggle('on', s === 'az');
+  document.getElementById('sort-media').classList.toggle('on', s === 'media');
+  lexRender();
+}
+function lexJump(l) {
+  LX_AZ = LX_AZ === l ? null : l;
+  lexRender();
+  var az = document.getElementById('lex-az');
+  if (az) az.querySelectorAll('.az-btn').forEach(function(b){
+    b.classList.toggle('active', b.textContent === LX_AZ);
+  });
+}
+function lexClear() {
+  var inp = document.getElementById('lex-inp');
+  if (inp) { inp.value = ''; inp.classList.remove('has-val'); inp.focus(); }
+  LX_Q = '';
+  document.getElementById('lex-clr').classList.remove('show');
+  lexRender();
+}
+
+/* ── Boot ───────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function(){
+  updatePillCounts();
+  lexRender();
+  var inp = document.getElementById('lex-inp');
+  if (inp) {
+    inp.addEventListener('input', function(){
+      LX_Q = this.value; LX_AZ = null;
+      this.classList.toggle('has-val', this.value.length > 0);
+      document.getElementById('lex-clr').classList.toggle('show', this.value.length > 0);
+      lexRender();
+    });
+  }
+  /* "/" shortcut */
+  document.addEventListener('keydown', function(e) {
+    if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+      e.preventDefault();
+      go('lexique');
+      var inp2 = document.getElementById('lex-inp');
+      if (inp2) setTimeout(function(){ inp2.focus(); }, 80);
+    }
+  });
+});
+</script>

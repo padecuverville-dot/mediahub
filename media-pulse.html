@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Pulse - Veille Média</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0f172a',
+                        card: '#1e293b',
+                        primary: '#3b82f6',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;  
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-dark text-slate-200 font-sans min-h-screen">
+
+    <header class="sticky top-0 z-50 bg-card border-b border-slate-700 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2 text-primary">
+                <i class="fa-solid fa-bolt text-2xl"></i>
+                <h1 class="text-xl font-bold text-white tracking-wide">Media Pulse</h1>
+            </div>
+            <div class="flex gap-4">
+                <button id="btn-fav-toggle" class="text-slate-400 hover:text-yellow-400 transition" title="Voir les favoris">
+                    <i class="fa-solid fa-star text-xl"></i>
+                </button>
+                <button id="btn-refresh" class="text-slate-400 hover:text-white transition" title="Rafraîchir les flux">
+                    <i class="fa-solid fa-rotate-right text-xl"></i>
+                </button>
+                <button id="btn-settings" class="text-slate-400 hover:text-white transition" title="Paramètres">
+                    <i class="fa-solid fa-gear text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        <div class="mb-8 space-y-4">
+            <div class="relative max-w-md">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-slate-500"></i>
+                </div>
+                <input type="text" id="search-input" placeholder="Rechercher un mot-clé..." class="block w-full pl-10 pr-3 py-2 border border-slate-600 rounded-lg bg-slate-800 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-primary transition">
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4">
+                <div class="relative flex-1">
+                    <button id="btn-dropdown-secteurs" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-left text-slate-300 flex justify-between items-center hover:border-primary transition focus:outline-none">
+                        <span id="label-secteurs">Filtrer par Secteur...</span>
+                        <i class="fa-solid fa-chevron-down text-sm transition-transform duration-200" id="icon-secteurs"></i>
+                    </button>
+                    <div id="dropdown-secteurs" class="hidden absolute z-40 w-full mt-2 bg-slate-800 border border-slate-600 rounded-lg shadow-xl max-h-72 overflow-y-auto p-3">
+                        <div id="filter-secteurs" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+
+                <div class="relative flex-1">
+                    <button id="btn-dropdown-leviers" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-left text-slate-300 flex justify-between items-center hover:border-primary transition focus:outline-none">
+                        <span id="label-leviers">Filtrer par Levier...</span>
+                        <i class="fa-solid fa-chevron-down text-sm transition-transform duration-200" id="icon-leviers"></i>
+                    </button>
+                    <div id="dropdown-leviers" class="hidden absolute z-40 w-full mt-2 bg-slate-800 border border-slate-600 rounded-lg shadow-xl max-h-72 overflow-y-auto p-3">
+                        <div id="filter-leviers" class="flex flex-wrap gap-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading-state" class="flex flex-col items-center justify-center py-20 hidden">
+            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-primary mb-4"></i>
+            <p class="text-slate-400">Récupération et décodage des flux en cours...</p>
+        </div>
+
+        <div id="news-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+        <div id="empty-state" class="text-center py-20 hidden">
+            <i class="fa-regular fa-folder-open text-4xl text-slate-600 mb-4"></i>
+            <p class="text-slate-400 text-lg">Aucun article ne correspond à vos critères.</p>
+        </div>
+
+    </main>
+
+    <div id="settings-modal" class="fixed inset-0 z-[100] hidden bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-card border border-slate-700 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800">
+                <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-rss mr-2"></i>Gestion des Flux RSS</h2>
+                <button id="close-settings" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-6">
+                <form id="add-feed-form" class="mb-6 flex gap-2">
+                    <input type="text" id="feed-name" placeholder="Nom (ex: CB News)" required class="flex-1 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary">
+                    <input type="url" id="feed-url" placeholder="URL du flux RSS" required class="flex-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary">
+                    <button type="submit" class="bg-primary hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition"><i class="fa-solid fa-plus"></i></button>
+                </form>
+                <div class="max-h-60 overflow-y-auto pr-2 no-scrollbar">
+                    <ul id="feed-list" class="space-y-3"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TAG_RULES = {
+            secteurs: {
+                "Auto & Mobilité": ["auto", "automobile", "voiture", "véhicule", "mobilité", "constructeur", "concession", "deux-roues", "électrique", "hybride", "suv", "motor"],
+                "FMCG & Agro": ["fmcg", "pgc", "grande consommation", "agroalimentaire", "alimentaire", "boisson", "food", "nutrition", "snacking", "breuvage"],
+                "Beauté & Soins": ["beauté", "cosmétique", "maquillage", "parfum", "soin", "skincare", "capillaire", "dermatologie"],
+                "Santé & Bien-être": ["santé", "médical", "pharma", "pharmacie", "bien-être", "mutuelle", "soin du corps", "laboratoire"],
+                "Retail & E-commerce": ["retail", "commerce", "grande distribution", "supermarché", "hypermarché", "e-commerce", "marketplace", "drive", "magasin", "boutique"],
+                "Luxe & Mode": ["luxe", "mode", "haute couture", "horlogerie", "joaillerie", "maroquinerie", "fashion", "prêt-à-porter", "textile", "accessoires"],
+                "Tech & Télécoms": ["tech", "technologie", "télécom", "opérateur", "smartphone", "logiciel", "ia", "intelligence artificielle", "informatique", "cybersécurité", "cloud", "saas", "google", "alphabet"],
+                "Banque & Assurance": ["banque", "assurance", "finance", "crédit", "fintech", "paiement", "investissement", "épargne", "bancassurance"],
+                "Voyage & Tourisme": ["tourisme", "voyage", "hôtellerie", "compagnie aérienne", "transport", "vacances", "loisir", "train", "avion", "croisière"],
+                "Entertainment & Culture": ["entertainment", "divertissement", "cinéma", "musique", "jeu vidéo", "streaming", "svod", "culture", "édition", "spectacle", "gaming", "esport"],
+                "Énergie & RSE": ["énergie", "environnement", "écologie", "électricité", "gaz", "transition énergétique", "renouvelable", "rse", "durabilité", "carbone", "climat"],
+                "B2B & Corporate": ["b2b", "corporate", "entreprise", "rh", "recrutement", "management", "industrie", "marque employeur", "institutionnel"]
+            },
+            leviers: {
+                "Social & Influence": ["social", "influence", "créateur", "tiktok", "instagram", "meta", "facebook", "linkedin", "x", "twitter", "snapchat", "pinterest", "smm", "smo", "réseaux sociaux", "ugc"],
+                "Search (SEO/SEA)": ["search", "seo", "sea", "google ads", "bing", "référencement", "mots-clés", "sem", "synergi", "SERP"],
+                "Programmatic & Data": ["programmatique", "programmatic", "rtb", "dsp", "ssp", "dmp", "cdp", "data", "ciblage", "cookie", "privacy", "adtech", "cookieless", "first-party", "rgpd"],
+                "Retail Media": ["retail media", "e-retail", "amazon ads", "sponsored products", "off-site", "on-site", "criteo", "citrus", "monétisation"],
+                "TV & Vidéo (CTV/VOL)": ["tv", "télévision", "ctv", "télévision segmentée", "replay", "vol", "vidéo en ligne", "youtube", "avod", "fast tv", "iptv", "broadcaster"],
+                "OOH & DOOH": ["ooh", "dooh", "affichage", "extérieur", "mobilier urbain", "panneau", "abribus", "gare", "aéroport", "prisme"],
+                "Audio Digital": ["audio", "podcast", "radio", "webradio", "streaming audio", "spotify", "deezer", "voix", "smart speaker"],
+                "Print & Presse": ["print", "presse", "magazine", "quotidien", "pqr", "pqn", "journal", "papier", "éditorial", "publireportage"],
+                "CRM & Fidélisation": ["crm", "fidélisation", "email", "emailing", "newsletter", "marketing direct", "automation", "prgm"],
+                "Event & Sponsoring": ["événementiel", "event", "sponsoring", "partenariat", "mécénat", "salon", "foire", "activation", "brand content", "opération spéciale"]
+            }
+        };
+
+        const DEFAULT_FEEDS = [
+            { id: '1', name: 'Google News (À la une)', url: 'https://news.google.com/rss?hl=fr&gl=FR&ceid=FR:fr' },
+            { id: '2', name: 'Alerte : Google (Actualités)', url: 'https://news.google.com/rss/search?q=Google+when:7d&hl=fr&gl=FR&ceid=FR:fr' },
+            { id: '3', name: 'Alerte : Doctolib IA', url: 'https://news.google.com/rss/search?q=doctolib+ia+when:7d&hl=fr&gl=FR&ceid=FR:fr' },
+            { id: '4', name: 'Stratégies', url: 'https://www.strategies.fr/rss.xml' },
+            { id: '5', name: 'CB News', url: 'https://www.cbnews.fr/rss.xml' }
+        ];
+
+        let state = {
+            feeds: JSON.parse(localStorage.getItem('mediaPulse_feeds_v2')) || DEFAULT_FEEDS,
+            favorites: JSON.parse(localStorage.getItem('mediaPulse_favorites_v2')) || [],
+            articles: JSON.parse(localStorage.getItem('mediaPulse_articles_v2')) || [],
+            filters: { secteurs: new Set(), leviers: new Set(), search: "", showFavoritesOnly: false }
+        };
+
+        const DOM = {
+            grid: document.getElementById('news-grid'),
+            loading: document.getElementById('loading-state'),
+            empty: document.getElementById('empty-state'),
+            btnRefresh: document.getElementById('btn-refresh'),
+            btnSettings: document.getElementById('btn-settings'),
+            btnFavToggle: document.getElementById('btn-fav-toggle'),
+            modalSettings: document.getElementById('settings-modal'),
+            btnCloseSettings: document.getElementById('close-settings'),
+            feedList: document.getElementById('feed-list'),
+            addFeedForm: document.getElementById('add-feed-form'),
+            filterSecteurs: document.getElementById('filter-secteurs'),
+            filterLeviers: document.getElementById('filter-leviers'),
+            searchInput: document.getElementById('search-input'),
+            btnDropSecteurs: document.getElementById('btn-dropdown-secteurs'),
+            dropSecteurs: document.getElementById('dropdown-secteurs'),
+            labelSecteurs: document.getElementById('label-secteurs'),
+            btnDropLeviers: document.getElementById('btn-dropdown-leviers'),
+            dropLeviers: document.getElementById('dropdown-leviers'),
+            labelLeviers: document.getElementById('label-leviers')
+        };
+
+        const saveFeeds = () => localStorage.setItem('mediaPulse_feeds_v2', JSON.stringify(state.feeds));
+        const saveFavorites = () => localStorage.setItem('mediaPulse_favorites_v2', JSON.stringify(state.favorites));
+        const saveArticles = () => localStorage.setItem('mediaPulse_articles_v2', JSON.stringify(state.articles));
+        const generateId = () => Math.random().toString(36).substr(2, 9);
+        
+        const stripHtml = (html) => {
+            let tmp = document.createElement("DIV");
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || "";
+        };
+
+        const formatDate = (dateString) => {
+            const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+            const date = new Date(dateString);
+            return isNaN(date) ? "Date inconnue" : date.toLocaleDateString('fr-FR', options);
+        };
+
+        const autoTag = (title, description) => {
+            const text = (title + " " + description).toLowerCase();
+            let tagsSecteurs = [];
+            let tagsLeviers = [];
+
+            for (const [secteur, keywords] of Object.entries(TAG_RULES.secteurs)) {
+                if (keywords.some(kw => text.includes(kw.toLowerCase()))) tagsSecteurs.push(secteur);
+            }
+            for (const [levier, keywords] of Object.entries(TAG_RULES.leviers)) {
+                if (keywords.some(kw => text.includes(kw.toLowerCase()))) tagsLeviers.push(levier);
+            }
+            if (tagsSecteurs.length === 0) tagsSecteurs.push("Général");
+            
+            return { secteurs: tagsSecteurs, leviers: tagsLeviers };
+        };
+
+        const fetchRSS = async () => {
+            DOM.empty.classList.add('hidden');
+            DOM.loading.classList.remove('hidden');
+
+            const proxies = [
+                (url) => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`,
+                (url) => `https://corsproxy.io/?url=${encodeURIComponent(url)}`
+            ];
+
+            const fetchPromises = state.feeds.map(async (feed) => {
+                let success = false;
+
+                for (const proxyBuilder of proxies) {
+                    if (success) break;
+
+                    try {
+                        const proxyUrl = proxyBuilder(feed.url);
+                        const response = await fetch(proxyUrl);
+                        if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+
+                        if (proxyUrl.includes('rss2json')) {
+                            const data = await response.json();
+                            if (data.status === 'ok' && data.items) {
+                                data.items.forEach(item => {
+                                    const title = item.title || "Sans titre";
+                                    const description = stripHtml(item.description || item.content || "");
+                                    const link = item.link || "#";
+                                    const pubDate = item.pubDate || new Date().toISOString();
+                                    const tags = autoTag(title, description);
+
+                                    if (!state.articles.some(a => a.id === link)) {
+                                        state.articles.push({
+                                            id: link, source: feed.name, title, description, link, pubDate, tags, timestamp: new Date(pubDate).getTime()
+                                        });
+                                    }
+                                });
+                                success = true;
+                            }
+                        } 
+                        else {
+                            const text = await response.text();
+                            const parser = new DOMParser();
+                            const xml = parser.parseFromString(text, "text/xml");
+                            if (xml.querySelector("parsererror")) throw new Error("XML Invalide");
+
+                            const items = xml.querySelectorAll("item, entry");
+                            if (items.length > 0) {
+                                items.forEach(item => {
+                                    const title = item.querySelector("title")?.textContent || "Sans titre";
+                                    const rawDesc = item.querySelector("description, content")?.textContent || "";
+                                    const description = stripHtml(rawDesc);
+                                    const link = item.querySelector("link")?.textContent || item.querySelector("link")?.getAttribute('href') || "#";
+                                    const pubDate = item.querySelector("pubDate, published, updated")?.textContent || new Date().toISOString();
+                                    const tags = autoTag(title, description);
+
+                                    if (!state.articles.some(a => a.id === link)) {
+                                        state.articles.push({
+                                            id: link, source: feed.name, title, description, link, pubDate, tags, timestamp: new Date(pubDate).getTime()
+                                        });
+                                    }
+                                });
+                                success = true;
+                            }
+                        }
+                    } catch (error) {
+                        console.warn(`[Media Pulse] Fallback déclenché pour ${feed.name}`);
+                    }
+                }
+            });
+
+            await Promise.all(fetchPromises);
+            
+            const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+            const now = Date.now();
+            
+            state.articles = state.articles.filter(article => {
+                const isFav = state.favorites.includes(article.id);
+                const isRecent = (now - article.timestamp) <= ONE_WEEK_MS;
+                return isFav || isRecent;
+            });
+
+            state.articles.sort((a, b) => b.timestamp - a.timestamp);
+            saveArticles();
+            
+            DOM.loading.classList.add('hidden');
+            renderArticles();
+        };
+
+        const renderFilters = () => {
+            DOM.labelSecteurs.textContent = state.filters.secteurs.size > 0 ? `Secteurs (${state.filters.secteurs.size} actif${state.filters.secteurs.size > 1 ? 's' : ''})` : 'Filtrer par Secteur...';
+            DOM.labelLeviers.textContent = state.filters.leviers.size > 0 ? `Leviers (${state.filters.leviers.size} actif${state.filters.leviers.size > 1 ? 's' : ''})` : 'Filtrer par Levier...';
+
+            DOM.btnDropSecteurs.classList.toggle('border-indigo-500', state.filters.secteurs.size > 0);
+            DOM.btnDropSecteurs.classList.toggle('text-white', state.filters.secteurs.size > 0);
+            DOM.btnDropLeviers.classList.toggle('border-emerald-500', state.filters.leviers.size > 0);
+            DOM.btnDropLeviers.classList.toggle('text-white', state.filters.leviers.size > 0);
+
+            const allSecteurs = Object.keys(TAG_RULES.secteurs).concat(["Général"]);
+            DOM.filterSecteurs.innerHTML = allSecteurs.map(s => `
+                <button data-type="secteurs" data-val="${s}" class="filter-btn px-3 py-1.5 rounded-md text-sm font-medium border border-slate-600 transition ${state.filters.secteurs.has(s) ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'text-slate-300 hover:bg-slate-700 bg-slate-900'}">
+                    ${s}
+                </button>
+            `).join('');
+
+            const allLeviers = Object.keys(TAG_RULES.leviers);
+            DOM.filterLeviers.innerHTML = allLeviers.map(l => `
+                <button data-type="leviers" data-val="${l}" class="filter-btn px-3 py-1.5 rounded-md text-sm font-medium border border-slate-600 transition ${state.filters.leviers.has(l) ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'text-slate-300 hover:bg-slate-700 bg-slate-900'}">
+                    ${l}
+                </button>
+            `).join('');
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation(); 
+                    const type = e.target.dataset.type;
+                    const val = e.target.dataset.val;
+                    state.filters[type].has(val) ? state.filters[type].delete(val) : state.filters[type].add(val);
+                    renderFilters(); 
+                    renderArticles(); 
+                });
+            });
+        };
+
+        const renderArticles = () => {
+            let filtered = state.articles.filter(article => {
+                if (state.filters.showFavoritesOnly && !state.favorites.includes(article.id)) return false;
+                const matchSearch = (article.title + article.description).toLowerCase().includes(state.filters.search.toLowerCase());
+                if (!matchSearch) return false;
+                if (state.filters.secteurs.size > 0 && !article.tags.secteurs.some(s => state.filters.secteurs.has(s))) return false;
+                if (state.filters.leviers.size > 0 && !article.tags.leviers.some(l => state.filters.leviers.has(l))) return false;
+                return true;
+            });
+
+            DOM.grid.innerHTML = '';
+
+            if (filtered.length === 0) {
+                DOM.empty.classList.remove('hidden');
+                return;
+            } else {
+                DOM.empty.classList.add('hidden');
+            }
+
+            filtered.forEach(article => {
+                const isFav = state.favorites.includes(article.id);
+                const sectorBadges = article.tags.secteurs.map(s => `<span class="bg-indigo-900/50 text-indigo-300 border border-indigo-700/50 px-2 py-0.5 rounded text-xs">${s}</span>`).join('');
+                const levierBadges = article.tags.leviers.map(l => `<span class="bg-emerald-900/50 text-emerald-300 border border-emerald-700/50 px-2 py-0.5 rounded text-xs">${l}</span>`).join('');
+
+                const card = document.createElement('div');
+                card.className = "bg-card border border-slate-700 rounded-xl p-5 hover:border-slate-500 transition shadow-lg flex flex-col h-full group relative";
+                
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">${article.source}</span>
+                        <button class="fav-btn text-lg z-10 transition ${isFav ? 'text-yellow-400' : 'text-slate-600 hover:text-yellow-400'}" data-id="${article.id}">
+                            <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-star"></i>
+                        </button>
+                    </div>
+                    <a href="${article.link}" target="_blank" class="block flex-grow focus:outline-none z-0">
+                        <h3 class="text-lg font-bold text-white mb-2 leading-tight group-hover:text-primary transition">${article.title}</h3>
+                        <p class="text-sm text-slate-400 line-clamp-3 mb-4">${article.description}</p>
+                    </a>
+                    <div class="mt-auto pt-4 border-t border-slate-700/50 flex flex-col gap-2">
+                        <div class="flex flex-wrap gap-1">${sectorBadges} ${levierBadges}</div>
+                        <div class="text-xs text-slate-500 text-right mt-1">${formatDate(article.pubDate)}</div>
+                    </div>
+                `;
+                DOM.grid.appendChild(card);
+            });
+
+            document.querySelectorAll('.fav-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = e.currentTarget.dataset.id;
+                    state.favorites = state.favorites.includes(id) ? state.favorites.filter(f => f !== id) : [...state.favorites, id];
+                    saveFavorites();
+                    renderArticles();
+                });
+            });
+        };
+
+        const renderSettingsFeeds = () => {
+            DOM.feedList.innerHTML = state.feeds.map(feed => `
+                <li class="flex justify-between items-center bg-slate-900 border border-slate-700 p-3 rounded-lg">
+                    <div>
+                        <p class="font-medium text-white text-sm">${feed.name}</p>
+                        <p class="text-xs text-slate-500 truncate w-48 sm:w-64">${feed.url}</p>
+                    </div>
+                    <button class="delete-feed-btn text-red-500 hover:text-red-400 p-2" data-id="${feed.id}">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </li>
+            `).join('');
+
+            document.querySelectorAll('.delete-feed-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    state.feeds = state.feeds.filter(f => f.id !== e.currentTarget.dataset.id);
+                    saveFeeds();
+                    renderSettingsFeeds();
+                });
+            });
+        };
+
+        DOM.searchInput.addEventListener('input', (e) => { state.filters.search = e.target.value; renderArticles(); });
+        
+        DOM.btnFavToggle.addEventListener('click', () => {
+            state.filters.showFavoritesOnly = !state.filters.showFavoritesOnly;
+            DOM.btnFavToggle.classList.toggle('text-yellow-400', state.filters.showFavoritesOnly);
+            DOM.btnFavToggle.classList.toggle('text-slate-400', !state.filters.showFavoritesOnly);
+            renderArticles();
+        });
+
+        DOM.btnRefresh.addEventListener('click', () => {
+            const icon = DOM.btnRefresh.querySelector('i');
+            icon.classList.add('fa-spin');
+            setTimeout(() => icon.classList.remove('fa-spin'), 1000);
+            fetchRSS();
+        });
+
+        DOM.btnSettings.addEventListener('click', () => { renderSettingsFeeds(); DOM.modalSettings.classList.remove('hidden'); });
+        
+        DOM.btnCloseSettings.addEventListener('click', () => { DOM.modalSettings.classList.add('hidden'); fetchRSS(); });
+
+        DOM.modalSettings.addEventListener('click', (e) => {
+            if(e.target === DOM.modalSettings) { DOM.modalSettings.classList.add('hidden'); fetchRSS(); }
+        });
+
+        DOM.addFeedForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nameInput = document.getElementById('feed-name');
+            const urlInput = document.getElementById('feed-url');
+            state.feeds.push({ id: generateId(), name: nameInput.value, url: urlInput.value });
+            saveFeeds();
+            renderSettingsFeeds();
+            nameInput.value = ''; urlInput.value = '';
+        });
+
+        // --- LOGIQUE DES MENUS DÉROULANTS ---
+        const toggleDropdown = (dropElement, btnIcon) => {
+            const isHidden = dropElement.classList.contains('hidden');
+            DOM.dropSecteurs.classList.add('hidden');
+            DOM.dropLeviers.classList.add('hidden');
+            document.getElementById('icon-secteurs').style.transform = 'rotate(0deg)';
+            document.getElementById('icon-leviers').style.transform = 'rotate(0deg)';
+
+            if (isHidden) {
+                dropElement.classList.remove('hidden');
+                btnIcon.style.transform = 'rotate(180deg)';
+            }
+        };
+
+        DOM.btnDropSecteurs.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown(DOM.dropSecteurs, document.getElementById('icon-secteurs'));
+        });
+
+        DOM.btnDropLeviers.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown(DOM.dropLeviers, document.getElementById('icon-leviers'));
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!DOM.btnDropSecteurs.contains(e.target) && !DOM.dropSecteurs.contains(e.target)) {
+                DOM.dropSecteurs.classList.add('hidden');
+                document.getElementById('icon-secteurs').style.transform = 'rotate(0deg)';
+            }
+            if (!DOM.btnDropLeviers.contains(e.target) && !DOM.dropLeviers.contains(e.target)) {
+                DOM.dropLeviers.classList.add('hidden');
+                document.getElementById('icon-leviers').style.transform = 'rotate(0deg)';
+            }
+        });
+
+        const init = () => { renderFilters(); fetchRSS(); };
+        init();
+
+    </script>
+</body>
+</html>
