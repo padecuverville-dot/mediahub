@@ -1,498 +1,858 @@
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Media Pulse - Veille Média</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        dark: '#0f172a',
-                        card: '#1e293b',
-                        primary: '#3b82f6',
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .line-clamp-3 {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;  
-            overflow: hidden;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Media Pulse — Veille Média</title>
+<!-- ════════════════════════════════════════════════════════════════
+     MEDIA PULSE — Veille média par flux RSS, tagging auto
+     Harmonisé sur le design system « Pulse » (réf. DESIGN_SYSTEM.md)
+     ─────────────────────────────────────────────────────────────────
+     Architecture : Single-file · Vanilla JS · zéro framework
+     (Tailwind CDN + Font Awesome supprimés → CSS natif + SVG inline)
+     Données      : localStorage (clés mediaPulse_*_v2 conservées)
+     ════════════════════════════════════════════════════════════════ -->
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+/* ════════════════════════════════════════════════════════════════
+   1. DESIGN TOKENS — mode sombre obsidian (défaut)
+   ════════════════════════════════════════════════════════════════ */
+:root {
+  --bg:        #0a0e27;
+  --surface-1: #11152e;
+  --surface-2: #161b38;
+  --surface-3: #1a1f3a;
+  --glass:     rgba(22, 27, 56, 0.55);
+  --glass-hi:  rgba(26, 31, 58, 0.75);
+
+  --border-xs: rgba(148, 163, 255, 0.07);
+  --border-sm: rgba(148, 163, 255, 0.12);
+  --border-md: rgba(148, 163, 255, 0.20);
+
+  --cyan:       #22d3ee;  --cyan-dim:   rgba(34, 211, 238, 0.12);
+  --violet:     #8b5cf6;  --violet-dim: rgba(139, 92, 246, 0.14);
+  --good:       #34d399;  --good-dim:   rgba(52, 211, 153, 0.13);
+  --bad:        #fb7185;  --bad-dim:    rgba(251, 113, 133, 0.13);
+  --star:       #fbbf24;
+  --grad-accent: linear-gradient(120deg, #22d3ee 0%, #8b5cf6 100%);
+
+  --t1: #eef0ff; --t2: #9aa3c7; --t3: #5b6388;
+
+  --r-sm: 10px; --r-md: 14px; --r-lg: 20px;
+  --shadow-card:  0 10px 32px rgba(0, 0, 0, 0.35);
+  --shadow-modal: 0 24px 80px rgba(0, 0, 0, 0.55);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast: 0.18s var(--ease);
+  --t-med:  0.35s var(--ease);
+}
+
+/* ── Surcharges mode clair ── */
+body.light {
+  --bg:        #f3f5fb;
+  --surface-1: #ffffff;
+  --surface-2: #ffffff;
+  --surface-3: #f6f8fe;
+  --glass:     rgba(255, 255, 255, 0.78);
+  --glass-hi:  rgba(255, 255, 255, 0.92);
+  --border-xs: rgba(19, 23, 52, 0.07);
+  --border-sm: rgba(19, 23, 52, 0.11);
+  --border-md: rgba(19, 23, 52, 0.18);
+  --cyan:   #0891b2; --cyan-dim:   rgba(8, 145, 178, 0.10);
+  --violet: #6d28d9; --violet-dim: rgba(109, 40, 217, 0.09);
+  --good:   #059669; --good-dim:   rgba(5, 150, 105, 0.10);
+  --bad:    #e11d48; --bad-dim:    rgba(225, 29, 72, 0.09);
+  --star:   #b45309;
+  --grad-accent: linear-gradient(120deg, #0891b2 0%, #6d28d9 100%);
+  --t1: #131734; --t2: #4a5273; --t3: #7b84a8;
+  --shadow-card:  0 8px 28px rgba(19, 23, 52, 0.08);
+  --shadow-modal: 0 24px 80px rgba(19, 23, 52, 0.22);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   2. RESET & BASE
+   ════════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg); color: var(--t1);
+  font-size: 14px; line-height: 1.55; min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.4s ease, color 0.4s ease;
+  overflow-x: hidden;
+}
+h1, h2, h3 { font-family: 'Poppins', 'Inter', sans-serif; }
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input { font-family: inherit; color: inherit; }
+svg.ic { width: 16px; height: 16px; flex-shrink: 0; }
+::selection { background: var(--violet-dim); color: var(--t1); }
+:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: 4px; }
+
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--t3); }
+
+/* ── Fond signature "aurora" ── */
+.aurora {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(900px 600px at 12% -8%, rgba(34, 211, 238, 0.10), transparent 60%),
+    radial-gradient(1000px 700px at 95% 12%, rgba(139, 92, 246, 0.12), transparent 60%);
+  transition: opacity 0.4s ease;
+}
+body.light .aurora { opacity: 0.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   3. HEADER
+   ════════════════════════════════════════════════════════════════ */
+.header {
+  position: sticky; top: 0; z-index: 60;
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  border-bottom: 1px solid var(--border-xs);
+}
+.header-inner {
+  max-width: 1280px; margin: 0 auto; padding: 12px 24px;
+  display: flex; align-items: center; gap: 14px;
+}
+.logo-mark {
+  width: 36px; height: 36px; border-radius: 11px; flex-shrink: 0;
+  background: var(--grad-accent);
+  display: grid; place-items: center; color: #fff;
+  box-shadow: 0 4px 18px rgba(139, 92, 246, 0.35);
+}
+.logo-mark svg { width: 18px; height: 18px; }
+.brand-title { font-family: 'Poppins'; font-weight: 700; font-size: 15.5px; letter-spacing: -0.2px; }
+.brand-sub { font-size: 11px; color: var(--t3); font-weight: 500; margin-top: -2px; }
+.header-spacer { flex: 1; }
+
+/* Boutons icône du header */
+.icon-btn {
+  width: 36px; height: 36px; border-radius: var(--r-sm);
+  display: grid; place-items: center;
+  border: 1px solid var(--border-sm); background: var(--surface-2); color: var(--t2);
+  transition: all var(--t-fast);
+}
+.icon-btn:hover { color: var(--t1); border-color: var(--border-md); transform: translateY(-1px); }
+.icon-btn.fav-active { color: var(--star); border-color: color-mix(in srgb, var(--star) 40%, transparent); }
+.icon-btn svg { width: 16px; height: 16px; }
+.icon-btn .spin { animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.theme-toggle {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 13px; border-radius: var(--r-sm);
+  border: 1px solid var(--border-sm); background: var(--surface-2);
+  font-size: 12.5px; font-weight: 600; color: var(--t2);
+  transition: all var(--t-fast);
+}
+.theme-toggle:hover { color: var(--t1); border-color: var(--border-md); transform: translateY(-1px); }
+.theme-toggle svg { width: 15px; height: 15px; }
+.theme-toggle .sun { display: none; }
+body.light .theme-toggle .sun { display: block; }
+body.light .theme-toggle .moon { display: none; }
+
+/* ════════════════════════════════════════════════════════════════
+   4. FILTRES — recherche + menus déroulants
+   ════════════════════════════════════════════════════════════════ */
+main { max-width: 1280px; margin: 0 auto; padding: 24px; }
+.filters { display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px; }
+
+.input-wrap { position: relative; max-width: 420px; }
+.input-wrap svg {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 14px; height: 14px; color: var(--t3); pointer-events: none;
+}
+.input {
+  width: 100%; padding: 9px 12px 9px 34px;
+  background: var(--surface-2); border: 1px solid var(--border-sm);
+  border-radius: var(--r-sm); font-size: 13px; color: var(--t1);
+  transition: border-color var(--t-fast), box-shadow var(--t-fast);
+}
+.input:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px var(--cyan-dim); }
+.input::placeholder { color: var(--t3); }
+
+.drop-row { display: flex; gap: 14px; flex-wrap: wrap; }
+.drop-wrap { position: relative; flex: 1; min-width: 240px; }
+.drop-btn {
+  width: 100%; padding: 9px 14px;
+  background: var(--surface-2); border: 1px solid var(--border-sm);
+  border-radius: var(--r-sm); font-size: 13px; font-weight: 500; color: var(--t2);
+  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  transition: all var(--t-fast); text-align: left;
+}
+.drop-btn:hover { border-color: var(--border-md); color: var(--t1); }
+.drop-btn svg { width: 13px; height: 13px; transition: transform 0.2s var(--ease); }
+/* Bouton actif : accent par dimension (secteurs = violet, leviers = vert) */
+.drop-btn.active-secteurs { border-color: var(--violet); color: var(--t1); box-shadow: 0 0 0 3px var(--violet-dim); }
+.drop-btn.active-leviers  { border-color: var(--good);   color: var(--t1); box-shadow: 0 0 0 3px var(--good-dim); }
+
+.drop-panel {
+  position: absolute; z-index: 40; width: 100%; margin-top: 8px;
+  background: var(--glass-hi); backdrop-filter: blur(20px);
+  border: 1px solid var(--border-sm); border-radius: var(--r-md);
+  box-shadow: var(--shadow-modal);
+  max-height: 290px; overflow-y: auto; padding: 12px;
+}
+.drop-panel.hidden { display: none; }
+.pill-group { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Pills de filtre — couleur portée par --lc */
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 99px;
+  font-size: 12px; font-weight: 600;
+  border: 1px solid var(--border-sm); color: var(--t2);
+  background: var(--surface-2);
+  transition: all var(--t-fast);
+}
+.pill:hover { border-color: var(--lc, var(--border-md)); color: var(--t1); transform: translateY(-1px); }
+.pill.active {
+  color: var(--t1); border-color: transparent;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--lc, var(--cyan)) 22%, var(--surface-2)), var(--surface-2));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lc, var(--cyan)) 45%, transparent);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   5. ÉTATS — chargement & vide
+   ════════════════════════════════════════════════════════════════ */
+.state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; gap: 14px; color: var(--t2); }
+.state.hidden { display: none; }
+.spinner {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: 3px solid var(--border-sm); border-top-color: var(--cyan);
+  animation: spin 0.9s linear infinite;
+}
+.state svg { width: 38px; height: 38px; color: var(--t3); }
+
+/* ════════════════════════════════════════════════════════════════
+   6. GRILLE D'ARTICLES — bento responsive
+   ════════════════════════════════════════════════════════════════ */
+.news-grid {
+  display: grid; gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+}
+.article-card {
+  position: relative; display: flex; flex-direction: column; height: 100%;
+  background: var(--glass); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-xs); border-radius: var(--r-md);
+  padding: 18px;
+  transition: transform var(--t-med), box-shadow var(--t-med), border-color var(--t-med);
+  animation: fadeUp 0.45s var(--ease) both;
+}
+.article-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-md);
+  box-shadow: var(--shadow-card);
+}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+.card-meta { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 8px; }
+.card-source {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--t3);
+}
+.fav-btn { color: var(--t3); transition: color var(--t-fast), transform var(--t-fast); z-index: 2; }
+.fav-btn:hover { color: var(--star); transform: scale(1.15); }
+.fav-btn.is-fav { color: var(--star); }
+.fav-btn svg { width: 17px; height: 17px; }
+
+.card-body { flex: 1; display: block; }
+.card-title-link {
+  font-family: 'Poppins'; font-size: 15.5px; font-weight: 700; line-height: 1.35;
+  letter-spacing: -0.2px; margin-bottom: 8px;
+  transition: color var(--t-fast);
+}
+.article-card:hover .card-title-link { color: var(--cyan); }
+.card-desc {
+  font-size: 13px; color: var(--t2); margin-bottom: 14px;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.card-foot {
+  margin-top: auto; padding-top: 12px;
+  border-top: 1px solid var(--border-xs);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.badge-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.badge {
+  font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 99px;
+  border: 1px solid transparent;
+}
+.badge.secteur { background: var(--violet-dim); color: var(--violet); border-color: color-mix(in srgb, var(--violet) 25%, transparent); }
+.badge.levier  { background: var(--good-dim);   color: var(--good);   border-color: color-mix(in srgb, var(--good) 25%, transparent); }
+.card-date { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--t3); text-align: right; }
+
+/* ════════════════════════════════════════════════════════════════
+   7. MODALE — gestion des flux RSS
+   ════════════════════════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(7, 10, 29, 0.6); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+}
+.modal-overlay.hidden { display: none; }
+.modal {
+  width: 100%; max-width: 540px; max-height: 86vh; overflow: hidden;
+  display: flex; flex-direction: column;
+  background: var(--glass-hi); backdrop-filter: blur(20px);
+  border: 1px solid var(--border-sm); border-radius: var(--r-lg);
+  box-shadow: var(--shadow-modal);
+}
+.modal-head {
+  padding: 16px 20px; border-bottom: 1px solid var(--border-xs);
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+}
+.modal-title { font-family: 'Poppins'; font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 9px; }
+.modal-title svg { width: 16px; height: 16px; color: var(--cyan); }
+.modal-close {
+  width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center;
+  color: var(--t3); font-size: 18px; transition: all var(--t-fast);
+}
+.modal-close:hover { color: var(--t1); background: var(--surface-3); }
+.modal-body { padding: 20px; overflow-y: auto; }
+
+.add-feed-form { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+.add-feed-form .input { padding-left: 12px; flex: 1; min-width: 130px; }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 16px; border-radius: var(--r-sm);
+  font-size: 13px; font-weight: 600;
+  background: var(--grad-accent); color: #fff;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.30);
+  transition: all var(--t-fast);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 26px rgba(139, 92, 246, 0.42); }
+.btn-primary svg { width: 14px; height: 14px; }
+
+.feed-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.feed-item {
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  background: var(--surface-2); border: 1px solid var(--border-xs);
+  padding: 11px 13px; border-radius: var(--r-sm);
+}
+.feed-name { font-size: 13px; font-weight: 600; }
+.feed-url {
+  font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--t3);
+  max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.delete-feed-btn {
+  width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center;
+  color: var(--t3); transition: all var(--t-fast); flex-shrink: 0;
+}
+.delete-feed-btn:hover { color: var(--bad); background: var(--bad-dim); }
+.delete-feed-btn svg { width: 14px; height: 14px; }
+
+/* ════════════════════════════════════════════════════════════════
+   8. RESPONSIVE
+   ════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  main { padding: 16px; }
+  .header-inner { padding: 10px 16px; gap: 10px; }
+  .brand-sub { display: none; }
+  .theme-toggle span { display: none; }
+  .feed-url { max-width: 170px; }
+}
+</style>
 </head>
-<body class="bg-dark text-slate-200 font-sans min-h-screen">
+<body>
+<div class="aurora"></div>
 
-    <header class="sticky top-0 z-50 bg-card border-b border-slate-700 shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2 text-primary">
-                <i class="fa-solid fa-bolt text-2xl"></i>
-                <h1 class="text-xl font-bold text-white tracking-wide">Media Pulse</h1>
-            </div>
-            <div class="flex gap-4">
-                <button id="btn-fav-toggle" class="text-slate-400 hover:text-yellow-400 transition" title="Voir les favoris">
-                    <i class="fa-solid fa-star text-xl"></i>
-                </button>
-                <button id="btn-refresh" class="text-slate-400 hover:text-white transition" title="Rafraîchir les flux">
-                    <i class="fa-solid fa-rotate-right text-xl"></i>
-                </button>
-                <button id="btn-settings" class="text-slate-400 hover:text-white transition" title="Paramètres">
-                    <i class="fa-solid fa-gear text-xl"></i>
-                </button>
-            </div>
-        </div>
-    </header>
+<!-- ════════════════════ HEADER ════════════════════ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo-mark" aria-hidden="true">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+    </div>
+    <div>
+      <div class="brand-title">Media Pulse</div>
+      <div class="brand-sub">Veille média · flux RSS · tagging automatique</div>
+    </div>
+    <div class="header-spacer"></div>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        
-        <div class="mb-8 space-y-4">
-            <div class="relative max-w-md">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <i class="fa-solid fa-magnifying-glass text-slate-500"></i>
-                </div>
-                <input type="text" id="search-input" placeholder="Rechercher un mot-clé..." class="block w-full pl-10 pr-3 py-2 border border-slate-600 rounded-lg bg-slate-800 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-primary transition">
-            </div>
+    <button id="btn-fav-toggle" class="icon-btn" title="Voir les favoris" aria-label="Afficher uniquement les favoris">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.5a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.5.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>
+    </button>
+    <button id="btn-refresh" class="icon-btn" title="Rafraîchir les flux" aria-label="Rafraîchir les flux">
+      <svg id="refresh-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+    </button>
+    <button id="btn-settings" class="icon-btn" title="Paramètres" aria-label="Gérer les flux RSS">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"/></svg>
+    </button>
+    <button class="theme-toggle" id="themeToggle" title="Basculer jour / nuit" aria-label="Basculer le thème">
+      <svg class="moon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      <svg class="sun" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      <span id="themeLabel">Mode jour</span>
+    </button>
+  </div>
+</header>
 
-            <div class="flex flex-col sm:flex-row gap-4">
-                <div class="relative flex-1">
-                    <button id="btn-dropdown-secteurs" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-left text-slate-300 flex justify-between items-center hover:border-primary transition focus:outline-none">
-                        <span id="label-secteurs">Filtrer par Secteur...</span>
-                        <i class="fa-solid fa-chevron-down text-sm transition-transform duration-200" id="icon-secteurs"></i>
-                    </button>
-                    <div id="dropdown-secteurs" class="hidden absolute z-40 w-full mt-2 bg-slate-800 border border-slate-600 rounded-lg shadow-xl max-h-72 overflow-y-auto p-3">
-                        <div id="filter-secteurs" class="flex flex-wrap gap-2"></div>
-                    </div>
-                </div>
+<main>
 
-                <div class="relative flex-1">
-                    <button id="btn-dropdown-leviers" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-left text-slate-300 flex justify-between items-center hover:border-primary transition focus:outline-none">
-                        <span id="label-leviers">Filtrer par Levier...</span>
-                        <i class="fa-solid fa-chevron-down text-sm transition-transform duration-200" id="icon-leviers"></i>
-                    </button>
-                    <div id="dropdown-leviers" class="hidden absolute z-40 w-full mt-2 bg-slate-800 border border-slate-600 rounded-lg shadow-xl max-h-72 overflow-y-auto p-3">
-                        <div id="filter-leviers" class="flex flex-wrap gap-2"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="loading-state" class="flex flex-col items-center justify-center py-20 hidden">
-            <i class="fa-solid fa-circle-notch fa-spin text-4xl text-primary mb-4"></i>
-            <p class="text-slate-400">Récupération et décodage des flux en cours...</p>
-        </div>
-
-        <div id="news-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
-        <div id="empty-state" class="text-center py-20 hidden">
-            <i class="fa-regular fa-folder-open text-4xl text-slate-600 mb-4"></i>
-            <p class="text-slate-400 text-lg">Aucun article ne correspond à vos critères.</p>
-        </div>
-
-    </main>
-
-    <div id="settings-modal" class="fixed inset-0 z-[100] hidden bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-card border border-slate-700 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
-            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800">
-                <h2 class="text-lg font-bold text-white"><i class="fa-solid fa-rss mr-2"></i>Gestion des Flux RSS</h2>
-                <button id="close-settings" class="text-slate-400 hover:text-white transition"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <div class="p-6">
-                <form id="add-feed-form" class="mb-6 flex gap-2">
-                    <input type="text" id="feed-name" placeholder="Nom (ex: CB News)" required class="flex-1 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary">
-                    <input type="url" id="feed-url" placeholder="URL du flux RSS" required class="flex-2 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary">
-                    <button type="submit" class="bg-primary hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition"><i class="fa-solid fa-plus"></i></button>
-                </form>
-                <div class="max-h-60 overflow-y-auto pr-2 no-scrollbar">
-                    <ul id="feed-list" class="space-y-3"></ul>
-                </div>
-            </div>
-        </div>
+  <!-- ── FILTRES ── -->
+  <div class="filters">
+    <div class="input-wrap">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/></svg>
+      <input type="text" id="search-input" class="input" placeholder="Rechercher un mot-clé…">
     </div>
 
-    <script>
-        const TAG_RULES = {
-            secteurs: {
-                "Auto & Mobilité": ["auto", "automobile", "voiture", "véhicule", "mobilité", "constructeur", "concession", "deux-roues", "électrique", "hybride", "suv", "motor"],
-                "FMCG & Agro": ["fmcg", "pgc", "grande consommation", "agroalimentaire", "alimentaire", "boisson", "food", "nutrition", "snacking", "breuvage"],
-                "Beauté & Soins": ["beauté", "cosmétique", "maquillage", "parfum", "soin", "skincare", "capillaire", "dermatologie"],
-                "Santé & Bien-être": ["santé", "médical", "pharma", "pharmacie", "bien-être", "mutuelle", "soin du corps", "laboratoire"],
-                "Retail & E-commerce": ["retail", "commerce", "grande distribution", "supermarché", "hypermarché", "e-commerce", "marketplace", "drive", "magasin", "boutique"],
-                "Luxe & Mode": ["luxe", "mode", "haute couture", "horlogerie", "joaillerie", "maroquinerie", "fashion", "prêt-à-porter", "textile", "accessoires"],
-                "Tech & Télécoms": ["tech", "technologie", "télécom", "opérateur", "smartphone", "logiciel", "ia", "intelligence artificielle", "informatique", "cybersécurité", "cloud", "saas", "google", "alphabet"],
-                "Banque & Assurance": ["banque", "assurance", "finance", "crédit", "fintech", "paiement", "investissement", "épargne", "bancassurance"],
-                "Voyage & Tourisme": ["tourisme", "voyage", "hôtellerie", "compagnie aérienne", "transport", "vacances", "loisir", "train", "avion", "croisière"],
-                "Entertainment & Culture": ["entertainment", "divertissement", "cinéma", "musique", "jeu vidéo", "streaming", "svod", "culture", "édition", "spectacle", "gaming", "esport"],
-                "Énergie & RSE": ["énergie", "environnement", "écologie", "électricité", "gaz", "transition énergétique", "renouvelable", "rse", "durabilité", "carbone", "climat"],
-                "B2B & Corporate": ["b2b", "corporate", "entreprise", "rh", "recrutement", "management", "industrie", "marque employeur", "institutionnel"]
-            },
-            leviers: {
-                "Social & Influence": ["social", "influence", "créateur", "tiktok", "instagram", "meta", "facebook", "linkedin", "x", "twitter", "snapchat", "pinterest", "smm", "smo", "réseaux sociaux", "ugc"],
-                "Search (SEO/SEA)": ["search", "seo", "sea", "google ads", "bing", "référencement", "mots-clés", "sem", "synergi", "SERP"],
-                "Programmatic & Data": ["programmatique", "programmatic", "rtb", "dsp", "ssp", "dmp", "cdp", "data", "ciblage", "cookie", "privacy", "adtech", "cookieless", "first-party", "rgpd"],
-                "Retail Media": ["retail media", "e-retail", "amazon ads", "sponsored products", "off-site", "on-site", "criteo", "citrus", "monétisation"],
-                "TV & Vidéo (CTV/VOL)": ["tv", "télévision", "ctv", "télévision segmentée", "replay", "vol", "vidéo en ligne", "youtube", "avod", "fast tv", "iptv", "broadcaster"],
-                "OOH & DOOH": ["ooh", "dooh", "affichage", "extérieur", "mobilier urbain", "panneau", "abribus", "gare", "aéroport", "prisme"],
-                "Audio Digital": ["audio", "podcast", "radio", "webradio", "streaming audio", "spotify", "deezer", "voix", "smart speaker"],
-                "Print & Presse": ["print", "presse", "magazine", "quotidien", "pqr", "pqn", "journal", "papier", "éditorial", "publireportage"],
-                "CRM & Fidélisation": ["crm", "fidélisation", "email", "emailing", "newsletter", "marketing direct", "automation", "prgm"],
-                "Event & Sponsoring": ["événementiel", "event", "sponsoring", "partenariat", "mécénat", "salon", "foire", "activation", "brand content", "opération spéciale"]
-            }
-        };
+    <div class="drop-row">
+      <div class="drop-wrap">
+        <button id="btn-dropdown-secteurs" class="drop-btn">
+          <span id="label-secteurs">Filtrer par Secteur…</span>
+          <svg id="icon-secteurs" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+        </button>
+        <div id="dropdown-secteurs" class="drop-panel hidden">
+          <div id="filter-secteurs" class="pill-group"></div>
+        </div>
+      </div>
 
-        const DEFAULT_FEEDS = [
-            { id: '1', name: 'Google News (À la une)', url: 'https://news.google.com/rss?hl=fr&gl=FR&ceid=FR:fr' },
-            { id: '2', name: 'Alerte : Google (Actualités)', url: 'https://news.google.com/rss/search?q=Google+when:7d&hl=fr&gl=FR&ceid=FR:fr' },
-            { id: '3', name: 'Alerte : Doctolib IA', url: 'https://news.google.com/rss/search?q=doctolib+ia+when:7d&hl=fr&gl=FR&ceid=FR:fr' },
-            { id: '4', name: 'Stratégies', url: 'https://www.strategies.fr/rss.xml' },
-            { id: '5', name: 'CB News', url: 'https://www.cbnews.fr/rss.xml' }
-        ];
+      <div class="drop-wrap">
+        <button id="btn-dropdown-leviers" class="drop-btn">
+          <span id="label-leviers">Filtrer par Levier…</span>
+          <svg id="icon-leviers" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
+        </button>
+        <div id="dropdown-leviers" class="drop-panel hidden">
+          <div id="filter-leviers" class="pill-group"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        let state = {
-            feeds: JSON.parse(localStorage.getItem('mediaPulse_feeds_v2')) || DEFAULT_FEEDS,
-            favorites: JSON.parse(localStorage.getItem('mediaPulse_favorites_v2')) || [],
-            articles: JSON.parse(localStorage.getItem('mediaPulse_articles_v2')) || [],
-            filters: { secteurs: new Set(), leviers: new Set(), search: "", showFavoritesOnly: false }
-        };
+  <!-- ── ÉTAT CHARGEMENT ── -->
+  <div id="loading-state" class="state hidden">
+    <div class="spinner" aria-hidden="true"></div>
+    <p>Récupération et décodage des flux en cours…</p>
+  </div>
 
-        const DOM = {
-            grid: document.getElementById('news-grid'),
-            loading: document.getElementById('loading-state'),
-            empty: document.getElementById('empty-state'),
-            btnRefresh: document.getElementById('btn-refresh'),
-            btnSettings: document.getElementById('btn-settings'),
-            btnFavToggle: document.getElementById('btn-fav-toggle'),
-            modalSettings: document.getElementById('settings-modal'),
-            btnCloseSettings: document.getElementById('close-settings'),
-            feedList: document.getElementById('feed-list'),
-            addFeedForm: document.getElementById('add-feed-form'),
-            filterSecteurs: document.getElementById('filter-secteurs'),
-            filterLeviers: document.getElementById('filter-leviers'),
-            searchInput: document.getElementById('search-input'),
-            btnDropSecteurs: document.getElementById('btn-dropdown-secteurs'),
-            dropSecteurs: document.getElementById('dropdown-secteurs'),
-            labelSecteurs: document.getElementById('label-secteurs'),
-            btnDropLeviers: document.getElementById('btn-dropdown-leviers'),
-            dropLeviers: document.getElementById('dropdown-leviers'),
-            labelLeviers: document.getElementById('label-leviers')
-        };
+  <!-- ── GRILLE D'ARTICLES ── -->
+  <div id="news-grid" class="news-grid"></div>
 
-        const saveFeeds = () => localStorage.setItem('mediaPulse_feeds_v2', JSON.stringify(state.feeds));
-        const saveFavorites = () => localStorage.setItem('mediaPulse_favorites_v2', JSON.stringify(state.favorites));
-        const saveArticles = () => localStorage.setItem('mediaPulse_articles_v2', JSON.stringify(state.articles));
-        const generateId = () => Math.random().toString(36).substr(2, 9);
-        
-        const stripHtml = (html) => {
-            let tmp = document.createElement("DIV");
-            tmp.innerHTML = html;
-            return tmp.textContent || tmp.innerText || "";
-        };
+  <!-- ── ÉTAT VIDE ── -->
+  <div id="empty-state" class="state hidden">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883 2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25 2.25 0 002.227-1.932l.857-6a2.25 2.25 0 00-1.883-2.542m-16.5 0V6A2.25 2.25 0 016 3.75h3.879a1.5 1.5 0 011.06.44l2.122 2.12a1.5 1.5 0 001.06.44H18A2.25 2.25 0 0120.25 9v.776"/></svg>
+    <p>Aucun article ne correspond à vos critères.</p>
+  </div>
 
-        const formatDate = (dateString) => {
-            const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
-            const date = new Date(dateString);
-            return isNaN(date) ? "Date inconnue" : date.toLocaleDateString('fr-FR', options);
-        };
+</main>
 
-        const autoTag = (title, description) => {
-            const text = (title + " " + description).toLowerCase();
-            let tagsSecteurs = [];
-            let tagsLeviers = [];
+<!-- ════════════════════ MODALE FLUX RSS ════════════════════ -->
+<div id="settings-modal" class="modal-overlay hidden">
+  <div class="modal" role="dialog" aria-labelledby="settingsTitle">
+    <div class="modal-head">
+      <h2 class="modal-title" id="settingsTitle">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12.75 19.5v-.75a7.5 7.5 0 00-7.5-7.5H4.5m0-6.75h.75c7.87 0 14.25 6.38 14.25 14.25v.75M6 18.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/></svg>
+        Gestion des Flux RSS
+      </h2>
+      <button id="close-settings" class="modal-close" aria-label="Fermer">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="add-feed-form" class="add-feed-form">
+        <input type="text" id="feed-name" class="input" placeholder="Nom (ex : CB News)" required>
+        <input type="url" id="feed-url" class="input" placeholder="URL du flux RSS" required>
+        <button type="submit" class="btn-primary" aria-label="Ajouter le flux">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.4"><path stroke-linecap="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+        </button>
+      </form>
+      <ul id="feed-list" class="feed-list"></ul>
+    </div>
+  </div>
+</div>
 
-            for (const [secteur, keywords] of Object.entries(TAG_RULES.secteurs)) {
-                if (keywords.some(kw => text.includes(kw.toLowerCase()))) tagsSecteurs.push(secteur);
-            }
-            for (const [levier, keywords] of Object.entries(TAG_RULES.leviers)) {
-                if (keywords.some(kw => text.includes(kw.toLowerCase()))) tagsLeviers.push(levier);
-            }
-            if (tagsSecteurs.length === 0) tagsSecteurs.push("Général");
-            
-            return { secteurs: tagsSecteurs, leviers: tagsLeviers };
-        };
+<script>
+/* ════════════════════════════════════════════════════════════════
+   RÈGLES DE TAGGING AUTOMATIQUE — secteurs & leviers
+   ════════════════════════════════════════════════════════════════ */
+const TAG_RULES = {
+    secteurs: {
+        "Auto & Mobilité": ["auto", "automobile", "voiture", "véhicule", "mobilité", "constructeur", "concession", "deux-roues", "électrique", "hybride", "suv", "motor"],
+        "FMCG & Agro": ["fmcg", "pgc", "grande consommation", "agroalimentaire", "alimentaire", "boisson", "food", "nutrition", "snacking", "breuvage"],
+        "Beauté & Soins": ["beauté", "cosmétique", "maquillage", "parfum", "soin", "skincare", "capillaire", "dermatologie"],
+        "Santé & Bien-être": ["santé", "médical", "pharma", "pharmacie", "bien-être", "mutuelle", "soin du corps", "laboratoire"],
+        "Retail & E-commerce": ["retail", "commerce", "grande distribution", "supermarché", "hypermarché", "e-commerce", "marketplace", "drive", "magasin", "boutique"],
+        "Luxe & Mode": ["luxe", "mode", "haute couture", "horlogerie", "joaillerie", "maroquinerie", "fashion", "prêt-à-porter", "textile", "accessoires"],
+        "Tech & Télécoms": ["tech", "technologie", "télécom", "opérateur", "smartphone", "logiciel", "ia", "intelligence artificielle", "informatique", "cybersécurité", "cloud", "saas", "google", "alphabet"],
+        "Banque & Assurance": ["banque", "assurance", "finance", "crédit", "fintech", "paiement", "investissement", "épargne", "bancassurance"],
+        "Voyage & Tourisme": ["tourisme", "voyage", "hôtellerie", "compagnie aérienne", "transport", "vacances", "loisir", "train", "avion", "croisière"],
+        "Entertainment & Culture": ["entertainment", "divertissement", "cinéma", "musique", "jeu vidéo", "streaming", "svod", "culture", "édition", "spectacle", "gaming", "esport"],
+        "Énergie & RSE": ["énergie", "environnement", "écologie", "électricité", "gaz", "transition énergétique", "renouvelable", "rse", "durabilité", "carbone", "climat"],
+        "B2B & Corporate": ["b2b", "corporate", "entreprise", "rh", "recrutement", "management", "industrie", "marque employeur", "institutionnel"]
+    },
+    leviers: {
+        "Social & Influence": ["social", "influence", "créateur", "tiktok", "instagram", "meta", "facebook", "linkedin", "x", "twitter", "snapchat", "pinterest", "smm", "smo", "réseaux sociaux", "ugc"],
+        "Search (SEO/SEA)": ["search", "seo", "sea", "google ads", "bing", "référencement", "mots-clés", "sem", "synergi", "SERP"],
+        "Programmatic & Data": ["programmatique", "programmatic", "rtb", "dsp", "ssp", "dmp", "cdp", "data", "ciblage", "cookie", "privacy", "adtech", "cookieless", "first-party", "rgpd"],
+        "Retail Media": ["retail media", "e-retail", "amazon ads", "sponsored products", "off-site", "on-site", "criteo", "citrus", "monétisation"],
+        "TV & Vidéo (CTV/VOL)": ["tv", "télévision", "ctv", "télévision segmentée", "replay", "vol", "vidéo en ligne", "youtube", "avod", "fast tv", "iptv", "broadcaster"],
+        "OOH & DOOH": ["ooh", "dooh", "affichage", "extérieur", "mobilier urbain", "panneau", "abribus", "gare", "aéroport", "prisme"],
+        "Audio Digital": ["audio", "podcast", "radio", "webradio", "streaming audio", "spotify", "deezer", "voix", "smart speaker"],
+        "Print & Presse": ["print", "presse", "magazine", "quotidien", "pqr", "pqn", "journal", "papier", "éditorial", "publireportage"],
+        "CRM & Fidélisation": ["crm", "fidélisation", "email", "emailing", "newsletter", "marketing direct", "automation", "prgm"],
+        "Event & Sponsoring": ["événementiel", "event", "sponsoring", "partenariat", "mécénat", "salon", "foire", "activation", "brand content", "opération spéciale"]
+    }
+};
 
-        const fetchRSS = async () => {
-            DOM.empty.classList.add('hidden');
-            DOM.loading.classList.remove('hidden');
+const DEFAULT_FEEDS = [
+    { id: '1', name: 'Google News (À la une)', url: 'https://news.google.com/rss?hl=fr&gl=FR&ceid=FR:fr' },
+    { id: '2', name: 'Alerte : Google (Actualités)', url: 'https://news.google.com/rss/search?q=Google+when:7d&hl=fr&gl=FR&ceid=FR:fr' },
+    { id: '3', name: 'Alerte : Doctolib IA', url: 'https://news.google.com/rss/search?q=doctolib+ia+when:7d&hl=fr&gl=FR&ceid=FR:fr' },
+    { id: '4', name: 'Stratégies', url: 'https://www.strategies.fr/rss.xml' },
+    { id: '5', name: 'CB News', url: 'https://www.cbnews.fr/rss.xml' }
+];
 
-            const proxies = [
-                (url) => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`,
-                (url) => `https://corsproxy.io/?url=${encodeURIComponent(url)}`
-            ];
+/* ════════════════════════════════════════════════════════════════
+   ÉTAT — persistance localStorage (clés v2 conservées)
+   ════════════════════════════════════════════════════════════════ */
+let state = {
+    feeds: JSON.parse(localStorage.getItem('mediaPulse_feeds_v2')) || DEFAULT_FEEDS,
+    favorites: JSON.parse(localStorage.getItem('mediaPulse_favorites_v2')) || [],
+    articles: JSON.parse(localStorage.getItem('mediaPulse_articles_v2')) || [],
+    filters: { secteurs: new Set(), leviers: new Set(), search: "", showFavoritesOnly: false }
+};
 
-            const fetchPromises = state.feeds.map(async (feed) => {
-                let success = false;
+const DOM = {
+    grid: document.getElementById('news-grid'),
+    loading: document.getElementById('loading-state'),
+    empty: document.getElementById('empty-state'),
+    btnRefresh: document.getElementById('btn-refresh'),
+    btnSettings: document.getElementById('btn-settings'),
+    btnFavToggle: document.getElementById('btn-fav-toggle'),
+    modalSettings: document.getElementById('settings-modal'),
+    btnCloseSettings: document.getElementById('close-settings'),
+    feedList: document.getElementById('feed-list'),
+    addFeedForm: document.getElementById('add-feed-form'),
+    filterSecteurs: document.getElementById('filter-secteurs'),
+    filterLeviers: document.getElementById('filter-leviers'),
+    searchInput: document.getElementById('search-input'),
+    btnDropSecteurs: document.getElementById('btn-dropdown-secteurs'),
+    dropSecteurs: document.getElementById('dropdown-secteurs'),
+    labelSecteurs: document.getElementById('label-secteurs'),
+    btnDropLeviers: document.getElementById('btn-dropdown-leviers'),
+    dropLeviers: document.getElementById('dropdown-leviers'),
+    labelLeviers: document.getElementById('label-leviers')
+};
 
-                for (const proxyBuilder of proxies) {
-                    if (success) break;
+const saveFeeds = () => localStorage.setItem('mediaPulse_feeds_v2', JSON.stringify(state.feeds));
+const saveFavorites = () => localStorage.setItem('mediaPulse_favorites_v2', JSON.stringify(state.favorites));
+const saveArticles = () => localStorage.setItem('mediaPulse_articles_v2', JSON.stringify(state.articles));
+const generateId = () => Math.random().toString(36).substr(2, 9);
 
-                    try {
-                        const proxyUrl = proxyBuilder(feed.url);
-                        const response = await fetch(proxyUrl);
-                        if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+/* SVG étoile (favori) — pleine ou contour */
+const starSvg = (filled) => filled
+    ? '<svg fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd"/></svg>'
+    : '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.5a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.5.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/></svg>';
 
-                        if (proxyUrl.includes('rss2json')) {
-                            const data = await response.json();
-                            if (data.status === 'ok' && data.items) {
-                                data.items.forEach(item => {
-                                    const title = item.title || "Sans titre";
-                                    const description = stripHtml(item.description || item.content || "");
-                                    const link = item.link || "#";
-                                    const pubDate = item.pubDate || new Date().toISOString();
-                                    const tags = autoTag(title, description);
+const trashSvg = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>';
 
-                                    if (!state.articles.some(a => a.id === link)) {
-                                        state.articles.push({
-                                            id: link, source: feed.name, title, description, link, pubDate, tags, timestamp: new Date(pubDate).getTime()
-                                        });
-                                    }
-                                });
-                                success = true;
+/* Palette cyclique pour les pills de filtre */
+const PILL_COLORS = ['#22d3ee', '#8b5cf6', '#34d399', '#f472b6', '#fbbf24', '#38bdf8', '#a78bfa', '#2dd4bf'];
+
+const stripHtml = (html) => {
+    let tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
+};
+const escAttr = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+const formatDate = (dateString) => {
+    const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+    const date = new Date(dateString);
+    return isNaN(date) ? "Date inconnue" : date.toLocaleDateString('fr-FR', options);
+};
+
+const autoTag = (title, description) => {
+    const text = (title + " " + description).toLowerCase();
+    let tagsSecteurs = [];
+    let tagsLeviers = [];
+    for (const [secteur, keywords] of Object.entries(TAG_RULES.secteurs)) {
+        if (keywords.some(kw => text.includes(kw.toLowerCase()))) tagsSecteurs.push(secteur);
+    }
+    for (const [levier, keywords] of Object.entries(TAG_RULES.leviers)) {
+        if (keywords.some(kw => text.includes(kw.toLowerCase()))) tagsLeviers.push(levier);
+    }
+    if (tagsSecteurs.length === 0) tagsSecteurs.push("Général");
+    return { secteurs: tagsSecteurs, leviers: tagsLeviers };
+};
+
+/* ════════════════════════════════════════════════════════════════
+   RÉCUPÉRATION DES FLUX — rss2json puis corsproxy en secours
+   ════════════════════════════════════════════════════════════════ */
+const fetchRSS = async () => {
+    DOM.empty.classList.add('hidden');
+    DOM.loading.classList.remove('hidden');
+
+    const proxies = [
+        (url) => `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`,
+        (url) => `https://corsproxy.io/?url=${encodeURIComponent(url)}`
+    ];
+
+    const fetchPromises = state.feeds.map(async (feed) => {
+        let success = false;
+        for (const proxyBuilder of proxies) {
+            if (success) break;
+            try {
+                const proxyUrl = proxyBuilder(feed.url);
+                const response = await fetch(proxyUrl);
+                if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+
+                if (proxyUrl.includes('rss2json')) {
+                    const data = await response.json();
+                    if (data.status === 'ok' && data.items) {
+                        data.items.forEach(item => {
+                            const title = item.title || "Sans titre";
+                            const description = stripHtml(item.description || item.content || "");
+                            const link = item.link || "#";
+                            const pubDate = item.pubDate || new Date().toISOString();
+                            const tags = autoTag(title, description);
+                            if (!state.articles.some(a => a.id === link)) {
+                                state.articles.push({ id: link, source: feed.name, title, description, link, pubDate, tags, timestamp: new Date(pubDate).getTime() });
                             }
-                        } 
-                        else {
-                            const text = await response.text();
-                            const parser = new DOMParser();
-                            const xml = parser.parseFromString(text, "text/xml");
-                            if (xml.querySelector("parsererror")) throw new Error("XML Invalide");
-
-                            const items = xml.querySelectorAll("item, entry");
-                            if (items.length > 0) {
-                                items.forEach(item => {
-                                    const title = item.querySelector("title")?.textContent || "Sans titre";
-                                    const rawDesc = item.querySelector("description, content")?.textContent || "";
-                                    const description = stripHtml(rawDesc);
-                                    const link = item.querySelector("link")?.textContent || item.querySelector("link")?.getAttribute('href') || "#";
-                                    const pubDate = item.querySelector("pubDate, published, updated")?.textContent || new Date().toISOString();
-                                    const tags = autoTag(title, description);
-
-                                    if (!state.articles.some(a => a.id === link)) {
-                                        state.articles.push({
-                                            id: link, source: feed.name, title, description, link, pubDate, tags, timestamp: new Date(pubDate).getTime()
-                                        });
-                                    }
-                                });
-                                success = true;
+                        });
+                        success = true;
+                    }
+                } else {
+                    const text = await response.text();
+                    const parser = new DOMParser();
+                    const xml = parser.parseFromString(text, "text/xml");
+                    if (xml.querySelector("parsererror")) throw new Error("XML Invalide");
+                    const items = xml.querySelectorAll("item, entry");
+                    if (items.length > 0) {
+                        items.forEach(item => {
+                            const title = item.querySelector("title")?.textContent || "Sans titre";
+                            const rawDesc = item.querySelector("description, content")?.textContent || "";
+                            const description = stripHtml(rawDesc);
+                            const link = item.querySelector("link")?.textContent || item.querySelector("link")?.getAttribute('href') || "#";
+                            const pubDate = item.querySelector("pubDate, published, updated")?.textContent || new Date().toISOString();
+                            const tags = autoTag(title, description);
+                            if (!state.articles.some(a => a.id === link)) {
+                                state.articles.push({ id: link, source: feed.name, title, description, link, pubDate, tags, timestamp: new Date(pubDate).getTime() });
                             }
-                        }
-                    } catch (error) {
-                        console.warn(`[Media Pulse] Fallback déclenché pour ${feed.name}`);
+                        });
+                        success = true;
                     }
                 }
-            });
-
-            await Promise.all(fetchPromises);
-            
-            const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-            const now = Date.now();
-            
-            state.articles = state.articles.filter(article => {
-                const isFav = state.favorites.includes(article.id);
-                const isRecent = (now - article.timestamp) <= ONE_WEEK_MS;
-                return isFav || isRecent;
-            });
-
-            state.articles.sort((a, b) => b.timestamp - a.timestamp);
-            saveArticles();
-            
-            DOM.loading.classList.add('hidden');
-            renderArticles();
-        };
-
-        const renderFilters = () => {
-            DOM.labelSecteurs.textContent = state.filters.secteurs.size > 0 ? `Secteurs (${state.filters.secteurs.size} actif${state.filters.secteurs.size > 1 ? 's' : ''})` : 'Filtrer par Secteur...';
-            DOM.labelLeviers.textContent = state.filters.leviers.size > 0 ? `Leviers (${state.filters.leviers.size} actif${state.filters.leviers.size > 1 ? 's' : ''})` : 'Filtrer par Levier...';
-
-            DOM.btnDropSecteurs.classList.toggle('border-indigo-500', state.filters.secteurs.size > 0);
-            DOM.btnDropSecteurs.classList.toggle('text-white', state.filters.secteurs.size > 0);
-            DOM.btnDropLeviers.classList.toggle('border-emerald-500', state.filters.leviers.size > 0);
-            DOM.btnDropLeviers.classList.toggle('text-white', state.filters.leviers.size > 0);
-
-            const allSecteurs = Object.keys(TAG_RULES.secteurs).concat(["Général"]);
-            DOM.filterSecteurs.innerHTML = allSecteurs.map(s => `
-                <button data-type="secteurs" data-val="${s}" class="filter-btn px-3 py-1.5 rounded-md text-sm font-medium border border-slate-600 transition ${state.filters.secteurs.has(s) ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'text-slate-300 hover:bg-slate-700 bg-slate-900'}">
-                    ${s}
-                </button>
-            `).join('');
-
-            const allLeviers = Object.keys(TAG_RULES.leviers);
-            DOM.filterLeviers.innerHTML = allLeviers.map(l => `
-                <button data-type="leviers" data-val="${l}" class="filter-btn px-3 py-1.5 rounded-md text-sm font-medium border border-slate-600 transition ${state.filters.leviers.has(l) ? 'bg-emerald-600 text-white border-emerald-600 shadow-md' : 'text-slate-300 hover:bg-slate-700 bg-slate-900'}">
-                    ${l}
-                </button>
-            `).join('');
-
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation(); 
-                    const type = e.target.dataset.type;
-                    const val = e.target.dataset.val;
-                    state.filters[type].has(val) ? state.filters[type].delete(val) : state.filters[type].add(val);
-                    renderFilters(); 
-                    renderArticles(); 
-                });
-            });
-        };
-
-        const renderArticles = () => {
-            let filtered = state.articles.filter(article => {
-                if (state.filters.showFavoritesOnly && !state.favorites.includes(article.id)) return false;
-                const matchSearch = (article.title + article.description).toLowerCase().includes(state.filters.search.toLowerCase());
-                if (!matchSearch) return false;
-                if (state.filters.secteurs.size > 0 && !article.tags.secteurs.some(s => state.filters.secteurs.has(s))) return false;
-                if (state.filters.leviers.size > 0 && !article.tags.leviers.some(l => state.filters.leviers.has(l))) return false;
-                return true;
-            });
-
-            DOM.grid.innerHTML = '';
-
-            if (filtered.length === 0) {
-                DOM.empty.classList.remove('hidden');
-                return;
-            } else {
-                DOM.empty.classList.add('hidden');
+            } catch (error) {
+                console.warn(`[Media Pulse] Fallback déclenché pour ${feed.name}`);
             }
+        }
+    });
 
-            filtered.forEach(article => {
-                const isFav = state.favorites.includes(article.id);
-                const sectorBadges = article.tags.secteurs.map(s => `<span class="bg-indigo-900/50 text-indigo-300 border border-indigo-700/50 px-2 py-0.5 rounded text-xs">${s}</span>`).join('');
-                const levierBadges = article.tags.leviers.map(l => `<span class="bg-emerald-900/50 text-emerald-300 border border-emerald-700/50 px-2 py-0.5 rounded text-xs">${l}</span>`).join('');
+    await Promise.all(fetchPromises);
 
-                const card = document.createElement('div');
-                card.className = "bg-card border border-slate-700 rounded-xl p-5 hover:border-slate-500 transition shadow-lg flex flex-col h-full group relative";
-                
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">${article.source}</span>
-                        <button class="fav-btn text-lg z-10 transition ${isFav ? 'text-yellow-400' : 'text-slate-600 hover:text-yellow-400'}" data-id="${article.id}">
-                            <i class="${isFav ? 'fa-solid' : 'fa-regular'} fa-star"></i>
-                        </button>
-                    </div>
-                    <a href="${article.link}" target="_blank" class="block flex-grow focus:outline-none z-0">
-                        <h3 class="text-lg font-bold text-white mb-2 leading-tight group-hover:text-primary transition">${article.title}</h3>
-                        <p class="text-sm text-slate-400 line-clamp-3 mb-4">${article.description}</p>
-                    </a>
-                    <div class="mt-auto pt-4 border-t border-slate-700/50 flex flex-col gap-2">
-                        <div class="flex flex-wrap gap-1">${sectorBadges} ${levierBadges}</div>
-                        <div class="text-xs text-slate-500 text-right mt-1">${formatDate(article.pubDate)}</div>
-                    </div>
-                `;
-                DOM.grid.appendChild(card);
-            });
+    /* Rétention : favoris + articles de moins d'une semaine */
+    const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    state.articles = state.articles.filter(article => {
+        const isFav = state.favorites.includes(article.id);
+        const isRecent = (now - article.timestamp) <= ONE_WEEK_MS;
+        return isFav || isRecent;
+    });
 
-            document.querySelectorAll('.fav-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const id = e.currentTarget.dataset.id;
-                    state.favorites = state.favorites.includes(id) ? state.favorites.filter(f => f !== id) : [...state.favorites, id];
-                    saveFavorites();
-                    renderArticles();
-                });
-            });
-        };
+    state.articles.sort((a, b) => b.timestamp - a.timestamp);
+    saveArticles();
 
-        const renderSettingsFeeds = () => {
-            DOM.feedList.innerHTML = state.feeds.map(feed => `
-                <li class="flex justify-between items-center bg-slate-900 border border-slate-700 p-3 rounded-lg">
-                    <div>
-                        <p class="font-medium text-white text-sm">${feed.name}</p>
-                        <p class="text-xs text-slate-500 truncate w-48 sm:w-64">${feed.url}</p>
-                    </div>
-                    <button class="delete-feed-btn text-red-500 hover:text-red-400 p-2" data-id="${feed.id}">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </li>
-            `).join('');
+    DOM.loading.classList.add('hidden');
+    renderArticles();
+};
 
-            document.querySelectorAll('.delete-feed-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    state.feeds = state.feeds.filter(f => f.id !== e.currentTarget.dataset.id);
-                    saveFeeds();
-                    renderSettingsFeeds();
-                });
-            });
-        };
+/* ════════════════════════════════════════════════════════════════
+   RENDU — filtres (pills) & articles (cartes glass)
+   ════════════════════════════════════════════════════════════════ */
+const renderFilters = () => {
+    DOM.labelSecteurs.textContent = state.filters.secteurs.size > 0 ? `Secteurs (${state.filters.secteurs.size} actif${state.filters.secteurs.size > 1 ? 's' : ''})` : 'Filtrer par Secteur…';
+    DOM.labelLeviers.textContent = state.filters.leviers.size > 0 ? `Leviers (${state.filters.leviers.size} actif${state.filters.leviers.size > 1 ? 's' : ''})` : 'Filtrer par Levier…';
 
-        DOM.searchInput.addEventListener('input', (e) => { state.filters.search = e.target.value; renderArticles(); });
-        
-        DOM.btnFavToggle.addEventListener('click', () => {
-            state.filters.showFavoritesOnly = !state.filters.showFavoritesOnly;
-            DOM.btnFavToggle.classList.toggle('text-yellow-400', state.filters.showFavoritesOnly);
-            DOM.btnFavToggle.classList.toggle('text-slate-400', !state.filters.showFavoritesOnly);
+    DOM.btnDropSecteurs.classList.toggle('active-secteurs', state.filters.secteurs.size > 0);
+    DOM.btnDropLeviers.classList.toggle('active-leviers', state.filters.leviers.size > 0);
+
+    const allSecteurs = Object.keys(TAG_RULES.secteurs).concat(["Général"]);
+    DOM.filterSecteurs.innerHTML = allSecteurs.map((s, i) => `
+        <button data-type="secteurs" data-val="${escAttr(s)}" style="--lc:${PILL_COLORS[i % PILL_COLORS.length]}" class="pill filter-btn${state.filters.secteurs.has(s) ? ' active' : ''}">${s}</button>
+    `).join('');
+
+    const allLeviers = Object.keys(TAG_RULES.leviers);
+    DOM.filterLeviers.innerHTML = allLeviers.map((l, i) => `
+        <button data-type="leviers" data-val="${escAttr(l)}" style="--lc:${PILL_COLORS[i % PILL_COLORS.length]}" class="pill filter-btn${state.filters.leviers.has(l) ? ' active' : ''}">${l}</button>
+    `).join('');
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const type = e.currentTarget.dataset.type;
+            const val = e.currentTarget.dataset.val;
+            state.filters[type].has(val) ? state.filters[type].delete(val) : state.filters[type].add(val);
+            renderFilters();
             renderArticles();
         });
+    });
+};
 
-        DOM.btnRefresh.addEventListener('click', () => {
-            const icon = DOM.btnRefresh.querySelector('i');
-            icon.classList.add('fa-spin');
-            setTimeout(() => icon.classList.remove('fa-spin'), 1000);
-            fetchRSS();
+const renderArticles = () => {
+    let filtered = state.articles.filter(article => {
+        if (state.filters.showFavoritesOnly && !state.favorites.includes(article.id)) return false;
+        const matchSearch = (article.title + article.description).toLowerCase().includes(state.filters.search.toLowerCase());
+        if (!matchSearch) return false;
+        if (state.filters.secteurs.size > 0 && !article.tags.secteurs.some(s => state.filters.secteurs.has(s))) return false;
+        if (state.filters.leviers.size > 0 && !article.tags.leviers.some(l => state.filters.leviers.has(l))) return false;
+        return true;
+    });
+
+    DOM.grid.innerHTML = '';
+
+    if (filtered.length === 0) {
+        DOM.empty.classList.remove('hidden');
+        return;
+    } else {
+        DOM.empty.classList.add('hidden');
+    }
+
+    filtered.forEach((article, idx) => {
+        const isFav = state.favorites.includes(article.id);
+        const sectorBadges = article.tags.secteurs.map(s => `<span class="badge secteur">${s}</span>`).join('');
+        const levierBadges = article.tags.leviers.map(l => `<span class="badge levier">${l}</span>`).join('');
+
+        const card = document.createElement('article');
+        card.className = "article-card";
+        card.style.animationDelay = `${Math.min(idx, 12) * 0.03}s`;
+
+        card.innerHTML = `
+            <div class="card-meta">
+                <span class="card-source">${article.source}</span>
+                <button class="fav-btn${isFav ? ' is-fav' : ''}" data-id="${escAttr(article.id)}" aria-label="${isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}">${starSvg(isFav)}</button>
+            </div>
+            <a href="${escAttr(article.link)}" target="_blank" rel="noopener" class="card-body">
+                <h3 class="card-title-link">${article.title}</h3>
+                <p class="card-desc">${article.description}</p>
+            </a>
+            <div class="card-foot">
+                <div class="badge-row">${sectorBadges} ${levierBadges}</div>
+                <div class="card-date">${formatDate(article.pubDate)}</div>
+            </div>
+        `;
+        DOM.grid.appendChild(card);
+    });
+
+    document.querySelectorAll('.fav-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = e.currentTarget.dataset.id;
+            state.favorites = state.favorites.includes(id) ? state.favorites.filter(f => f !== id) : [...state.favorites, id];
+            saveFavorites();
+            renderArticles();
         });
+    });
+};
 
-        DOM.btnSettings.addEventListener('click', () => { renderSettingsFeeds(); DOM.modalSettings.classList.remove('hidden'); });
-        
-        DOM.btnCloseSettings.addEventListener('click', () => { DOM.modalSettings.classList.add('hidden'); fetchRSS(); });
+const renderSettingsFeeds = () => {
+    DOM.feedList.innerHTML = state.feeds.map(feed => `
+        <li class="feed-item">
+            <div>
+                <p class="feed-name">${feed.name}</p>
+                <p class="feed-url">${feed.url}</p>
+            </div>
+            <button class="delete-feed-btn" data-id="${escAttr(feed.id)}" aria-label="Supprimer ${escAttr(feed.name)}">${trashSvg}</button>
+        </li>
+    `).join('');
 
-        DOM.modalSettings.addEventListener('click', (e) => {
-            if(e.target === DOM.modalSettings) { DOM.modalSettings.classList.add('hidden'); fetchRSS(); }
-        });
-
-        DOM.addFeedForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const nameInput = document.getElementById('feed-name');
-            const urlInput = document.getElementById('feed-url');
-            state.feeds.push({ id: generateId(), name: nameInput.value, url: urlInput.value });
+    document.querySelectorAll('.delete-feed-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            state.feeds = state.feeds.filter(f => f.id !== e.currentTarget.dataset.id);
             saveFeeds();
             renderSettingsFeeds();
-            nameInput.value = ''; urlInput.value = '';
         });
+    });
+};
 
-        // --- LOGIQUE DES MENUS DÉROULANTS ---
-        const toggleDropdown = (dropElement, btnIcon) => {
-            const isHidden = dropElement.classList.contains('hidden');
-            DOM.dropSecteurs.classList.add('hidden');
-            DOM.dropLeviers.classList.add('hidden');
-            document.getElementById('icon-secteurs').style.transform = 'rotate(0deg)';
-            document.getElementById('icon-leviers').style.transform = 'rotate(0deg)';
+/* ════════════════════════════════════════════════════════════════
+   ÉVÉNEMENTS — recherche, favoris, refresh, modale, dropdowns, thème
+   ════════════════════════════════════════════════════════════════ */
+DOM.searchInput.addEventListener('input', (e) => { state.filters.search = e.target.value; renderArticles(); });
 
-            if (isHidden) {
-                dropElement.classList.remove('hidden');
-                btnIcon.style.transform = 'rotate(180deg)';
-            }
-        };
+DOM.btnFavToggle.addEventListener('click', () => {
+    state.filters.showFavoritesOnly = !state.filters.showFavoritesOnly;
+    DOM.btnFavToggle.classList.toggle('fav-active', state.filters.showFavoritesOnly);
+    renderArticles();
+});
 
-        DOM.btnDropSecteurs.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleDropdown(DOM.dropSecteurs, document.getElementById('icon-secteurs'));
-        });
+DOM.btnRefresh.addEventListener('click', () => {
+    const icon = document.getElementById('refresh-icon');
+    icon.classList.add('spin');
+    setTimeout(() => icon.classList.remove('spin'), 1000);
+    fetchRSS();
+});
 
-        DOM.btnDropLeviers.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleDropdown(DOM.dropLeviers, document.getElementById('icon-leviers'));
-        });
+DOM.btnSettings.addEventListener('click', () => { renderSettingsFeeds(); DOM.modalSettings.classList.remove('hidden'); });
+DOM.btnCloseSettings.addEventListener('click', () => { DOM.modalSettings.classList.add('hidden'); fetchRSS(); });
+DOM.modalSettings.addEventListener('click', (e) => {
+    if (e.target === DOM.modalSettings) { DOM.modalSettings.classList.add('hidden'); fetchRSS(); }
+});
 
-        document.addEventListener('click', (e) => {
-            if (!DOM.btnDropSecteurs.contains(e.target) && !DOM.dropSecteurs.contains(e.target)) {
-                DOM.dropSecteurs.classList.add('hidden');
-                document.getElementById('icon-secteurs').style.transform = 'rotate(0deg)';
-            }
-            if (!DOM.btnDropLeviers.contains(e.target) && !DOM.dropLeviers.contains(e.target)) {
-                DOM.dropLeviers.classList.add('hidden');
-                document.getElementById('icon-leviers').style.transform = 'rotate(0deg)';
-            }
-        });
+DOM.addFeedForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nameInput = document.getElementById('feed-name');
+    const urlInput = document.getElementById('feed-url');
+    state.feeds.push({ id: generateId(), name: nameInput.value, url: urlInput.value });
+    saveFeeds();
+    renderSettingsFeeds();
+    nameInput.value = ''; urlInput.value = '';
+});
 
-        const init = () => { renderFilters(); fetchRSS(); };
-        init();
+/* Menus déroulants exclusifs */
+const toggleDropdown = (dropElement, btnIcon) => {
+    const isHidden = dropElement.classList.contains('hidden');
+    DOM.dropSecteurs.classList.add('hidden');
+    DOM.dropLeviers.classList.add('hidden');
+    document.getElementById('icon-secteurs').style.transform = 'rotate(0deg)';
+    document.getElementById('icon-leviers').style.transform = 'rotate(0deg)';
+    if (isHidden) {
+        dropElement.classList.remove('hidden');
+        btnIcon.style.transform = 'rotate(180deg)';
+    }
+};
+DOM.btnDropSecteurs.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleDropdown(DOM.dropSecteurs, document.getElementById('icon-secteurs'));
+});
+DOM.btnDropLeviers.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleDropdown(DOM.dropLeviers, document.getElementById('icon-leviers'));
+});
+document.addEventListener('click', (e) => {
+    if (!DOM.btnDropSecteurs.contains(e.target) && !DOM.dropSecteurs.contains(e.target)) {
+        DOM.dropSecteurs.classList.add('hidden');
+        document.getElementById('icon-secteurs').style.transform = 'rotate(0deg)';
+    }
+    if (!DOM.btnDropLeviers.contains(e.target) && !DOM.dropLeviers.contains(e.target)) {
+        DOM.dropLeviers.classList.add('hidden');
+        document.getElementById('icon-leviers').style.transform = 'rotate(0deg)';
+    }
+});
 
-    </script>
+/* Thème jour/nuit persisté (clé : mediaPulse_theme) */
+(function initTheme() {
+    const label = document.getElementById('themeLabel');
+    function apply(isLight) {
+        document.body.classList.toggle('light', isLight);
+        label.textContent = isLight ? 'Mode nuit' : 'Mode jour';
+    }
+    try { apply(localStorage.getItem('mediaPulse_theme') === 'light'); } catch (e) { /* noop */ }
+    document.getElementById('themeToggle').addEventListener('click', () => {
+        const isLight = !document.body.classList.contains('light');
+        apply(isLight);
+        try { localStorage.setItem('mediaPulse_theme', isLight ? 'light' : 'dark'); } catch (e) { /* noop */ }
+    });
+})();
+
+const init = () => { renderFilters(); fetchRSS(); };
+init();
+</script>
 </body>
 </html>
